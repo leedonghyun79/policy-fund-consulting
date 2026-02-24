@@ -15,18 +15,18 @@
 }
 
 :root {
-  --green-vibrant: #29cd6a;
-  --green-deep: #29cd6a;
-  --green-forest: #3e4838;
-  --green-bright: #29cd6a;
-  --green-light: #edf7f3;
+  --blue-primary: #014099;
+  --blue-deep: #014099;
+  --blue-forest: #002a66;
+  --blue-bright: #014099;
+  --blue-light: #f0f5ff;
   --bg-page: #ffffff;
-  --bg-soft: #f4f9f7;
+  --bg-soft: #f8fafc;
   --text-dark: #363636;
   --text-strong: #ffffff;
-  --text-body: #3e4838;
-  --text-muted: #6b7a66;
-  --border: #dce6e1;
+  --text-body: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
   --shadow-sm: 0 4px 6px -1px rgba(54, 54, 54, 0.05);
   --shadow-md: 0 10px 15px -3px rgba(54, 54, 54, 0.1);
   --radius-sm: 8px;
@@ -122,7 +122,7 @@ body {
 }
 
 .header-cta-btn {
-  background: var(--green-vibrant);
+  background: var(--blue-primary);
   color: #fff;
   border: none;
   padding: 8px 16px;
@@ -159,7 +159,7 @@ body {
   height: 100%;
   /* Adjusted gradient: Slightly more transparent to show image better */
   background-image: linear-gradient(rgba(7, 0, 0, 0.75),
-      rgba(62, 72, 56, 0.55)),
+      rgba(0, 42, 102, 0.55)),
     url('https://images.unsplash.com/photo-1517502884422-41eaead166d4?q=80&w=1600&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
@@ -205,7 +205,7 @@ body {
 
 .hero-highlight {
   display: inline-block;
-  background-color: var(--green-deep);
+  background-color: var(--blue-deep);
   padding: 4px 12px;
   margin-top: 8px;
   border-radius: 4px;
@@ -239,7 +239,7 @@ body {
 }
 
 .checkpoint-item .icon {
-  color: var(--green-vibrant);
+  color: var(--blue-primary);
   font-size: 1.1rem;
 }
 
@@ -330,12 +330,12 @@ body {
 
 /* Sections */
 .bg-deep {
-  background: var(--green-deep);
+  background: var(--blue-deep);
   color: #fff;
 }
 
 .bg-forest {
-  background: var(--green-forest);
+  background: var(--blue-forest);
   color: #fff;
 }
 
@@ -386,12 +386,12 @@ body {
 }
 
 .bg-light {
-  background: var(--green-light);
+  background: var(--blue-light);
 }
 
 /* Buttons */
 .btn-vibrant {
-  background: linear-gradient(90deg, var(--green-vibrant), var(--green-bright));
+  background: linear-gradient(90deg, var(--blue-primary), var(--blue-bright));
   color: #fff;
   border: none;
   padding: 18px 40px;
@@ -506,12 +506,12 @@ body {
 }
 
 .definition-box {
-  background: var(--green-light);
+  background: var(--blue-light);
   border-radius: var(--radius-md);
   padding: 40px;
   margin-top: 50px;
   text-align: left;
-  border-left: 6px solid var(--green-vibrant);
+  border-left: 6px solid var(--blue-primary);
   box-shadow: var(--shadow-sm);
 }
 
@@ -620,16 +620,16 @@ body {
 .card-icon {
   width: 50px;
   height: 50px;
-  background: rgba(41, 205, 106, 0.2);
+  background: rgba(1, 64, 153, 0.2);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.6rem;
   margin-bottom: 20px;
-  color: var(--green-vibrant);
+  color: var(--blue-primary);
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(41, 205, 106, 0.3);
+  border: 1px solid rgba(1, 64, 153, 0.3);
 }
 
 /* Removing redundant card text styles since they are now handled by card-content */
@@ -649,7 +649,7 @@ body {
 .tr-head {
   display: grid;
   grid-template-columns: 1fr 1.5fr 1.5fr 1fr;
-  background: var(--green-deep);
+  background: var(--blue-deep);
   color: #fff;
   padding: 14px;
   font-size: 0.85rem;
@@ -674,8 +674,8 @@ body {
 }
 
 .tag-status.ing {
-  background: #e9f7f0;
-  color: var(--green-deep);
+  background: #e6f0ff;
+  color: var(--blue-deep);
 }
 
 .tag-status.done {
@@ -688,7 +688,7 @@ body {
   position: relative;
   padding: 100px 0;
   background-image: linear-gradient(rgba(255, 255, 255, 0.95),
-      rgba(237, 247, 243, 0.9)),
+      rgba(240, 245, 255, 0.9)),
     url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80');
   background-size: cover;
   background-position: center;
@@ -807,10 +807,10 @@ body {
 }
 
 .industry-btn.active {
-  background: var(--green-vibrant);
-  border-color: var(--green-vibrant);
+  background: var(--blue-primary);
+  border-color: var(--blue-primary);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 4px 12px rgba(1, 64, 153, 0.2);
 }
 
 @media (max-width: 600px) {

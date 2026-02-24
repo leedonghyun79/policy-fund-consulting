@@ -138,7 +138,7 @@ export default function Home() {
         <div className="container text-center">
           <p className="brand-stats-headcopy" style={{ fontFamily: "'GmarketSansBold', sans-serif", fontSize: '32px', fontWeight: 700, color: 'var(--text-dark)', marginBottom: '40px', wordBreak: 'keep-all', lineHeight: 1.4 }}>
             정부가 매년 준비하는 수조 원의 정책자금,<br />
-            <span style={{ color: 'var(--green-vibrant)' }}>비티씨는 그 기회를 현실로 만들어 왔습니다.</span>
+            <span style={{ color: 'var(--blue-primary)' }}>비티씨는 그 기회를 현실로 만들어 왔습니다.</span>
           </p>
           <div className="brand-stats-grid">
             <div className="brand-stat-item">
@@ -161,7 +161,7 @@ export default function Home() {
       <section className="section-padding bg-light text-center reveal">
         <div className="container">
           <h2 className="section-title">
-            정보는 넘칩니다. <br />부족한 건 <span style={{ color: "var(--green-vibrant)" }}>'전략'</span>입니다.<br />
+            정보는 넘칩니다. <br />부족한 건 <span style={{ color: "var(--blue-primary)" }}>'전략'</span>입니다.<br />
           </h2>
           <div className="section-subtitle" style={{ maxWidth: 800, margin: '30px auto 0', lineHeight: 1.4, fontSize: '18px', color: 'var(--text-body)' }}>
             "서류 준비만 하다 기회를 놓치진 않으셨나요?"<br />
@@ -173,7 +173,7 @@ export default function Home() {
 
           <div style={{ marginTop: 80, borderTop: '1px solid var(--border)', paddingTop: 60 }}>
             <h3 className="section-title" style={{ fontSize: '2rem', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-              <FiShield style={{ color: 'var(--green-vibrant)' }} /> 잠깐! 여기서 정책자금이란?
+              <FiShield style={{ color: 'var(--blue-primary)' }} /> 잠깐! 여기서 정책자금이란?
             </h3>
             <div className="definition-box" style={{ marginTop: 20 }}>
               <h4>정책자금이란?</h4>
@@ -230,7 +230,7 @@ export default function Home() {
       <section className="section-padding bg-forest text-center reveal">
         <div className="container">
           <h2 className="section-title white" style={{ marginBottom: 30 }}>
-            <span style={{ color: 'var(--green-vibrant)' }}>어떤 고민</span> 때문에<br />
+            <span style={{ color: 'var(--blue-primary)' }}>어떤 고민</span> 때문에<br />
             여기까지 보고 계신걸까요?
           </h2>
 
@@ -300,7 +300,7 @@ export default function Home() {
       <section className="form-box reveal" ref={formRef} id="consult">
         <div className="container text-center">
           <h2 className="section-title">
-            <span style={{ color: "var(--green-vibrant)" }}>성과가 없으면</span><br />
+            <span style={{ color: "var(--blue-primary)" }}>성과가 없으면</span><br />
             비용도 받지 않습니다!
           </h2>
           <p className="section-subtitle" style={{ marginBottom: 40 }}>먼저 편하게 말씀해 주세요. 방향은 저희가 잡아드리겠습니다.</p>
@@ -375,7 +375,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer style={{ padding: "60px 20px", background: "var(--green-light)", borderTop: "1px solid var(--border)", fontSize: "0.85rem", color: "var(--text-muted)" }} className="text-center">
+      <footer style={{ padding: "60px 20px", background: "var(--blue-light)", borderTop: "1px solid var(--border)", fontSize: "0.85rem", color: "var(--text-muted)" }} className="text-center">
         <div className="container">
           <p style={{ fontWeight: 700, color: "var(--text-dark)", marginBottom: 10 }}>주식회사 비티씨</p>
           <p>상호명: 주식회사 비티씨 | 사업자번호: 452-81-03847</p>
