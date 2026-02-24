@@ -403,7 +403,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer style={{ padding: "60px 20px", background: "var(--blue-light)", borderTop: "1px solid var(--border)", fontSize: "0.85rem", color: "var(--text-muted)" }} className="text-center">
+      <footer style={{ marginTop: "-1px", padding: "60px 20px", background: "#eef3ff", fontSize: "0.85rem", color: "var(--text-muted)" }} className="text-center">
         <div className="container">
           <p style={{ fontWeight: 700, color: "var(--text-dark)", marginBottom: 10 }}>주식회사 비티씨</p>
           <p>상호명: 주식회사 비티씨 | 사업자번호: 452-81-03847</p>

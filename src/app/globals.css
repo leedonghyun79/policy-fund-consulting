@@ -651,19 +651,19 @@ body {
 }
 
 .card-startup {
-  background-image: url('../assets/images/policy-fund-item1.jpg');
+  background-image: url('../assets/images/policy-fund-item1.webp');
   background-size: cover;
   background-position: center;
 }
 
 .card-operating {
-  background-image: url('../assets/images/policy-fund-item2.jpg');
+  background-image: url('../assets/images/policy-fund-item2.webp');
   background-size: cover;
   background-position: center;
 }
 
 .card-facility {
-  background-image: url('../assets/images/policy-fund-item3.png');
+  background-image: url('../assets/images/policy-fund-item3.webp');
   background-size: cover;
   background-position: center;
 }
