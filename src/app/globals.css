@@ -1106,6 +1106,20 @@ input[type="number"] {
   display: inline;
 }
 
+.definition-title {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.definition-title svg {
+  color: var(--blue-primary);
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .section-padding {
@@ -1263,5 +1277,12 @@ input[type="number"] {
 
   .definition-box p {
     font-size: 0.95rem;
+  }
+
+  .definition-title {
+    font-size: 20px !important;
+    gap: 6px;
+    white-space: nowrap;
+    letter-spacing: -0.05em;
   }
 }

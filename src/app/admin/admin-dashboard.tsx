@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect, FormEvent } from "react";
+import * as XLSX from "xlsx";
 import { LeadStatus } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import {
@@ -48,11 +49,11 @@ const THEME = {
 };
 
 const statusConfig: Record<LeadStatus, { label: string; color: string; bg: string; dot: string }> = {
-  NEW: { label: "신규 접수", color: "#2563eb", bg: "#eff6ff", dot: "#3b82f6" },
-  QUALIFIED: { label: "검토 대상", color: "#7c3aed", bg: "#f5f3ff", dot: "#8b5cf6" },
-  CONTACTED: { label: "진행 중", color: "#0891b2", bg: "#ecfeff", dot: "#06b6d4" },
-  CONVERTED: { label: "매칭 성공", color: "#059669", bg: "#ecfdf5", dot: "#10b981" },
-  CLOSED: { label: "보류", color: "#4b5563", bg: "#f3f4f6", dot: "#6b7280" },
+  NEW: { label: "진행중", color: "#2563eb", bg: "#eff6ff", dot: "#3b82f6" },
+  QUALIFIED: { label: "진행중", color: "#7c3aed", bg: "#f5f3ff", dot: "#8b5cf6" },
+  CONTACTED: { label: "진행 완료", color: "#059669", bg: "#ecfdf5", dot: "#10b981" },
+  CONVERTED: { label: "진행 완료", color: "#059669", bg: "#ecfdf5", dot: "#10b981" },
+  CLOSED: { label: "진행 불가", color: "#4b5563", bg: "#f3f4f6", dot: "#6b7280" },
   SPAM: { label: "필터링", color: "#dc2626", bg: "#fef2f2", dot: "#ef4444" },
 };
 
@@ -77,6 +78,9 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const [adminForm, setAdminForm] = useState({ name: "", username: "", password: "", role: "MANAGER" });
   const [adminLoading, setAdminLoading] = useState(false);
   const [adminMessage, setAdminMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pendingStatuses, setPendingStatuses] = useState<Record<string, LeadStatus>>({});
+  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
     setIsMounted(true);
@@ -89,12 +93,20 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   }, []);
 
   const filteredLeads = useMemo(() => {
+    setCurrentPage(1); // Reset to first page on search
     if (!searchTerm) return leads;
     return leads.filter(l =>
       l.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       l.phoneRaw.includes(searchTerm)
     );
   }, [leads, searchTerm]);
+
+  const paginatedLeads = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredLeads.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredLeads, currentPage]);
+
+  const totalPages = Math.ceil(filteredLeads.length / ITEMS_PER_PAGE);
 
   const counters = useMemo(() => ({
     total: leads.length,
@@ -118,6 +130,40 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
     } finally {
       setLoadingId(null);
     }
+  };
+
+  const exportToExcel = () => {
+    const dataToExport = filteredLeads.map(lead => ({
+      "ID": lead.id,
+      "사업자명": lead.businessName,
+      "연락처": lead.phoneRaw,
+      "도로명주소": lead.addressRoad,
+      "상세주소": lead.addressDetail || "",
+      "업종": industryLabels[lead.industry] || lead.industry,
+      "희망자금": lead.desiredAmountText || "",
+      "상태": statusConfig[lead.status]?.label || lead.status,
+      "신청일시": new Date(lead.createdAt).toLocaleString('ko-KR')
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Consultations");
+
+    // 컬럼 너비 설정
+    const maxWidths = [
+      { wch: 20 }, // ID
+      { wch: 25 }, // 사업자명
+      { wch: 15 }, // 연락처
+      { wch: 40 }, // 도로명주소
+      { wch: 30 }, // 상세주소
+      { wch: 15 }, // 업종
+      { wch: 15 }, // 희망자금
+      { wch: 12 }, // 상태
+      { wch: 25 }, // 신청일시
+    ];
+    worksheet["!cols"] = maxWidths;
+
+    XLSX.writeFile(workbook, `상담_신청_리스트_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   const logout = async () => {
@@ -214,7 +260,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
             </div>
             <div>
               <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', margin: 0 }}>픽셀커넥트</h2>
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#60a5fa', letterSpacing: '0.15em', opacity: 0.8 }}>운용 엔진 v1.2</span>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: '#60a5fa', letterSpacing: '0.15em', opacity: 0.8 }}>픽셀 엔진 v1.2</span>
             </div>
           </div>
         </div>
@@ -223,7 +269,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
           <p style={{ padding: '0 16px', fontSize: '10px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.2em', marginBottom: '16px' }}>주요 현황</p>
           {[
             { id: 'dashboard', label: '대시보드 통계', icon: HiOutlineViewGrid },
-            { id: 'consultations', label: '상담 리드 관리', icon: HiOutlineClipboardList },
+            { id: 'consultations', label: '상담 현황', icon: HiOutlineClipboardList },
             { id: 'members', label: '접근 권한 제어', icon: HiOutlineUsers },
             { id: 'settings', label: '시스템 설정', icon: HiOutlineCog },
           ].map((item) => (
@@ -318,7 +364,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                 </div>
 
                 {/* 분석 섹션 */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '40px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '40px' }}>
                   <div style={{ backgroundColor: '#fff', padding: '48px', borderRadius: '40px', border: `1px solid ${THEME.border}` }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '48px' }}>
                       <h3 style={{ fontSize: '20px', fontWeight: 900, color: THEME.textMain, margin: 0 }}>신청 프로세스 현황</h3>
@@ -345,14 +391,6 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                       })}
                     </div>
                   </div>
-
-                  <div style={{ background: `linear-gradient(225deg, ${THEME.secondary} 0%, #1e293b 100%)`, padding: '48px', borderRadius: '40px', color: '#fff', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', boxShadow: '0 20px 40px rgba(15, 23, 42, 0.2)' }}>
-                    <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(59, 130, 246, 0.1)', filter: 'blur(60px)' }} />
-                    <HiOutlineDatabase size={40} color={THEME.primary} style={{ marginBottom: '32px' }} />
-                    <h3 style={{ fontSize: '24px', fontWeight: 900, marginBottom: '16px', letterSpacing: '-0.04em' }}>운용 로그 기록</h3>
-                    <p style={{ fontSize: '14px', opacity: 0.6, lineHeight: 1.7, marginBottom: '40px' }}>정책자금 분배 전략 분석을 위한 심층 데이터 및 원천 기록에 접근합니다.</p>
-                    <button style={{ marginTop: 'auto', width: '100%', padding: '20px', borderRadius: '20px', backgroundColor: THEME.primary, border: 'none', color: '#fff', fontWeight: 900, fontSize: '13px', letterSpacing: '0.05em', cursor: 'pointer', transition: 'all 0.2s' }}>리포트 터미널 접근</button>
-                  </div>
                 </div>
               </div>
             )}
@@ -372,58 +410,83 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                     />
                   </div>
                   <button style={{ height: '64px', padding: '0 32px', backgroundColor: '#fff', border: `1px solid ${THEME.border}`, borderRadius: '20px', fontWeight: 800, color: THEME.textMain, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}><HiOutlineFilter size={20} /> 필터 설정</button>
-                  <button style={{ height: '64px', padding: '0 32px', backgroundColor: THEME.secondary, color: '#fff', border: 'none', borderRadius: '20px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', letterSpacing: '0.05em' }}><HiOutlineDownload size={20} /> 데이터 추출</button>
+                  <button style={{ height: '64px', padding: '0 32px', backgroundColor: THEME.secondary, color: '#fff', border: 'none', borderRadius: '20px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', letterSpacing: '0.05em' }} onClick={exportToExcel}><HiOutlineDownload size={20} /> 데이터 내보내기</button>
                 </div>
 
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#fff', borderBottom: `2px solid ${THEME.border}` }}>
-                        {['사업자 정보', '연락처 / 위치', '주요 업종 / 자원', '상태 노드', '내부 관리'].map((h, i) => (
+                        {['사업자명', '연락처', '주소', '업종', '상담 상태'].map((h, i) => (
                           <th key={i} style={{ padding: '24px 40px', fontSize: '11px', fontWeight: 950, color: THEME.textMuted, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody style={{ verticalAlign: 'middle' }}>
-                      {filteredLeads.map((row) => {
-                        const st = statusConfig[row.status] || statusConfig.NEW;
+                      {paginatedLeads.map((row) => {
+                        const currentStatus = pendingStatuses[row.id] || row.status;
+                        const st = statusConfig[currentStatus] || statusConfig.NEW;
+                        const isChanged = pendingStatuses[row.id] && pendingStatuses[row.id] !== row.status;
+
                         return (
                           <tr key={row.id} style={{ borderBottom: `1px solid ${THEME.border}`, transition: 'background-color 0.2s' }}>
                             <td style={{ padding: '32px 40px' }}>
                               <p style={{ fontSize: '16px', fontWeight: 900, color: THEME.textMain, margin: 0, letterSpacing: '-0.02em' }}>{row.businessName}</p>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px' }}>
-                                <span style={{ fontSize: '11px', fontWeight: 800, color: THEME.textMuted }}>고유 ID: {row.id.substring(0, 8)}</span>
-                                <div style={{ width: '3px', height: '3px', borderRadius: '50%', backgroundColor: '#cbd5e1' }} />
-                                <span style={{ fontSize: '11px', fontWeight: 800, color: THEME.textMuted }}>{new Date(row.createdAt).toLocaleDateString()}</span>
-                              </div>
                             </td>
                             <td style={{ padding: '32px 40px' }}>
                               <p style={{ fontSize: '14px', fontWeight: 800, color: THEME.textMain, margin: 0 }}>{row.phoneRaw}</p>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
-                                <span style={{ fontSize: '11px', fontWeight: 700, color: THEME.textMuted, whiteSpace: 'nowrap' }}>{row.addressRoad}</span>
+                            </td>
+                            <td style={{ padding: '32px 40px' }}>
+                              <p style={{ fontSize: '13px', fontWeight: 700, color: THEME.textMuted, margin: 0, wordBreak: 'keep-all' }}>{row.addressRoad}</p>
+                            </td>
+                            <td style={{ padding: '32px 40px' }}>
+                              <p style={{ fontSize: '13px', fontWeight: 800, color: THEME.textMuted, margin: 0 }}>{industryLabels[row.industry] || row.industry}</p>
+                            </td>
+                            <td style={{ padding: '32px 40px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <select
+                                  value={currentStatus}
+                                  onChange={(e) => setPendingStatuses(prev => ({ ...prev, [row.id]: e.target.value as LeadStatus }))}
+                                  disabled={loadingId === row.id}
+                                  style={{
+                                    width: '120px',
+                                    height: '40px',
+                                    padding: '0 12px',
+                                    borderRadius: '12px',
+                                    backgroundColor: st.bg,
+                                    border: `1px solid ${st.color}44`,
+                                    fontSize: '12px',
+                                    fontWeight: 800,
+                                    color: st.color,
+                                    cursor: 'pointer',
+                                    outline: 'none'
+                                  }}
+                                >
+                                  {Object.entries(statusConfig).map(([k, v]) => (
+                                    <option key={k} value={k}>{v.label}</option>
+                                  ))}
+                                </select>
+
+                                {isChanged && (
+                                  <button
+                                    onClick={() => updateStatus(row.id, pendingStatuses[row.id])}
+                                    disabled={loadingId === row.id}
+                                    style={{
+                                      padding: '8px 16px',
+                                      borderRadius: '10px',
+                                      backgroundColor: THEME.primary,
+                                      color: '#fff',
+                                      border: 'none',
+                                      fontSize: '11px',
+                                      fontWeight: 900,
+                                      cursor: 'pointer',
+                                      boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+                                    }}
+                                  >
+                                    {loadingId === row.id ? "저장 중..." : "저장"}
+                                  </button>
+                                )}
                               </div>
-                            </td>
-                            <td style={{ padding: '32px 40px' }}>
-                              <div style={{ padding: '4px 10px', backgroundColor: '#f0f9ff', color: THEME.primary, borderRadius: '8px', fontSize: '12px', fontWeight: 900, display: 'inline-block', marginBottom: '6px' }}>{row.desiredAmountText || '검토중'}</div>
-                              <p style={{ fontSize: '11px', fontWeight: 800, color: THEME.textMuted, margin: 0 }}>{industryLabels[row.industry] || row.industry}</p>
-                            </td>
-                            <td style={{ padding: '32px 40px' }}>
-                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '10px 18px', borderRadius: '14px', backgroundColor: st.bg, color: st.color, fontSize: '12px', fontWeight: 900, letterSpacing: '-0.01em' }}>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: st.dot }} />
-                                {st.label}
-                              </div>
-                            </td>
-                            <td style={{ padding: '32px 40px' }}>
-                              <select
-                                value={row.status}
-                                onChange={(e) => updateStatus(row.id, e.target.value as LeadStatus)}
-                                disabled={loadingId === row.id}
-                                style={{ width: '130px', height: '44px', padding: '0 16px', borderRadius: '14px', backgroundColor: '#f8fafc', border: `1px solid ${THEME.border}`, fontSize: '12px', fontWeight: 800, color: THEME.textMain, cursor: 'pointer', outline: 'none' }}
-                              >
-                                {Object.entries(statusConfig).map(([k, v]) => (
-                                  <option key={k} value={k}>{v.label}</option>
-                                ))}
-                              </select>
                             </td>
                           </tr>
                         )
@@ -433,10 +496,22 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                 </div>
 
                 <div style={{ padding: '32px 40px', backgroundColor: '#fafbfd', borderTop: `1px solid ${THEME.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <p style={{ fontSize: '12px', fontWeight: 800, color: THEME.textMuted, letterSpacing: '0.05em' }}>총 <span style={{ color: THEME.textMain }}>{leads.length}</span>개 중 <span style={{ color: THEME.textMain }}>{filteredLeads.length}</span>개의 데이터 표시 중</p>
+                  <p style={{ fontSize: '12px', fontWeight: 800, color: THEME.textMuted, letterSpacing: '0.05em' }}>페이지 <span style={{ color: THEME.textMain }}>{currentPage}</span> / {totalPages || 1} (총 {filteredLeads.length}개)</p>
                   <div style={{ display: 'flex', gap: '12px' }}>
-                    <button style={{ padding: '10px 20px', border: `1px solid ${THEME.border}`, background: '#fff', borderRadius: '12px', fontSize: '11px', fontWeight: 900, color: '#cbd5e1', cursor: 'pointer' }}>이전</button>
-                    <button style={{ padding: '10px 20px', border: `1px solid ${THEME.border}`, background: '#fff', borderRadius: '12px', fontSize: '11px', fontWeight: 900, color: THEME.textMain, cursor: 'pointer' }}>다음</button>
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      style={{ padding: '10px 20px', border: `1px solid ${THEME.border}`, background: currentPage === 1 ? '#f8fafc' : '#fff', borderRadius: '12px', fontSize: '11px', fontWeight: 900, color: currentPage === 1 ? '#cbd5e1' : THEME.textMain, cursor: currentPage === 1 ? 'default' : 'pointer' }}
+                    >
+                      이전
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage >= totalPages || totalPages === 0}
+                      style={{ padding: '10px 20px', border: `1px solid ${THEME.border}`, background: (currentPage >= totalPages || totalPages === 0) ? '#f8fafc' : '#fff', borderRadius: '12px', fontSize: '11px', fontWeight: 900, color: (currentPage >= totalPages || totalPages === 0) ? '#cbd5e1' : THEME.textMain, cursor: (currentPage >= totalPages || totalPages === 0) ? 'default' : 'pointer' }}
+                    >
+                      다음
+                    </button>
                   </div>
                 </div>
               </div>

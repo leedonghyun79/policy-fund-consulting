@@ -9,11 +9,11 @@ import {
 import DaumPostcodeEmbed from 'react-daum-postcode';
 
 const STATUS_DATA = [
-  { name: "김재*", biz: "법인사업자", product: "운전·시설자금", tag: "상담 진행중" },
-  { name: "이정*", biz: "법인사업자", product: "고용지원금", tag: "상담 진행중" },
-  { name: "강하*", biz: "개인사업자", product: "고용지원금", tag: "신청 완료" },
-  { name: "장우*", biz: "법인사업자", product: "운전·시설자금", tag: "상담 진행중" },
-  { name: "나정*", biz: "개인사업자", product: "고용지원금", tag: "신청 완료" },
+  { name: "김재*", biz: "법인사업자", product: "운전·시설자금", tag: "진행 완료" },
+  { name: "이정*", biz: "법인사업자", product: "고용지원금", tag: "진행 완료" },
+  { name: "강하*", biz: "개인사업자", product: "고용지원금", tag: "진행중" },
+  { name: "장우*", biz: "법인사업자", product: "운전·시설자금", tag: "진행 완료" },
+  { name: "나정*", biz: "개인사업자", product: "고용지원금", tag: "진행중" },
 ];
 
 const REGIONS = [
@@ -228,15 +228,15 @@ export default function Home() {
           </div>
 
           <div style={{ marginTop: 80, paddingTop: 60 }}>
-            <h3 className="section-title" style={{ fontSize: '2rem', fontWeight: 500, marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-              <FiShield style={{ color: 'var(--blue-primary)' }} /> 잠깐! 여기서 정책자금이란?
+            <h3 className="section-title definition-title">
+              <FiShield /> 잠깐! 여기서 정책자금이란?
             </h3>
             <div className="definition-box" style={{ marginTop: 20 }}>
               <h4>정책자금이란?</h4>
-              <p>
-                정책자금은 정부 및 공공기관이 중소기업과 소상공인의<br />
-                경영 안정과 성장을 위해 지원하는 저금리 자금입니다.<br />
-                시중 금융권 대비 낮은 금리와 유연한 상환 조건이 적용되며,<br />
+              <p style={{ wordBreak: 'keep-all' }}>
+                정책자금은 정부 및 공공기관이 중소기업과 소상공인의
+                경영 안정과 성장을 위해 지원하는 저금리 자금입니다.
+                시중 금융권 대비 낮은 금리와 유연한 상환 조건이 적용되며,
                 업종·규모·사업 단계에 따라 맞춤 신청이 가능합니다.
               </p>
             </div>

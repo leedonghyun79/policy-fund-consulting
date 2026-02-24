@@ -137,7 +137,7 @@ export async function GET() {
         name: maskedName,
         biz: "사업자", // Or we can use simplified biz type
         product: industryMap[l.industry] || "자금컨설팅",
-        tag: l.status === "NEW" ? "신청 완료" : "상담 진행중",
+        tag: l.status === "NEW" ? "진행중" : "진행 완료",
       };
     });
 
