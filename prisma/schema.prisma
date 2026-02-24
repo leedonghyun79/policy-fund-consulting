@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  CLOSED
+  SPAM
+}
+
+enum IndustryType {
+  MANUFACTURING
+  RETAIL
+  SERVICE
+  FOOD
+  OTHER
+}
+
+model ConsultationLead {
+  id                String       @id @default(cuid())
+  businessName      String
+  phonePrefix       String       @default("010")
+  phoneMiddle       String       @db.VarChar(4)
+  phoneLast         String       @db.VarChar(4)
+  phoneRaw          String
+  addressRoad       String
+  addressDetail     String?
+  industry          IndustryType
+  desiredAmountText String?
+  consentAgreedAt   DateTime
+  consentVersion    String       @default("v1")
+  status            LeadStatus   @default(NEW)
+  source            String       @default("netlify-landing")
+  referrer          String?
+  utmSource         String?
+  utmMedium         String?
+  utmCampaign       String?
+  utmTerm           String?
+  utmContent        String?
+  ipAddress         String?
+  userAgent         String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  contactedAt       DateTime?
+  events            ConsultationEvent[]
+
+  @@index([createdAt])
+  @@index([status, createdAt])
+  @@index([phoneRaw])
+}
+
+model ConsultationEvent {
+  id        String           @id @default(cuid())
+  leadId    String
+  type      String
+  memo      String?
+  createdAt DateTime         @default(now())
+  lead      ConsultationLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt])
+}

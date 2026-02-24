@@ -172,7 +172,7 @@ export default function Home() {
           </div>
 
           <div style={{ marginTop: 80, paddingTop: 60 }}>
-            <h3 className="section-title" style={{ fontSize: '2rem', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+            <h3 className="section-title" style={{ fontSize: '2rem', fontWeight: 500, marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
               <FiShield style={{ color: 'var(--blue-primary)' }} /> 잠깐! 여기서 정책자금이란?
             </h3>
             <div className="definition-box" style={{ marginTop: 20 }}>
@@ -272,7 +272,7 @@ export default function Home() {
       {/* Section 4: Live Status */}
       <section className="rolling-section text-center reveal">
         <div className="container">
-          <h3 className="section-title" style={{ fontSize: "2rem" }}>실시간 상담 신청 현황</h3>
+          <h3 className="section-title" style={{ fontSize: "48px" }}>실시간 상담 신청 현황</h3>
           <div className="table-wrapper text-center">
             <div className="tr-head">
               <div>성함</div>
@@ -280,7 +280,7 @@ export default function Home() {
               <div>신청항목</div>
               <div>상태</div>
             </div>
-            <div style={{ height: 350, overflow: "hidden" }}>
+            <div className="rolling-viewport">
               <div className="rolling-list">
                 {[...STATUS_DATA, ...STATUS_DATA, ...STATUS_DATA].map((row, i) => (
                   <div className="tr-row" key={i}>
