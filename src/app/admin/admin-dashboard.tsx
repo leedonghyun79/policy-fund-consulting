@@ -138,8 +138,8 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   };
 
   const exportToExcel = () => {
-    const dataToExport = filteredLeads.map(lead => ({
-      "ID": lead.id,
+    const dataToExport = filteredLeads.map((lead, index) => ({
+      "No.": filteredLeads.length - index,
       "사업자명": lead.businessName,
       "연락처": lead.phoneRaw,
       "도로명주소": lead.addressRoad,
@@ -163,7 +163,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
 
     // 컬럼 너비 설정
     const maxWidths = [
-      { wch: 20 }, // ID
+      { wch: 8 }, // No.
       { wch: 25 }, // 사업자명
       { wch: 15 }, // 연락처
       { wch: 40 }, // 도로명주소
