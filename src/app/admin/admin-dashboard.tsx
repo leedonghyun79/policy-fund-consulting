@@ -86,7 +86,6 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const [pendingStatuses, setPendingStatuses] = useState<Record<string, LeadStatus>>({});
   const [collapsed, setCollapsed] = useState(false);
   const [showNotiDropdown, setShowNotiDropdown] = useState(false);
-  const [lastSeenLeadId, setLastSeenLeadId] = useState<string | null>(null);
   const [readNotiIds, setReadNotiIds] = useState<string[]>([]);
   const ITEMS_PER_PAGE = 10;
 
@@ -118,8 +117,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
 
   const newLeads = useMemo(() => leads.filter(l => l.status === "NEW"), [leads]);
   const unreadLeadsCount = useMemo(() => newLeads.filter(l => !readNotiIds.includes(l.id)).length, [newLeads, readNotiIds]);
-  const latestNewId = newLeads.length > 0 ? newLeads[0].id : null;
-  const hasUnread = latestNewId !== null && latestNewId !== lastSeenLeadId && unreadLeadsCount > 0;
+  const hasUnread = unreadLeadsCount > 0;
 
   const counters = useMemo(() => ({
     total: leads.length,
@@ -452,12 +450,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
             </div>
             <div style={{ position: 'relative' }}>
               <button
-                onClick={() => {
-                  setShowNotiDropdown(!showNotiDropdown);
-                  if (!showNotiDropdown && latestNewId) {
-                    setLastSeenLeadId(latestNewId);
-                  }
-                }}
+                onClick={() => setShowNotiDropdown(!showNotiDropdown)}
                 style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: THEME.textMuted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 <HiOutlineBell size={26} />
