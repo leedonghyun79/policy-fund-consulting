@@ -42,7 +42,10 @@ export default async function AdminPage() {
           <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', marginBottom: '16px' }}>데이터를 불러올 수 없습니다</h1>
           <p style={{ color: '#64748b', fontSize: '14px', lineHeight: 1.6, marginBottom: '32px' }}>
             데이터베이스 연결에 문제가 발생했습니다.<br />
-            환경 변수(DATABASE_URL) 설정이나 DB 상태를 확인해 주세요.
+            환경 변수(DATABASE_URL) 설정이나 DB 상태를 확인해 주세요.<br />
+            <small style={{ display: 'block', marginTop: '10px', fontSize: '10px', color: '#94a3b8' }}>
+              Error: {error instanceof Error ? error.message : "알 수 없는 요인"}
+            </small>
           </p>
           <a
             href="/admin"
