@@ -211,6 +211,16 @@ body {
   border-radius: 4px;
 }
 
+.hero-point {
+  color: #fff;
+  background: #2563eb;
+  padding: 2px 12px;
+  border-radius: 4px;
+  display: inline-block;
+  transform: skewX(-10deg);
+  margin: 0 4px;
+}
+
 .hero-desc {
   font-size: 18px;
   line-height: 1.4;

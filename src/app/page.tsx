@@ -101,7 +101,7 @@ export default function Home() {
         <div className="container" style={{ maxWidth: 1200 }}>
           <div className="hero-inner-content reveal">
             <h1 className="hero-main-title">
-              정책자금, 제대로 알고 <br /> 제대로 받으세요.
+              정책자금, <span className="hero-point">제대로</span> 알고 <br /> <span className="hero-point">제대로</span> 받으세요.
             </h1>
             <p className="hero-desc">
               중소기업·소상공인을 위한 정부 정책자금<br />
