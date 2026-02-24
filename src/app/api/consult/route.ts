@@ -1,6 +1,7 @@
 import { IndustryType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/src/lib/prisma";
+import { sendConsultationEmail } from "@/src/lib/mail";
 
 type ConsultPayload = {
   businessName?: string;
@@ -85,9 +86,64 @@ export async function POST(req: NextRequest) {
       select: { id: true, createdAt: true },
     });
 
+    // Send Notification Email
+    await sendConsultationEmail({
+      businessName: body.businessName.trim(),
+      phoneRaw,
+      addressRoad: body.addressRoad.trim(),
+      addressDetail: body.addressDetail?.trim(),
+      industry: body.industry,
+      desiredAmountText: body.desiredAmountText?.trim(),
+    });
+
     return NextResponse.json({ ok: true, lead }, { status: 201 });
   } catch (error) {
     console.error("Consultation create error:", error);
     return NextResponse.json({ message: "Internal server error." }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  try {
+    const leads = await prisma.consultationLead.findMany({
+      take: 10,
+      orderBy: { createdAt: "desc" },
+      select: {
+        businessName: true,
+        industry: true,
+        status: true,
+      },
+    });
+
+    const industryMap: Record<string, string> = {
+      MANUFACTURING: "제조업",
+      RETAIL: "도·소매업",
+      SERVICE: "서비스업",
+      FOOD: "요식업",
+      OTHER: "기타",
+    };
+
+    const formattedLeads = leads.map((l) => {
+      // Mask name (e.g., "홍길동" -> "홍*동" or "가나다라" -> "가**라")
+      const name = l.businessName.trim();
+      let maskedName = name;
+      if (name.length > 2) {
+        maskedName = name[0] + "*".repeat(name.length - 2) + name[name.length - 1];
+      } else if (name.length === 2) {
+        maskedName = name[0] + "*";
+      }
+
+      return {
+        name: maskedName,
+        biz: "사업자", // Or we can use simplified biz type
+        product: industryMap[l.industry] || "자금컨설팅",
+        tag: l.status === "NEW" ? "신청 완료" : "상담 진행중",
+      };
+    });
+
+    return NextResponse.json({ ok: true, leads: formattedLeads });
+  } catch (error) {
+    console.error("Fetch recent consults error:", error);
+    return NextResponse.json({ message: "Failed to fetch data" }, { status: 500 });
   }
 }

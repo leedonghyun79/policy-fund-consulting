@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState, useMemo } from "react";
 import {
   FiShield,
   FiCheck,
@@ -40,7 +40,31 @@ export default function Home() {
   const [showPostcode, setShowPostcode] = useState(false);
   const [activeTargetIndex, setActiveTargetIndex] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const [realLeads, setRealLeads] = useState<any[]>([]);
   const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchRecentLeads = async () => {
+      try {
+        const res = await fetch("/api/consult");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok && Array.isArray(data.leads)) {
+            setRealLeads(data.leads);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch leads", err);
+      }
+    };
+    fetchRecentLeads();
+  }, []);
+
+  const mergedLeads = useMemo(() => {
+    // Combine real leads with dummy data, keep total around a healthy number for the loop
+    const combined = [...realLeads, ...STATUS_DATA];
+    return combined.slice(0, 15); // Show top 15 (max 10 real + default dummy)
+  }, [realLeads]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -314,7 +338,7 @@ export default function Home() {
             </div>
             <div className="rolling-viewport">
               <div className="rolling-list">
-                {[...STATUS_DATA, ...STATUS_DATA, ...STATUS_DATA].map((row, i) => (
+                {[...mergedLeads, ...mergedLeads, ...mergedLeads].map((row, i) => (
                   <div className="tr-row" key={i}>
                     <div>{row.name}</div>
                     <div>{row.biz}</div>
@@ -451,7 +475,7 @@ export default function Home() {
           <div className="modal-content" style={{ maxWidth: 320 }}>
             <div className="modal-icon"><FiCheckCircle /></div>
             <h3>신청 완료!</h3>
-            <p>24시간 이내에 전문가가 연락드립니다.</p>
+            <p style={{ fontSize: 15 }}>24시간 이내에 전문가가 연락드립니다.</p>
             <button className="header-cta-btn" style={{ width: "100%", marginTop: 20 }} onClick={() => setShowModal(false)}>
               닫기
             </button>
