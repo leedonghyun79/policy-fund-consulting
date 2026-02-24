@@ -6,7 +6,6 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 enum LeadStatus {
@@ -52,11 +51,13 @@ model ConsultationLead {
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
   contactedAt       DateTime?
+  deletedAt         DateTime?
   events            ConsultationEvent[]
 
   @@index([createdAt])
   @@index([status, createdAt])
   @@index([phoneRaw])
+  @@index([deletedAt])
 }
 
 model ConsultationEvent {

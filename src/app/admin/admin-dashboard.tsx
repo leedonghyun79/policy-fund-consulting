@@ -24,7 +24,8 @@ import {
   HiOutlineHome,
   HiOutlineMenuAlt2,
   HiOutlineChevronDoubleLeft,
-  HiOutlineChevronDoubleRight
+  HiOutlineChevronDoubleRight,
+  HiOutlineTrash
 } from "react-icons/hi";
 
 type LeadRow = {
@@ -54,11 +55,11 @@ const THEME = {
 
 const statusConfig: Record<LeadStatus, { label: string; color: string; bg: string; dot: string }> = {
   NEW: { label: "진행중", color: "#2563eb", bg: "#eff6ff", dot: "#3b82f6" },
-  QUALIFIED: { label: "진행중", color: "#7c3aed", bg: "#f5f3ff", dot: "#8b5cf6" },
   CONTACTED: { label: "진행 완료", color: "#059669", bg: "#ecfdf5", dot: "#10b981" },
-  CONVERTED: { label: "진행 완료", color: "#059669", bg: "#ecfdf5", dot: "#10b981" },
   CLOSED: { label: "진행 불가", color: "#4b5563", bg: "#f3f4f6", dot: "#6b7280" },
-  SPAM: { label: "필터링", color: "#dc2626", bg: "#fef2f2", dot: "#ef4444" },
+  QUALIFIED: { label: "진행중", color: "#7c3aed", bg: "#f5f3ff", dot: "#8b5cf6" },
+  CONVERTED: { label: "진행 완료", color: "#059669", bg: "#ecfdf5", dot: "#10b981" },
+  SPAM: { label: "진행 불가", color: "#dc2626", bg: "#fef2f2", dot: "#ef4444" },
 };
 
 const industryLabels: Record<string, string> = {
@@ -87,6 +88,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const [collapsed, setCollapsed] = useState(false);
   const [showNotiDropdown, setShowNotiDropdown] = useState(false);
   const [readNotiIds, setReadNotiIds] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
@@ -100,13 +102,30 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   }, []);
 
   const filteredLeads = useMemo(() => {
-    setCurrentPage(1); // Reset to first page on search
-    if (!searchTerm) return leads;
-    return leads.filter(l =>
-      l.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      l.phoneRaw.includes(searchTerm)
-    );
-  }, [leads, searchTerm]);
+    let result = leads;
+
+    if (searchTerm) {
+      result = result.filter(l => {
+        const industryLabel = industryLabels[l.industry] || l.industry;
+        return (
+          l.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          l.addressRoad.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          industryLabel.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      });
+    }
+
+    if (statusFilter !== "ALL") {
+      result = result.filter(l => statusConfig[l.status]?.label === statusFilter);
+    }
+
+    return result;
+  }, [leads, searchTerm, statusFilter]);
+
+  // Reset to first page when search or filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
   const paginatedLeads = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -122,8 +141,8 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const counters = useMemo(() => ({
     total: leads.length,
     today: leads.filter(l => new Date(l.createdAt).toDateString() === new Date().toDateString()).length,
-    pending: leads.filter(l => l.status === "NEW").length,
-    completed: leads.filter(l => l.status === "CONTACTED" || l.status === "CONVERTED").length,
+    inProgress: leads.filter(l => statusConfig[l.status]?.label === "진행중").length,
+    completed: leads.filter(l => statusConfig[l.status]?.label === "진행 완료").length,
   }), [leads]);
 
   const updateStatus = async (id: string, status: LeadStatus) => {
@@ -136,8 +155,32 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
       });
       if (!res.ok) throw new Error("Status update failed");
       setLeads((prev) => prev.map((row) => row.id === id ? { ...row, status } : row));
+      setPendingStatuses(prev => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
     } catch (error) {
       alert("변경에 실패했습니다.");
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const deleteLead = async (id: string) => {
+    if (!confirm("정말 삭제하시겠습니까? (데이터는 1년간 보관 후 영구 삭제됩니다.)")) return;
+
+    setLoadingId(id);
+    try {
+      const res = await fetch(`/api/admin/consultations/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Delete failed");
+
+      // Update local state to remove the deleted lead
+      setLeads((prev) => prev.filter((row) => row.id !== id));
+    } catch (error) {
+      alert("삭제에 실패했습니다.");
     } finally {
       setLoadingId(null);
     }
@@ -153,17 +196,28 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
       "업종": industryLabels[lead.industry] || lead.industry,
       "희망자금": (() => {
         if (!lead.desiredAmountText) return "";
-        const numeric = lead.desiredAmountText.replace(/,/g, "");
+        const numeric = lead.desiredAmountText.replace(/,/g, "").replace(/원/g, "").trim();
         if (/^\d+$/.test(numeric)) {
-          return Number(numeric).toLocaleString() + "원";
+          return Number(numeric);
         }
-        return lead.desiredAmountText.endsWith("원") ? lead.desiredAmountText : lead.desiredAmountText + "원";
+        return lead.desiredAmountText;
       })(),
       "상태": statusConfig[lead.status]?.label || lead.status,
       "신청일시": new Date(lead.createdAt).toLocaleString('ko-KR')
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+    // 희망자금 컬럼(6번 인덱스 - G열)에 숫자 포맷 및 우측 정렬 적용
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+    for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+      const cellAddress = XLSX.utils.encode_cell({ r: R, c: 6 });
+      const cell = worksheet[cellAddress];
+      if (cell && typeof cell.v === 'number') {
+        cell.z = '#,##0"원"'; // 천 단위 콤마 + '원' 붙이기 (엑셀 숫자 서식)
+      }
+    }
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Consultations");
 
@@ -322,7 +376,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
             {!collapsed && (
               <div style={{ whiteSpace: 'nowrap' }}>
                 <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', margin: 0 }}>비티씨</h2>
-                <span style={{ fontSize: '10px', fontWeight: 700, color: '#60a5fa', letterSpacing: '0.15em', opacity: 0.8 }}>관리 엔진 v1.2</span>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#60a5fa', letterSpacing: '0.15em', opacity: 0.8 }}>PIXEL ADMIN</span>
               </div>
             )}
           </div>
@@ -545,18 +599,17 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
               <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
 
                 {/* 지표 카드 */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '40px', marginBottom: '64px' }}>
                   {[
                     { label: '누적 접수 건', val: counters.total, icon: HiOutlineDatabase, color: '#3b82f6', bg: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)' },
                     { label: "금일 실시간", val: counters.today, icon: HiOutlineLightningBolt, color: '#f59e0b', bg: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' },
-                    { label: '검토 대기중', val: counters.pending, icon: HiOutlineFilter, color: '#8b5cf6', bg: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)' },
-                    { label: '상담 완료 건', val: counters.completed, icon: HiOutlineTrendingUp, color: '#10b981', bg: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)' }
+                    { label: '상담 진행중', val: counters.inProgress, icon: HiOutlineFilter, color: '#8b5cf6', bg: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)' },
+                    { label: '진행 완료 건', val: counters.completed, icon: HiOutlineTrendingUp, color: '#10b981', bg: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)' }
                   ].map((item, i) => (
                     <div key={i} style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '32px', border: `1px solid ${THEME.border}`, boxShadow: '0 4px 20px rgba(0,0,0,0.02)', position: 'relative', overflow: 'hidden' }}>
                       <div style={{ width: '56px', height: '56px', borderRadius: '18px', background: item.bg, color: item.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '32px' }}>
                         <item.icon size={28} />
                       </div>
-                      <p style={{ fontSize: '11px', fontWeight: 950, color: THEME.textMuted, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px' }}>{item.label}</p>
                       <h2 style={{ fontSize: '42px', fontWeight: 900, color: THEME.textMain, letterSpacing: '-0.06em', margin: 0 }}>{item.val}</h2>
                     </div>
                   ))}
@@ -571,9 +624,9 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                       {[
-                        { label: '신규 유입 스트림', val: counters.pending, color: '#3b82f6' },
-                        { label: '조건 충족 매칭', val: counters.completed, color: '#10b981' },
-                        { label: '내부 관리 프로세스', val: counters.total - counters.pending - counters.completed, color: '#94a3b8' }
+                        { label: '신규 진행 유입', val: counters.inProgress, color: '#3b82f6' },
+                        { label: '성공적 프로세스 완료', val: counters.completed, color: '#10b981' },
+                        { label: '기타/미충족 내부 관리', val: counters.total - counters.inProgress - counters.completed, color: '#94a3b8' }
                       ].map((p, i) => {
                         const pct = Math.round((p.val / (counters.total || 1)) * 100);
                         return (
@@ -602,13 +655,33 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                     <HiOutlineSearch size={20} color="#94a3b8" style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)' }} />
                     <input
                       type="text"
-                      placeholder="사업자명, 연락처, 도로명 주소로 검색..."
+                      placeholder="사업자명, 주소, 업종으로 검색..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       style={{ width: '100%', height: '64px', paddingLeft: '64px', paddingRight: '24px', backgroundColor: '#fff', border: `1px solid ${THEME.border}`, borderRadius: '20px', fontSize: '15px', fontWeight: 700, color: THEME.textMain, outline: 'none', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}
                     />
                   </div>
-                  <button style={{ height: '64px', padding: '0 32px', backgroundColor: '#fff', border: `1px solid ${THEME.border}`, borderRadius: '20px', fontWeight: 800, color: THEME.textMain, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}><HiOutlineFilter size={20} /> 필터 설정</button>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    style={{
+                      height: '64px',
+                      padding: '0 24px',
+                      backgroundColor: '#fff',
+                      border: `1px solid ${THEME.border}`,
+                      borderRadius: '20px',
+                      fontWeight: 800,
+                      color: THEME.textMain,
+                      cursor: 'pointer',
+                      outline: 'none',
+                      minWidth: '150px'
+                    }}
+                  >
+                    <option value="ALL">전체 상태</option>
+                    <option value="진행중">진행중</option>
+                    <option value="진행 완료">진행 완료</option>
+                    <option value="진행 불가">진행 불가</option>
+                  </select>
                   <button style={{ height: '64px', padding: '0 32px', backgroundColor: THEME.secondary, color: '#fff', border: 'none', borderRadius: '20px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', letterSpacing: '0.05em' }} onClick={exportToExcel}><HiOutlineDownload size={20} /> 데이터 내보내기</button>
                 </div>
 
@@ -616,7 +689,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#fff', borderBottom: `2px solid ${THEME.border}` }}>
-                        {['No.', '사업자명', '연락처', '주소', '업종', '필요자금', '상담 상태'].map((h, i) => (
+                        {['No.', '사업자명', '연락처', '주소', '업종', '필요자금', '상담 상태', '관리'].map((h, i) => (
                           <th key={i} style={{ padding: '24px 40px', fontSize: '11px', fontWeight: 950, color: THEME.textMuted, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{h}</th>
                         ))}
                       </tr>
@@ -676,9 +749,13 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                                     outline: 'none'
                                   }}
                                 >
-                                  {Object.entries(statusConfig).map(([k, v]) => (
-                                    <option key={k} value={k}>{v.label}</option>
-                                  ))}
+                                  <option value="NEW">진행중</option>
+                                  <option value="CONTACTED">진행 완료</option>
+                                  <option value="CLOSED">진행 불가</option>
+                                  {/* Keep original values visible if they are currently set to something else */}
+                                  {currentStatus === "QUALIFIED" && <option value="QUALIFIED">진행중 (검토)</option>}
+                                  {currentStatus === "CONVERTED" && <option value="CONVERTED">계약 완료</option>}
+                                  {currentStatus === "SPAM" && <option value="SPAM">필터링</option>}
                                 </select>
 
                                 {isChanged && (
@@ -701,6 +778,29 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                                   </button>
                                 )}
                               </div>
+                            </td>
+                            <td style={{ padding: '32px 40px' }}>
+                              {(currentStatus === "CONTACTED" || currentStatus === "CONVERTED") && (
+                                <button
+                                  onClick={() => deleteLead(row.id)}
+                                  disabled={loadingId === row.id}
+                                  title="상담 삭제"
+                                  style={{
+                                    padding: '10px',
+                                    borderRadius: '12px',
+                                    backgroundColor: '#fef2f2',
+                                    color: '#ef4444',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.2s'
+                                  }}
+                                >
+                                  <HiOutlineTrash size={18} />
+                                </button>
+                              )}
                             </td>
                           </tr>
                         )
@@ -776,7 +876,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                   <HiOutlineCog size={64} color={THEME.textMuted} />
                 </div>
                 <h3 style={{ fontSize: '32px', fontWeight: 950, color: THEME.textMain, letterSpacing: '-0.06em' }}>핵심 설정 재구성</h3>
-                <p style={{ fontSize: '15px', fontWeight: 600, color: THEME.textMuted, maxWidth: '400px', lineHeight: 1.7, marginTop: '16px' }}>글로벌 운용 파라미터 및 워크플로우 프로토콜이 동기화 중입니다. 보안 패치 0.8.4 대기 중.</p>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: THEME.textMuted, maxWidth: '400px', lineHeight: 1.7, marginTop: '16px' }}>글로벌 운용 파라미터 및 워크플로우 프로토콜이 동기화 중입니다.<br />보안 패치 0.8.4 대기 중.</p>
               </div>
             )}
 
