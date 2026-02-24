@@ -4,15 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import {
   FiShield,
   FiCheck,
-  FiTarget,
-  FiRepeat,
-  FiTruck,
-  FiCpu,
   FiCheckCircle,
-  FiTrendingUp,
-  FiZap,
-  FiHome,
-  FiDatabase
 } from "react-icons/fi";
 import DaumPostcodeEmbed from 'react-daum-postcode';
 
@@ -205,7 +197,6 @@ export default function Home() {
             <div className="card-item card-startup">
               <div className="card-overlay"></div>
               <div className="card-content">
-                <div className="card-icon"><FiTarget /></div>
                 <h4>① 창업 지원 자금</h4>
                 <p>초기 창업기업을 위한 자금<br />(사업화 자금, 시설자금, 운전자금)</p>
               </div>
@@ -213,7 +204,6 @@ export default function Home() {
             <div className="card-item card-operating">
               <div className="card-overlay"></div>
               <div className="card-content">
-                <div className="card-icon"><FiRepeat /></div>
                 <h4>② 운전자금</h4>
                 <p>재료비, 인건비, 임대료 등<br />운영자금 지원</p>
               </div>
@@ -221,7 +211,6 @@ export default function Home() {
             <div className="card-item card-facility">
               <div className="card-overlay"></div>
               <div className="card-content">
-                <div className="card-icon"><FiTruck /></div>
                 <h4>③ 시설자금</h4>
                 <p>공장 설립, 기계 설비 도입,<br />사업장 확장</p>
               </div>
@@ -229,7 +218,6 @@ export default function Home() {
             <div className="card-item card-tech">
               <div className="card-overlay"></div>
               <div className="card-content">
-                <div className="card-icon"><FiCpu /></div>
                 <h4>④ 기술·혁신 자금</h4>
                 <p>R&D 기업, 특허 보유 기업<br />대상 지원</p>
               </div>
@@ -258,22 +246,18 @@ export default function Home() {
 
           <div className="card-grid-2">
             <div className={`card-item ${activeTargetIndex === 1 ? "active-loop" : ""}`}>
-              <div className="card-icon"><FiTrendingUp /></div>
               <h4>고금리 대환 필요</h4>
               <p>연 7% 이상의 높은 이자를 감당하고 계신 기업</p>
             </div>
             <div className={`card-item ${activeTargetIndex === 2 ? "active-loop" : ""}`}>
-              <div className="card-icon"><FiZap /></div>
               <h4>긴급 운영자금</h4>
               <p>갑작스러운 유동성 확보가 시급한 소상공인</p>
             </div>
             <div className={`card-item ${activeTargetIndex === 3 ? "active-loop" : ""}`}>
-              <div className="card-icon"><FiHome /></div>
               <h4>시설 투자 계획</h4>
               <p>공장 및 기계 설비 도입을 준비 중인 기업</p>
             </div>
             <div className={`card-item ${activeTargetIndex === 4 ? "active-loop" : ""}`}>
-              <div className="card-icon"><FiDatabase /></div>
               <h4>한도 부족 해결</h4>
               <p>이미 은행 대출을 가득 받아 대안이 필요할 때</p>
             </div>
