@@ -85,6 +85,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingStatuses, setPendingStatuses] = useState<Record<string, LeadStatus>>({});
   const [collapsed, setCollapsed] = useState(false);
+  const [showNotiDropdown, setShowNotiDropdown] = useState(false);
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
@@ -442,10 +443,96 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                 <p style={{ fontSize: '10px', fontWeight: 700, color: THEME.primary, margin: 0 }}>권한: 마스터</p>
               </div>
             </div>
-            <button style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: THEME.textMuted }}>
-              <HiOutlineBell size={26} />
-              <span style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', backgroundColor: '#ef4444', borderRadius: '50%', border: '2px solid #fff' }} />
-            </button>
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setShowNotiDropdown(!showNotiDropdown)}
+                style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: THEME.textMuted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <HiOutlineBell size={26} />
+                {leads.filter(l => l.status === "NEW").length > 0 && (
+                  <span style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', backgroundColor: '#ef4444', borderRadius: '50%', border: '2px solid #fff' }} />
+                )}
+              </button>
+
+              {showNotiDropdown && (
+                <>
+                  <div
+                    style={{ position: 'fixed', inset: 0, zIndex: 90 }}
+                    onClick={() => setShowNotiDropdown(false)}
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    top: '50px',
+                    right: '-10px',
+                    width: '320px',
+                    backgroundColor: '#fff',
+                    borderRadius: '24px',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+                    border: `1px solid ${THEME.border}`,
+                    zIndex: 100,
+                    overflow: 'hidden',
+                    animation: 'modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                  }}>
+                    <div style={{ padding: '24px', borderBottom: `1px solid ${THEME.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 900, color: THEME.textMain }}>실시간 알림</h4>
+                      <span style={{ fontSize: '11px', fontWeight: 800, color: THEME.primary, backgroundColor: '#eff6ff', padding: '4px 10px', borderRadius: '8px' }}>
+                        {leads.filter(l => l.status === "NEW").length}건 미확인
+                      </span>
+                    </div>
+                    <div style={{ maxHeight: '400px', overflowY: 'auto', padding: '8px' }}>
+                      {leads.filter(l => l.status === "NEW").length === 0 ? (
+                        <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+                          <p style={{ fontSize: '13px', color: THEME.textMuted, margin: 0 }}>새로운 상담 문의가 없습니다.</p>
+                        </div>
+                      ) : (
+                        leads.filter(l => l.status === "NEW").map((l) => (
+                          <div
+                            key={l.id}
+                            onClick={() => {
+                              setActiveTab('consultations');
+                              setSearchTerm(l.businessName);
+                              setShowNotiDropdown(false);
+                            }}
+                            style={{
+                              padding: '16px',
+                              borderRadius: '16px',
+                              cursor: 'pointer',
+                              transition: 'background-color 0.2s'
+                            }}
+                            className="noti-item"
+                          >
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                              <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#eff6ff', color: THEME.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <HiOutlineLightningBolt size={20} />
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <p style={{ margin: '0 0 4px', fontSize: '13px', fontWeight: 800, color: THEME.textMain, lineHeight: 1.4 }}>
+                                  <span style={{ color: THEME.primary }}>{l.businessName}</span> 님 상담 문의입니다.
+                                </p>
+                                <p style={{ margin: 0, fontSize: '11px', fontWeight: 600, color: THEME.textMuted }}>
+                                  {new Date(l.createdAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    {leads.filter(l => l.status === "NEW").length > 0 && (
+                      <div
+                        style={{ padding: '16px', textAlign: 'center', borderTop: `1px solid ${THEME.border}`, cursor: 'pointer' }}
+                        onClick={() => {
+                          setActiveTab('consultations');
+                          setShowNotiDropdown(false);
+                        }}
+                      >
+                        <span style={{ fontSize: '12px', fontWeight: 800, color: THEME.textMuted }}>전체 상담 현황 보기</span>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </header>
 
