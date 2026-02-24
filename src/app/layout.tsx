@@ -24,6 +24,10 @@ export default function RootLayout({
     <html lang="ko">
       <head>
         <link
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@800&display=swap"
+          rel="stylesheet"
+        />
+        <link
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
           rel="stylesheet"
         />

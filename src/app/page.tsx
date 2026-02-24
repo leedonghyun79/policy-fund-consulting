@@ -136,7 +136,7 @@ export default function Home() {
       {/* Section 1-1: Brand Stats (Separated from Hero) */}
       <section className="section-padding reveal" style={{ background: '#fff' }}>
         <div className="container text-center">
-          <p className="brand-stats-headcopy" style={{ fontFamily: "'GmarketSansBold', sans-serif", fontSize: '32px', fontWeight: 700, color: 'var(--text-dark)', marginBottom: '40px', wordBreak: 'keep-all', lineHeight: 1.4 }}>
+          <p className="brand-stats-headcopy" style={{ fontFamily: "'Outfit', sans-serif", fontSize: '32px', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '40px', wordBreak: 'keep-all', lineHeight: 1.4 }}>
             정부가 매년 준비하는 수조 원의 정책자금,<br />
             <span style={{ color: 'var(--blue-primary)' }}>비티씨는 그 기회를 현실로 만들어 왔습니다.</span>
           </p>
@@ -228,9 +228,14 @@ export default function Home() {
 
       {/* Section 3: Targeted (Forest Green) */}
       <section className="section-padding bg-forest text-center reveal">
+        <div className="deco-wrap">
+          <div className="deco-shape deco-1"></div>
+          <div className="deco-shape deco-2"></div>
+          <div className="deco-shape deco-3"></div>
+        </div>
         <div className="container">
           <h2 className="section-title white" style={{ marginBottom: 30 }}>
-            <span style={{ color: 'var(--blue-primary)' }}>어떤 고민</span> 때문에<br />
+            <span style={{ color: '#93c5fd' }}>어떤 고민</span> 때문에<br />
             여기까지 보고 계신걸까요?
           </h2>
 
@@ -268,7 +273,7 @@ export default function Home() {
       {/* Section 4: Live Status */}
       <section className="rolling-section text-center reveal">
         <div className="container">
-          <h3 className="section-title" style={{ fontSize: "1.3rem" }}>실시간 상담 신청 현황</h3>
+          <h3 className="section-title" style={{ fontSize: "2rem" }}>실시간 상담 신청 현황</h3>
           <div className="table-wrapper text-center">
             <div className="tr-head">
               <div>성함</div>
@@ -276,7 +281,7 @@ export default function Home() {
               <div>신청항목</div>
               <div>상태</div>
             </div>
-            <div style={{ height: 260, overflow: "hidden" }}>
+            <div style={{ height: 350, overflow: "hidden" }}>
               <div className="rolling-list">
                 {[...STATUS_DATA, ...STATUS_DATA, ...STATUS_DATA].map((row, i) => (
                   <div className="tr-row" key={i}>
@@ -312,7 +317,31 @@ export default function Home() {
             </div>
             <div className="form-group">
               <label className="form-label">휴대폰번호 *</label>
-              <input className="form-input" type="tel" placeholder="010-0000-0000" required />
+              <div className="form-row" style={{ alignItems: 'center' }}>
+                <input className="form-input" type="text" value="010" readOnly style={{ width: '85px', textAlign: 'center', backgroundColor: '#f8fafc' }} />
+                <span style={{ color: '#999' }}>-</span>
+                <input
+                  className="form-input"
+                  type="number"
+                  placeholder="0000"
+                  required
+                  style={{ textAlign: 'center' }}
+                  onInput={(e: any) => {
+                    if (e.target.value.length > 4) e.target.value = e.target.value.slice(0, 4);
+                  }}
+                />
+                <span style={{ color: '#999' }}>-</span>
+                <input
+                  className="form-input"
+                  type="number"
+                  placeholder="0000"
+                  required
+                  style={{ textAlign: 'center' }}
+                  onInput={(e: any) => {
+                    if (e.target.value.length > 4) e.target.value = e.target.value.slice(0, 4);
+                  }}
+                />
+              </div>
             </div>
             <div className="form-group">
               <label className="form-label">지역(주소) *</label>
@@ -354,8 +383,8 @@ export default function Home() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">희망 자금 규모 *</label>
-              <input className="form-input" type="text" placeholder="예: 5,000만원" required />
+              <label className="form-label">희망 자금 규모 (선택)</label>
+              <input className="form-input" type="text" placeholder="예: 5,000만원" />
             </div>
 
             <div style={{ marginTop: 20, fontSize: "0.85rem", color: "#666" }}>
