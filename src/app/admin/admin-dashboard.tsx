@@ -119,7 +119,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const newLeads = useMemo(() => leads.filter(l => l.status === "NEW"), [leads]);
   const unreadLeadsCount = useMemo(() => newLeads.filter(l => !readNotiIds.includes(l.id)).length, [newLeads, readNotiIds]);
   const latestNewId = newLeads.length > 0 ? newLeads[0].id : null;
-  const hasUnread = latestNewId !== null && latestNewId !== lastSeenLeadId;
+  const hasUnread = latestNewId !== null && latestNewId !== lastSeenLeadId && unreadLeadsCount > 0;
 
   const counters = useMemo(() => ({
     total: leads.length,
