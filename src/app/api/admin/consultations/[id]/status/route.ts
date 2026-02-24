@@ -12,14 +12,14 @@ function parseStatus(input: string | null): LeadStatus | null {
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getAdminSessionFromCookies();
   if (!session) {
     return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
   }
 
-  const { id } = params;
+  const { id } = await params;
   const body = (await req.json()) as { status?: string };
   const nextStatus = parseStatus(body.status ?? null);
   if (!nextStatus) {
