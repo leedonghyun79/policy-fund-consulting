@@ -171,7 +171,7 @@ export default function Home() {
             승인 가능성을 극대화하는 맞춤형 전략을 설계합니다.
           </div>
 
-          <div style={{ marginTop: 80, borderTop: '1px solid var(--border)', paddingTop: 60 }}>
+          <div style={{ marginTop: 80, paddingTop: 60 }}>
             <h3 className="section-title" style={{ fontSize: '2rem', marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
               <FiShield style={{ color: 'var(--blue-primary)' }} /> 잠깐! 여기서 정책자금이란?
             </h3>
@@ -231,7 +231,6 @@ export default function Home() {
         <div className="deco-wrap">
           <div className="deco-shape deco-1"></div>
           <div className="deco-shape deco-2"></div>
-          <div className="deco-shape deco-3"></div>
         </div>
         <div className="container">
           <h2 className="section-title white" style={{ marginBottom: 30 }}>
@@ -457,4 +456,3 @@ export default function Home() {
     </div>
   );
 }
-
