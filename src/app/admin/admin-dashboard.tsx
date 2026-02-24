@@ -86,6 +86,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const [pendingStatuses, setPendingStatuses] = useState<Record<string, LeadStatus>>({});
   const [collapsed, setCollapsed] = useState(false);
   const [showNotiDropdown, setShowNotiDropdown] = useState(false);
+  const [lastSeenLeadId, setLastSeenLeadId] = useState<string | null>(null);
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
@@ -113,6 +114,10 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   }, [filteredLeads, currentPage]);
 
   const totalPages = Math.ceil(filteredLeads.length / ITEMS_PER_PAGE);
+
+  const newLeads = useMemo(() => leads.filter(l => l.status === "NEW"), [leads]);
+  const latestNewId = newLeads.length > 0 ? newLeads[0].id : null;
+  const hasUnread = latestNewId !== null && latestNewId !== lastSeenLeadId;
 
   const counters = useMemo(() => ({
     total: leads.length,
@@ -445,11 +450,16 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
             </div>
             <div style={{ position: 'relative' }}>
               <button
-                onClick={() => setShowNotiDropdown(!showNotiDropdown)}
+                onClick={() => {
+                  setShowNotiDropdown(!showNotiDropdown);
+                  if (!showNotiDropdown && latestNewId) {
+                    setLastSeenLeadId(latestNewId);
+                  }
+                }}
                 style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: THEME.textMuted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 <HiOutlineBell size={26} />
-                {leads.filter(l => l.status === "NEW").length > 0 && (
+                {hasUnread && (
                   <span style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', backgroundColor: '#ef4444', borderRadius: '50%', border: '2px solid #fff' }} />
                 )}
               </button>
