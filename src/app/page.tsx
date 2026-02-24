@@ -34,6 +34,7 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const [selectedIndustry, setSelectedIndustry] = useState("제조업");
   const [address, setAddress] = useState("");
   const [extraAddress, setExtraAddress] = useState("");
@@ -344,7 +345,7 @@ export default function Home() {
                     <div>{row.biz}</div>
                     <div>{row.product}</div>
                     <div>
-                      <span className={`tag-status ${row.tag === "상담 진행중" ? "ing" : "done"}`}>
+                      <span className={`tag-status ${row.tag?.includes("진행중") ? "ing" : "done"}`}>
                         {row.tag}
                       </span>
                     </div>
@@ -447,7 +448,10 @@ export default function Home() {
             <div style={{ marginTop: 20, fontSize: "0.85rem", color: "#666" }}>
               <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} required />
-                개인정보처리방침 동의 [약관보기]
+                개인정보처리방침 동의
+                <button type="button" onClick={() => setShowTermsModal(true)} style={{ color: "var(--blue-primary)", textDecoration: "underline", background: "none", border: "none", padding: 0, font: "inherit", cursor: "pointer" }}>
+                  [약관보기]
+                </button>
               </label>
             </div>
 
@@ -508,6 +512,82 @@ export default function Home() {
                 setShowPostcode(false);
               }}
             />
+          </div>
+        </div>
+      )}
+      {showTermsModal && (
+        <div className="modal-overlay" onClick={() => setShowTermsModal(false)}>
+          <div className="modal-content" style={{ maxWidth: 600, width: "95%", textAlign: "left", maxHeight: "85vh", overflowY: "auto", padding: "30px 20px" }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, borderBottom: "1px solid #eee", paddingBottom: 15 }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 800 }}>이용약관 및 개인정보처리방침</h2>
+              <button onClick={() => setShowTermsModal(false)} style={{ background: "none", border: "none", fontSize: "1.5rem", cursor: "pointer", color: "#666" }}>&times;</button>
+            </div>
+
+            <div style={{ fontSize: "0.9rem", color: "#475569", lineHeight: 1.6 }}>
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>이용약관</h3>
+              <p><strong>제 1 장 총칙</strong></p>
+              <p><strong>제 1 조 (목적)</strong> 이 약관은 주식회사 비티씨(이하 "회사")가 제공하는 서비스 이용에 관한 조건 및 절차와 기타 필요한 사항을 규정하는 것을 목적으로 합니다.</p>
+              <p><strong>제 2 조 (용어의 정의)</strong> 이 약관에서 사용하는 용어의 정의는 다음과 같습니다.</p>
+              <p><strong>제 3 조 (약관의 효력과 변경)</strong> 회사는 본 약관의 내용을 서비스 화면에 게시하거나 기타의 방법으로 이용자에게 공지함으로써 효력이 발생합니다.</p>
+              <p><strong>제 4 조 (약관외 준칙)</strong> 이 약관에 명시되지 않은 사항이 관계 법령에 규정되어 있을 경우 그 규정에 따르며, 그렇지 않은 경우에는 일반적인 관례에 따릅니다.</p>
+              <p><strong>제 5 조 (적용범위)</strong> 본 약관은 서비스 이용자 모두에게 적용됩니다.</p>
+
+              <p style={{ marginTop: 15 }}><strong>제 2 장 서비스 이용 계약</strong></p>
+              <p><strong>제 6 조 (이용계약의 성립)</strong> 이용계약은 이용자의 이용신청에 대한 회사의 이용승낙과 이용자의 약관내용에 대한 동의로 성립됩니다.</p>
+              <p><strong>제 7 조 (이용계약 승인의 유보)</strong> 회사는 서비스 관련 설비의 여유가 없거나 기술상 사유가 있는 경우 승인을 유보할 수 있습니다.</p>
+
+              <p style={{ marginTop: 15 }}><strong>제 3 장 서비스의 이용</strong></p>
+              <p><strong>제 8 조 (서비스 이용시간)</strong> 서비스 이용은 회사의 업무상 또는 기술상 특별한 지장이 없는 한 연중무휴, 1일 24시간을 원칙으로 합니다.</p>
+              <p><strong>제 9 조 (이용계약의 해지 및 서비스 이용의 제한)</strong> 이용자가 이용계약을 해지하고자 하는 때에는 이용자 본인이 온라인을 통해 회사에 해지 신청을 하여야 합니다.</p>
+              <p><strong>제 10 조 (이용자 게시물의 삭제 이용 제한)</strong> 회사는 이용자가 게시하거나 등록하는 서비스 내의 내용물이 규정에 위반되는 경우 사전 통지 없이 삭제할 수 있습니다.</p>
+              <p><strong>제 11 조 (서비스의 중지 및 제한)</strong> 회사는 긴급한 시스템 점검, 증설 및 교체 등 부득이한 사유로 인하여 사전 공지 없이 일시적으로 서비스를 중단할 수 있습니다.</p>
+
+              <p style={{ marginTop: 15 }}><strong>제 4 장 의무</strong></p>
+              <p><strong>제 12 조 (회사의 의무)</strong> 회사는 특별한 사정이 없는 한 이용자가 신청한 서비스 제공 개시일에 서비스를 이용할 수 있도록 합니다.</p>
+              <p><strong>제 12조의 1 (개인정보보호)</strong> 회사는 관련 법령이 정하는 바에 따라서 이용자 등록정보를 포함한 이용자의 개인정보를 보호하기 위하여 노력합니다.</p>
+              <p><strong>제 13 조 (이용자의 의무)</strong> 이용자는 관계 법령, 본 약관의 규정, 이용안내 및 서비스 상에 공지한 주의사항 등을 준수하여야 합니다.</p>
+              <p><strong>제 13 조의 1 (입력정보등)</strong> 이용자는 상담 신청 시 정확한 정보를 입력해야 하며, 허위 정보 입력 시 서비스 이용에 제한이 있을 수 있습니다.</p>
+
+              <p style={{ marginTop: 15 }}><strong>제 5 장 저작권 및 면책</strong></p>
+              <p><strong>제 14 조 (게재된 자료에 대한 권리)</strong> 서비스에 게재된 자료에 대한 권리는 회사에 있습니다.</p>
+              <p><strong>제 15 조 (면책)</strong> 회사는 천재지변 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는 서비스 제공에 관한 책임이 면제됩니다.</p>
+
+              <hr style={{ margin: "25px 0", border: 0, borderTop: "1px solid #eee" }} />
+
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>개인정보처리방침</h3>
+              <p><strong>가. 수집하는 개인정보 항목 및 수집방법</strong></p>
+              <p>- 성함(사업자명), 휴대폰번호, 지역(주소), 업종, 희망 자금 규모</p>
+
+              <p style={{ marginTop: 10 }}><strong>나. 개인정보의 수집 및 이용목적</strong></p>
+              <p>수집한 개인정보를 다음의 목적을 위해 활용합니다.</p>
+              <p>- 정책자금 컨설팅 및 담당 전문가의 전화 상담/안내</p>
+
+              <p style={{ marginTop: 10 }}><strong>다. 수집한 개인정보의 보유 및 이용기간</strong></p>
+              <p>- 원칙적으로 개인정보 수집 및 이용목적이 달성된 후(상담 완료 등)에는 해당 정보를 지체 없이 파기합니다. 단, 관계법령의 규정에 의하여 보존할 필요가 있는 경우 일정 기간 보존합니다.</p>
+
+              <p style={{ marginTop: 10 }}><strong>라. 동의 거부권 및 거부 시 불이익</strong></p>
+              <p>- 이용자는 개인정보 수집 및 이용에 대한 동의를 거부할 권리가 있으며, 동의를 거부할 경우 상담 신청 서비스 이용이 제한됩니다.</p>
+
+              <p style={{ marginTop: 20 }}><strong>개인정보 제3자 제공 정책</strong></p>
+              <p>주식회사 비티씨는 원활한 서비스 제공을 위하여 아래와 같이 이용자의 개인정보를 제공하고 있습니다.</p>
+              <p>1. 제공받는 자: 제휴 컨설턴트 및 전문 대행 기관</p>
+              <p>2. 제공받는 자의 이용목적: 정책자금 상담 및 서비스 제공, 마케팅 및 광고 활용</p>
+              <p>3. 제공하는 항목: 성함, 연락처, 지역, 업종 등 신청 정보 일체</p>
+              <p>4. 보유 및 이용기간: 제공 목적 달성 시까지 (최대 3년)</p>
+
+              <p style={{ marginTop: 20 }}><strong>개인정보의 파기</strong></p>
+              <p>1. 회사는 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체 없이 해당 개인정보를 파기합니다.</p>
+              <p>2. 전자적 파일 형태의 정보는 기록을 재생할 수 없는 기술적 방법을 사용하며, 종이에 출력된 개인정보는 분쇄 기를 통해 파기합니다.</p>
+
+              <p style={{ marginTop: 20 }}><strong>기술적·관리적 보호 대책</strong></p>
+              <p>회사는 이용자들의 개인정보 보호를 위해 암호화 저장, 해킹 대비 침입차단 시스템 운영, 백신 프로그램 설치, 개인정보 취급 직원 최소화 및 교육 등 최선을 다하고 있습니다.</p>
+            </div>
+
+            <div style={{ marginTop: 30, display: "flex", justifyContent: "flex-end" }}>
+              <button onClick={() => setShowTermsModal(false)} style={{ background: "var(--blue-primary)", color: "#fff", border: "none", padding: "10px 25px", borderRadius: "8px", fontWeight: 700, cursor: "pointer" }}>
+                확인
+              </button>
+            </div>
           </div>
         </div>
       )}

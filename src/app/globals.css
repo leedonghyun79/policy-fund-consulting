@@ -1286,3 +1286,13 @@ input[type="number"] {
     letter-spacing: -0.05em;
   }
 }
+
+/* Admin Sidebar Hover */
+.sidebar-nav-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.sidebar-nav-btn:active {
+  transform: scale(0.98);
+}

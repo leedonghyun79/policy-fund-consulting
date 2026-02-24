@@ -20,7 +20,11 @@ import {
   HiOutlineX,
   HiOutlineCheckCircle,
   HiOutlineChevronRight,
-  HiOutlineDatabase
+  HiOutlineDatabase,
+  HiOutlineHome,
+  HiOutlineMenuAlt2,
+  HiOutlineChevronDoubleLeft,
+  HiOutlineChevronDoubleRight
 } from "react-icons/hi";
 
 type LeadRow = {
@@ -80,6 +84,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const [adminMessage, setAdminMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingStatuses, setPendingStatuses] = useState<Record<string, LeadStatus>>({});
+  const [collapsed, setCollapsed] = useState(false);
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
@@ -140,7 +145,14 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
       "도로명주소": lead.addressRoad,
       "상세주소": lead.addressDetail || "",
       "업종": industryLabels[lead.industry] || lead.industry,
-      "희망자금": lead.desiredAmountText || "",
+      "희망자금": (() => {
+        if (!lead.desiredAmountText) return "";
+        const numeric = lead.desiredAmountText.replace(/,/g, "");
+        if (/^\d+$/.test(numeric)) {
+          return Number(numeric).toLocaleString() + "원";
+        }
+        return lead.desiredAmountText.endsWith("원") ? lead.desiredAmountText : lead.desiredAmountText + "원";
+      })(),
       "상태": statusConfig[lead.status]?.label || lead.status,
       "신청일시": new Date(lead.createdAt).toLocaleString('ko-KR')
     }));
@@ -252,21 +264,75 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
     <div style={{ display: 'flex', height: '100vh', width: '100vw', backgroundColor: THEME.bg, overflow: 'hidden', position: 'fixed', top: 0, left: 0, fontFamily: '"Pretendard Variable", sans-serif' }}>
 
       {/* 🚀 프리미엄 사이드바 */}
-      <aside style={{ width: '300px', height: '100%', backgroundColor: THEME.secondary, color: '#fff', display: 'flex', flexDirection: 'column', transition: 'all 0.3s ease' }}>
-        <div style={{ padding: '48px 32px' }}>
+      <aside style={{
+        width: collapsed ? '90px' : '300px',
+        height: '100%',
+        backgroundColor: THEME.secondary,
+        color: '#fff',
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+        position: 'relative'
+      }}>
+        {/* Toggle Button */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          style={{
+            position: 'absolute',
+            right: '-15px',
+            top: '120px',
+            width: '30px',
+            height: '30px',
+            borderRadius: '50%',
+            backgroundColor: THEME.primary,
+            border: 'none',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 20,
+            boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+          }}
+        >
+          {collapsed ? <HiOutlineChevronDoubleRight /> : <HiOutlineChevronDoubleLeft />}
+        </button>
+
+        <div style={{ padding: collapsed ? '48px 21px' : '48px 32px', overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: `linear-gradient(135deg, ${THEME.primary}, #3b82f6)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 16px rgba(37, 99, 235, 0.3)' }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              minWidth: '48px',
+              borderRadius: '14px',
+              background: `linear-gradient(135deg, ${THEME.primary}, #3b82f6)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 8px 16px rgba(37, 99, 235, 0.3)'
+            }}>
               <span style={{ fontSize: '24px', fontWeight: 900, fontStyle: 'italic' }}>P</span>
             </div>
-            <div>
-              <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', margin: 0 }}>픽셀커넥트</h2>
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#60a5fa', letterSpacing: '0.15em', opacity: 0.8 }}>픽셀 엔진 v1.2</span>
-            </div>
+            {!collapsed && (
+              <div style={{ whiteSpace: 'nowrap' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', margin: 0 }}>비티씨</h2>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#60a5fa', letterSpacing: '0.15em', opacity: 0.8 }}>관리 엔진 v1.2</span>
+              </div>
+            )}
           </div>
         </div>
 
-        <nav style={{ flex: 1, padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <p style={{ padding: '0 16px', fontSize: '10px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.2em', marginBottom: '16px' }}>주요 현황</p>
+        <nav style={{ flex: 1, padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '8px', overflow: 'hidden' }}>
+          <p style={{
+            padding: '0 16px',
+            fontSize: '10px',
+            fontWeight: 800,
+            color: 'rgba(255,255,255,0.4)',
+            letterSpacing: '0.2em',
+            marginBottom: '16px',
+            whiteSpace: 'nowrap',
+            display: collapsed ? 'none' : 'block'
+          }}>주요 현황</p>
           {[
             { id: 'dashboard', label: '대시보드 통계', icon: HiOutlineViewGrid },
             { id: 'consultations', label: '상담 현황', icon: HiOutlineClipboardList },
@@ -276,32 +342,78 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
+              className="sidebar-nav-btn"
               style={{
                 width: '100%',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: collapsed ? 'center' : 'flex-start',
                 gap: '12px',
-                padding: '16px 20px',
+                padding: '16px 14px',
                 borderRadius: '16px',
                 border: 'none',
                 cursor: 'pointer',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'all 0.2s',
                 backgroundColor: activeTab === item.id ? 'rgba(255,255,255,0.1)' : 'transparent',
                 color: activeTab === item.id ? '#fff' : 'rgba(255,255,255,0.6)',
                 position: 'relative',
-                overflow: 'hidden'
+                whiteSpace: 'nowrap'
               }}
             >
-              <item.icon size={22} style={{ color: activeTab === item.id ? THEME.primary : 'inherit' }} />
-              <span style={{ fontWeight: 800, fontSize: '14px', letterSpacing: '-0.02em' }}>{item.label}</span>
-              {activeTab === item.id && <div style={{ position: 'absolute', right: 0, top: '25%', height: '50%', width: '4px', backgroundColor: THEME.primary, borderRadius: '4px 0 0 4px' }} />}
+              <item.icon size={22} style={{ color: activeTab === item.id ? THEME.primary : 'inherit', minWidth: '22px' }} />
+              {!collapsed && <span style={{ fontWeight: 800, fontSize: '14px', letterSpacing: '-0.02em' }}>{item.label}</span>}
+              {activeTab === item.id && !collapsed && <div style={{ position: 'absolute', right: 0, top: '25%', height: '50%', width: '4px', backgroundColor: THEME.primary, borderRadius: '4px 0 0 4px' }} />}
             </button>
           ))}
+
+          <button
+            onClick={() => router.push("/")}
+            className="sidebar-nav-btn"
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              gap: '12px',
+              padding: '16px 14px',
+              borderRadius: '16px',
+              border: '1px solid rgba(255,255,255,0.1)',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              backgroundColor: 'transparent',
+              color: 'rgba(255,255,255,0.8)',
+              marginTop: '20px',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <HiOutlineHome size={22} style={{ minWidth: '22px' }} />
+            {!collapsed && <span style={{ fontWeight: 800, fontSize: '14px', letterSpacing: '-0.02em' }}>메인페이지</span>}
+          </button>
         </nav>
 
-        <div style={{ padding: '32px' }}>
-          <button onClick={logout} style={{ width: '100%', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#fda4af', fontWeight: 800, fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <HiOutlineLogout size={18} /> 시스템 로그아웃
+        <div style={{ padding: collapsed ? '30px 10px' : '32px' }}>
+          <button
+            onClick={logout}
+            className="sidebar-nav-btn"
+            style={{
+              width: '100%',
+              padding: '16px',
+              borderRadius: '16px',
+              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'rgba(255,255,255,0.05)',
+              color: '#fda4af',
+              fontWeight: 800,
+              fontSize: '12px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <HiOutlineLogout size={18} style={{ minWidth: '18px' }} />
+            {!collapsed && "시스템 로그아웃"}
           </button>
         </div>
       </aside>
@@ -417,19 +529,22 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#fff', borderBottom: `2px solid ${THEME.border}` }}>
-                        {['사업자명', '연락처', '주소', '업종', '상담 상태'].map((h, i) => (
+                        {['No.', '사업자명', '연락처', '주소', '업종', '필요자금', '상담 상태'].map((h, i) => (
                           <th key={i} style={{ padding: '24px 40px', fontSize: '11px', fontWeight: 950, color: THEME.textMuted, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody style={{ verticalAlign: 'middle' }}>
-                      {paginatedLeads.map((row) => {
+                      {paginatedLeads.map((row, index) => {
                         const currentStatus = pendingStatuses[row.id] || row.status;
                         const st = statusConfig[currentStatus] || statusConfig.NEW;
                         const isChanged = pendingStatuses[row.id] && pendingStatuses[row.id] !== row.status;
 
                         return (
                           <tr key={row.id} style={{ borderBottom: `1px solid ${THEME.border}`, transition: 'background-color 0.2s' }}>
+                            <td style={{ padding: '32px 40px' }}>
+                              <p style={{ fontSize: '14px', fontWeight: 700, color: THEME.textMuted, margin: 0 }}>{filteredLeads.length - ((currentPage - 1) * ITEMS_PER_PAGE) - index}</p>
+                            </td>
                             <td style={{ padding: '32px 40px' }}>
                               <p style={{ fontSize: '16px', fontWeight: 900, color: THEME.textMain, margin: 0, letterSpacing: '-0.02em' }}>{row.businessName}</p>
                             </td>
@@ -441,6 +556,18 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                             </td>
                             <td style={{ padding: '32px 40px' }}>
                               <p style={{ fontSize: '13px', fontWeight: 800, color: THEME.textMuted, margin: 0 }}>{industryLabels[row.industry] || row.industry}</p>
+                            </td>
+                            <td style={{ padding: '32px 40px' }}>
+                              <p style={{ fontSize: '13px', fontWeight: 800, color: THEME.textMain, margin: 0 }}>
+                                {(() => {
+                                  if (!row.desiredAmountText) return "-";
+                                  const numeric = row.desiredAmountText.replace(/,/g, "");
+                                  if (/^\d+$/.test(numeric)) {
+                                    return Number(numeric).toLocaleString() + "원";
+                                  }
+                                  return row.desiredAmountText.endsWith("원") ? row.desiredAmountText : row.desiredAmountText + "원";
+                                })()}
+                              </p>
                             </td>
                             <td style={{ padding: '32px 40px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
