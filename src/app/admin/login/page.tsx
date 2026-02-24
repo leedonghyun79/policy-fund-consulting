@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { HiOutlineDatabase } from "react-icons/hi";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -9,6 +10,18 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,6 +46,62 @@ export default function AdminLoginPage() {
       setLoading(false);
     }
   };
+
+  if (!isMounted) return null;
+
+  if (isMobile) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        width: '100vw',
+        backgroundColor: '#0f172a',
+        color: '#fff',
+        padding: '32px',
+        textAlign: 'center',
+        fontFamily: 'Pretendard, sans-serif'
+      }}>
+        <div style={{
+          width: '80px',
+          height: '80px',
+          borderRadius: '24px',
+          background: 'rgba(255,255,255,0.05)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '32px',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <HiOutlineDatabase size={40} color="#2563eb" />
+        </div>
+        <h2 style={{ fontSize: '24px', fontWeight: 900, marginBottom: '16px', letterSpacing: '-0.04em' }}>관리자 터미널 안내</h2>
+        <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.7, marginBottom: '40px', wordBreak: 'keep-all' }}>
+          어드민 로그인 및 대시보드는 보안과<br />
+          정밀한 관리를 위해 <strong style={{ color: '#fff' }}>PC 환경에 최적화</strong>되어 있습니다.<br /><br />
+          원활한 시스템 사용을 위해<br />
+          PC 또는 데스크탑 기기에서 접속해 주시기 바랍니다.
+        </p>
+        <button
+          onClick={() => router.replace("/")}
+          style={{
+            padding: '16px 32px',
+            borderRadius: '16px',
+            backgroundColor: '#2563eb',
+            border: 'none',
+            color: '#fff',
+            fontWeight: 800,
+            fontSize: '14px',
+            cursor: 'pointer'
+          }}
+        >
+          메인페이지로 돌아가기
+        </button>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen w-full flex items-center justify-center bg-white font-sans">
