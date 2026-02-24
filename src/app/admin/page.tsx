@@ -9,28 +9,49 @@ export default async function AdminPage() {
     redirect("/admin/login");
   }
 
-  const leads = await prisma.consultationLead.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 300,
-    select: {
-      id: true,
-      businessName: true,
-      phoneRaw: true,
-      addressRoad: true,
-      addressDetail: true,
-      industry: true,
-      desiredAmountText: true,
-      status: true,
-      createdAt: true,
-    },
-  });
+  try {
+    const leads = await prisma.consultationLead.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 300,
+      select: {
+        id: true,
+        businessName: true,
+        phoneRaw: true,
+        addressRoad: true,
+        addressDetail: true,
+        industry: true,
+        desiredAmountText: true,
+        status: true,
+        createdAt: true,
+      },
+    });
 
-  return (
-    <AdminDashboard
-      initialLeads={leads.map((row) => ({
-        ...row,
-        createdAt: row.createdAt.toISOString(),
-      }))}
-    />
-  );
+    return (
+      <AdminDashboard
+        initialLeads={leads.map((row) => ({
+          ...row,
+          createdAt: row.createdAt.toISOString(),
+        }))}
+      />
+    );
+  } catch (error) {
+    console.error("Admin dashboard data fetch error:", error);
+    return (
+      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc', fontFamily: 'Pretendard, sans-serif' }}>
+        <div style={{ padding: '40px', backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', marginBottom: '16px' }}>데이터를 불러올 수 없습니다</h1>
+          <p style={{ color: '#64748b', fontSize: '14px', lineHeight: 1.6, marginBottom: '32px' }}>
+            데이터베이스 연결에 문제가 발생했습니다.<br />
+            환경 변수(DATABASE_URL) 설정이나 DB 상태를 확인해 주세요.
+          </p>
+          <a
+            href="/admin"
+            style={{ display: 'inline-block', padding: '12px 24px', backgroundColor: '#2563eb', color: '#fff', textDecoration: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+          >
+            대시보드 새로고침
+          </a>
+        </div>
+      </div>
+    );
+  }
 }
