@@ -22,6 +22,14 @@ const REGIONS = [
   "경상북도", "경상남도", "전라북도", "전라남도", "제주특별자치도",
 ];
 
+const INDUSTRY_TO_CODE: Record<string, string> = {
+  제조업: "MANUFACTURING",
+  "도·소매업": "RETAIL",
+  서비스업: "SERVICE",
+  요식업: "FOOD",
+  기타: "OTHER",
+};
+
 export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -49,25 +57,6 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-
-    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -79,11 +68,52 @@ export default function Home() {
       return;
     }
 
-    setSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setSubmitting(false);
-    setShowModal(true);
-    setAgreed(false);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const params = new URLSearchParams(window.location.search);
+
+    const payload = {
+      businessName: String(formData.get("businessName") || ""),
+      phoneMiddle: String(formData.get("phoneMiddle") || ""),
+      phoneLast: String(formData.get("phoneLast") || ""),
+      addressRoad: address,
+      addressDetail: extraAddress,
+      industry: INDUSTRY_TO_CODE[selectedIndustry],
+      desiredAmountText: String(formData.get("desiredAmountText") || ""),
+      agreed,
+      consentVersion: "v1",
+      referrer: document.referrer || null,
+      utmSource: params.get("utm_source"),
+      utmMedium: params.get("utm_medium"),
+      utmCampaign: params.get("utm_campaign"),
+      utmTerm: params.get("utm_term"),
+      utmContent: params.get("utm_content"),
+    };
+
+    try {
+      setSubmitting(true);
+      const res = await fetch("/api/consult", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "상담 신청 중 오류가 발생했습니다.");
+      }
+
+      form.reset();
+      setAddress("");
+      setExtraAddress("");
+      setSelectedIndustry("제조업");
+      setAgreed(false);
+      setShowModal(true);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "상담 신청 중 오류가 발생했습니다.";
+      alert(message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -130,6 +160,7 @@ export default function Home() {
             </div>
             <span>SCROLL</span>
           </div>
+
         </div>
       </section>
 
@@ -154,6 +185,7 @@ export default function Home() {
               <span>누적 상담</span>
             </div>
           </div>
+
         </div>
       </section>
 
@@ -312,7 +344,7 @@ export default function Home() {
           <form onSubmit={handleSubmit} style={{ textAlign: "left", maxWidth: 500, margin: "0 auto" }}>
             <div className="form-group">
               <label className="form-label">사업자명 *</label>
-              <input className="form-input" type="text" placeholder="회사명 입력" required />
+              <input className="form-input" name="businessName" type="text" placeholder="회사명 입력" required />
             </div>
             <div className="form-group">
               <label className="form-label">휴대폰번호 *</label>
@@ -321,6 +353,7 @@ export default function Home() {
                 <span style={{ color: '#999' }}>-</span>
                 <input
                   className="form-input"
+                  name="phoneMiddle"
                   type="number"
                   placeholder="0000"
                   required
@@ -332,6 +365,7 @@ export default function Home() {
                 <span style={{ color: '#999' }}>-</span>
                 <input
                   className="form-input"
+                  name="phoneLast"
                   type="number"
                   placeholder="0000"
                   required
@@ -383,7 +417,7 @@ export default function Home() {
 
             <div className="form-group">
               <label className="form-label">희망 자금 규모 (선택)</label>
-              <input className="form-input" type="text" placeholder="예: 5,000만원" />
+              <input className="form-input" name="desiredAmountText" type="text" placeholder="예: 5,000만원" />
             </div>
 
             <div style={{ marginTop: 20, fontSize: "0.85rem", color: "#666" }}>
