@@ -5,8 +5,8 @@ import { getAdminSessionFromCookies } from "@/src/lib/admin-auth";
 
 function parseStatus(input: string | null): LeadStatus | null {
   if (!input) return null;
-  if (input === LeadStatus.NEW) return LeadStatus.NEW;
-  if (input === LeadStatus.CONTACTED) return LeadStatus.CONTACTED;
+  const values = Object.values(LeadStatus) as string[];
+  if (values.includes(input)) return input as LeadStatus;
   return null;
 }
 
