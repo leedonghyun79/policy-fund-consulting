@@ -70,6 +70,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const [activeTab, setActiveTab] = useState("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
   const [isAddAdminModalOpen, setIsAddAdminModalOpen] = useState(false);
@@ -79,6 +80,12 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
 
   useEffect(() => {
     setIsMounted(true);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const filteredLeads = useMemo(() => {
@@ -140,6 +147,60 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   };
 
   if (!isMounted) return null;
+
+  if (isMobile) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        width: '100vw',
+        backgroundColor: THEME.secondary,
+        color: '#fff',
+        padding: '32px',
+        textAlign: 'center',
+        fontFamily: '"Pretendard Variable", sans-serif'
+      }}>
+        <div style={{
+          width: '80px',
+          height: '80px',
+          borderRadius: '24px',
+          background: 'rgba(255,255,255,0.05)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '32px',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <HiOutlineDatabase size={40} color={THEME.primary} />
+        </div>
+        <h2 style={{ fontSize: '24px', fontWeight: 950, marginBottom: '16px', letterSpacing: '-0.04em' }}>관리자 터미널 안내</h2>
+        <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.7, marginBottom: '40px', wordBreak: 'keep-all' }}>
+          어드민 대시보드는 정밀한 데이터 분석 및 관리를 위해<br />
+          <strong style={{ color: '#fff' }}>PC 환경에 최적화</strong>되어 있습니다.<br /><br />
+          보안 및 원활한 시스템 운용을 위해<br />
+          PC 모드 또는 데스크탑 기기에서 접속해 주시기 바랍니다.
+        </p>
+        <button
+          onClick={() => router.replace("/")}
+          style={{
+            padding: '16px 32px',
+            borderRadius: '16px',
+            backgroundColor: THEME.primary,
+            border: 'none',
+            color: '#fff',
+            fontWeight: 800,
+            fontSize: '14px',
+            cursor: 'pointer'
+          }}
+        >
+          메인 페이지로 돌아가기
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw', backgroundColor: THEME.bg, overflow: 'hidden', position: 'fixed', top: 0, left: 0, fontFamily: '"Pretendard Variable", sans-serif' }}>

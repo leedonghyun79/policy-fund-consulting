@@ -101,6 +101,23 @@ body {
   color: var(--text-muted);
 }
 
+.section-subtitle-large {
+  max-width: 800px;
+  margin: 30px auto 0;
+  line-height: 1.6;
+  font-size: 18px;
+  color: var(--text-body);
+  word-break: keep-all;
+}
+
+.forest-desc {
+  margin-bottom: 40px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
 /* Header */
 .header {
   height: 64px;
@@ -817,6 +834,13 @@ input[type="number"] {
 .form-row {
   display: flex;
   gap: 8px;
+  width: 100%;
+}
+
+.form-row>input,
+.form-row>select {
+  flex: 1;
+  min-width: 0;
 }
 
 .btn-search {
@@ -1066,18 +1090,178 @@ input[type="number"] {
   }
 }
 
+.brand-stats-headcopy {
+  font-family: 'Outfit', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 40px;
+  word-break: keep-all;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.text-blue {
+  color: var(--blue-primary);
+  display: inline;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
-  .hero-main-title {
-    font-size: 2.2rem;
-    line-height: 1.35;
+  .section-padding {
+    padding: 60px 0;
   }
 
+  .section-title {
+    font-size: 28px;
+    line-height: 1.25;
+    word-break: keep-all;
+  }
+
+  .section-subtitle {
+    font-size: 14px;
+    padding: 0 10px;
+    word-break: keep-all;
+  }
+
+  /* Header */
+  .header {
+    padding: 0 15px;
+  }
+
+  .logo {
+    font-size: 0.95rem;
+  }
+
+  .header-cta-btn {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+
+  /* Hero */
+  .hero-image-style {
+    min-height: 480px;
+    padding: 60px 20px 40px;
+  }
+
+  .hero-main-title {
+    font-size: 30px;
+    line-height: 1.35;
+    margin-bottom: 20px;
+    word-break: keep-all;
+  }
+
+  .hero-desc {
+    font-size: 14px;
+    margin-bottom: 30px;
+    padding: 0 10px;
+  }
+
+  /* Brand Stats Section */
+  .brand-stats-headcopy {
+    font-size: 19px !important;
+    padding: 0 15px;
+    line-height: 1.5 !important;
+    margin-bottom: 30px;
+  }
+
+  .text-blue {
+    display: block;
+    /* Make the blue part start on a new line on mobile for balance */
+    margin-top: 5px;
+  }
+
+  .section-subtitle-large {
+    font-size: 15px;
+    padding: 0 10px;
+    line-height: 1.5;
+  }
+
+  .forest-desc {
+    font-size: 0.95rem;
+    padding: 0 10px;
+    line-height: 1.5;
+  }
+
+  .hero-checkpoints {
+    gap: 12px;
+  }
+
+  .checkpoint-item {
+    font-size: 0.75rem;
+  }
+
+  /* Brand Stats */
+  .brand-stat-item b {
+    font-size: 1.8rem;
+  }
+
+  .brand-stat-item span {
+    font-size: 0.85rem;
+  }
+
+  /* Cards */
   .card-grid-2 {
     grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .card-item {
+    min-height: 200px;
+    padding: 30px 20px;
+  }
+
+  .card-item h4 {
+    font-size: 1.8rem;
+  }
+
+  /* Rolling Status Table */
+  .tr-head,
+  .tr-row {
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 12px 10px;
+    font-size: 0.85rem;
+  }
+
+  .tr-head div:nth-child(2),
+  .tr-row div:nth-child(2) {
+    display: none;
+    /* Hide '사업장' column on mobile to save space */
+  }
+
+  .rolling-viewport {
+    height: 300px;
+  }
+
+  /* Form */
+  .form-box {
+    padding: 60px 20px;
+  }
+
+  .industry-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .btn-vibrant {
+    padding: 15px 30px;
+    font-size: 1.1rem;
   }
 
   .scroll-indicator {
     display: none;
+  }
+
+  /* Definition Box */
+  .definition-box {
+    padding: 25px;
+    margin-top: 30px;
+  }
+
+  .definition-box h4 {
+    font-size: 1.2rem;
+  }
+
+  .definition-box p {
+    font-size: 0.95rem;
   }
 }

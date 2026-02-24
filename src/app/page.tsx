@@ -191,9 +191,9 @@ export default function Home() {
       {/* Section 1-1: Brand Stats (Separated from Hero) */}
       <section className="section-padding reveal" style={{ background: '#fff' }}>
         <div className="container text-center">
-          <p className="brand-stats-headcopy" style={{ fontFamily: "'Outfit', sans-serif", fontSize: '32px', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '40px', wordBreak: 'keep-all', lineHeight: 1.4 }}>
-            정부가 매년 준비하는 수조 원의 정책자금,<br />
-            <span style={{ color: 'var(--blue-primary)' }}>비티씨는 그 기회를 현실로 만들어 왔습니다.</span>
+          <p className="brand-stats-headcopy">
+            정부가 매년 준비하는 수조 원의 정책자금,
+            <span className="text-blue">비티씨는 그 기회를 현실로 만들어 왔습니다.</span>
           </p>
           <div className="brand-stats-grid">
             <div className="brand-stat-item">
@@ -219,7 +219,7 @@ export default function Home() {
           <h2 className="section-title">
             정보는 넘칩니다. <br />부족한 건 <span style={{ color: "var(--blue-primary)" }}>'전략'</span>입니다.<br />
           </h2>
-          <div className="section-subtitle" style={{ maxWidth: 800, margin: '30px auto 0', lineHeight: 1.4, fontSize: '18px', color: 'var(--text-body)' }}>
+          <div className="section-subtitle-large">
             "서류 준비만 하다 기회를 놓치진 않으셨나요?"<br />
             한 번의 탈락은 단순한 실패가 아니라<br />
             <b>6개월 이상의 신청 제한</b>으로 이어질 수 있습니다.<br />
@@ -294,13 +294,13 @@ export default function Home() {
             여기까지 보고 계신걸까요?
           </h2>
 
-          <div style={{ marginBottom: 40, color: 'rgba(255, 255, 255, 0.8)', fontSize: '1.1rem', lineHeight: 1.6 }}>
+          <div className="forest-desc">
             대표님의 고민, 맞춤 컨설팅으로 해결해드리겠습니다.<br />
             제발 더 이상 혼자 고민하지 마세요.<br />
             <span style={{ color: '#ff9033', fontWeight: 700 }}>10초만 투자해서 지금 바로 무료 상담 신청하세요</span>
           </div>
 
-          <button onClick={scrollToForm} className="btn-vibrant" style={{ marginBottom: 60, padding: '15px 35px', fontSize: '1.1rem' }}>
+          <button onClick={scrollToForm} className="btn-vibrant">
             무료 상담 신청
           </button>
 
@@ -328,7 +328,7 @@ export default function Home() {
       {/* Section 4: Live Status */}
       <section className="rolling-section text-center reveal">
         <div className="container">
-          <h3 className="section-title" style={{ fontSize: "48px" }}>실시간 상담 신청 현황</h3>
+          <h3 className="section-title">실시간 상담 신청 현황</h3>
           <div className="table-wrapper text-center">
             <div className="tr-head">
               <div>성함</div>
