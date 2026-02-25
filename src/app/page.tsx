@@ -470,7 +470,7 @@ export default function Home() {
             <span style={{ color: "var(--blue-primary)" }}>성과가 없으면</span><br />
             비용도 받지 않습니다!
           </h2>
-          <p className="section-subtitle" style={{ marginBottom: 40 }}>먼저 편하게 말씀해 주세요. <span className="mobile-br"></span>방향은 저희가 잡아드리겠습니다.</p>
+          <p className="section-subtitle" style={{ marginBottom: 40 }}>먼저 편하게 말씀해 주세요.<br className="mo-only" /> 방향은 저희가 잡아드리겠습니다.</p>
 
           <form onSubmit={handleSubmit} style={{ textAlign: "left", maxWidth: 500, margin: "0 auto" }}>
             <div className="form-group">

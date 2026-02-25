@@ -1496,13 +1496,17 @@ input[type="number"] {
 
   .mobile-br {
     display: block;
+    height: 0;
     content: "";
-    margin-top: 5px;
+  }
+
+  .mo-only {
+    display: inline !important;
   }
 }
 
-.mobile-br {
-  display: none;
+.mo-only {
+  display: none !important;
 }
 
 /* Admin Sidebar Hover */
