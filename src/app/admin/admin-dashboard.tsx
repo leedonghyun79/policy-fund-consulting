@@ -26,6 +26,7 @@ import {
 type LeadRow = {
   id: string;
   businessName: string;
+  representativeName: string | null;
   phoneRaw: string;
   addressRoad: string;
   addressDetail: string | null;
@@ -154,6 +155,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
     if (ui.searchTerm) {
       result = result.filter(l => (
         l.businessName.toLowerCase().includes(ui.searchTerm.toLowerCase()) ||
+        (l.representativeName || "").toLowerCase().includes(ui.searchTerm.toLowerCase()) ||
         l.addressRoad.toLowerCase().includes(ui.searchTerm.toLowerCase()) ||
         (industryLabels[l.industry] || l.industry).toLowerCase().includes(ui.searchTerm.toLowerCase())
       ));
@@ -189,6 +191,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
       return {
         "No.": filteredLeads.length - i,
         "사업자명": l.businessName,
+        "대표자명": l.representativeName || "-",
         "연락처": l.phoneRaw,
         "도로명주소": l.addressRoad,
         "상세주소": l.addressDetail || "",
@@ -204,7 +207,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
     // Apply currency format to '필요자금' column (Column G / Index 6)
     const range = XLSX.utils.decode_range(ws['!ref'] || "A1:I1");
     for (let R = range.s.r + 1; R <= range.e.r; ++R) {
-      const cell = ws[XLSX.utils.encode_cell({ r: R, c: 6 })];
+      const cell = ws[XLSX.utils.encode_cell({ r: R, c: 7 })];
       if (cell && cell.t === 'n') {
         cell.z = '#,##0"원"'; // Right-aligns numbers and adds suffix
       }
@@ -213,14 +216,15 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
     // Set Column Widths (Characters approximately)
     ws['!cols'] = [
       { wch: 8 },   // No.
-      { wch: 30 },  // 사업자명
+      { wch: 25 },  // 사업자명
+      { wch: 15 },  // 대표자명
       { wch: 20 },  // 연락처
-      { wch: 60 },  // 도로명주소
-      { wch: 45 },  // 상세주소
-      { wch: 20 },  // 업종
-      { wch: 20 },  // 필요자금
-      { wch: 15 },  // 진행 상태
-      { wch: 30 },  // 신청일시
+      { wch: 50 },  // 도로명주소
+      { wch: 40 },  // 상세주소
+      { wch: 15 },  // 업종
+      { wch: 15 },  // 필요자금
+      { wch: 12 },  // 진행 상태
+      { wch: 25 },  // 신청일시
     ];
 
     const wb = XLSX.utils.book_new();
@@ -415,7 +419,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
           {ui.activeTab === 'consultations' && (
             <div style={{ backgroundColor: '#fff', borderRadius: '24px', border: `1px solid ${THEME.border}`, overflow: 'hidden' }}>
               <div style={{ padding: '32px', borderBottom: `1px solid ${THEME.border}`, display: 'flex', gap: '20px' }}>
-                <input type="text" placeholder="사업자명, 주소, 업종으로 검색" value={ui.searchTerm} onChange={e => ui.setSearchTerm(e.target.value)} style={{ flex: 1, padding: '16px 24px', borderRadius: '16px', border: `1px solid ${THEME.border}`, outline: 'none' }} />
+                <input type="text" placeholder="사업자명, 대표자명, 주소, 업종으로 검색" value={ui.searchTerm} onChange={e => ui.setSearchTerm(e.target.value)} style={{ flex: 1, padding: '16px 24px', borderRadius: '16px', border: `1px solid ${THEME.border}`, outline: 'none' }} />
                 <select value={ui.statusFilter} onChange={e => ui.setStatusFilter(e.target.value)} style={{ padding: '0 20px', borderRadius: '16px', border: `1px solid ${THEME.border}` }}>
                   <option value="ALL">전체 상태</option><option value="진행중">진행중</option><option value="진행 완료">진행 완료</option><option value="진행 불가">진행 불가</option>
                 </select>
@@ -424,14 +428,14 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead style={{ background: '#f8fafc' }}>
                   <tr style={{ textAlign: 'left' }}>
-                    {['No.', '사업자명', '연락처', '도로명주소', '상세주소', '업종', '필요자금', '진행 상태', '신청일시', '관리'].map((h, idx) => (
+                    {['No.', '사업자명', '대표자명', '연락처', '도로명주소', '상세주소', '업종', '필요자금', '진행 상태', '신청일시', '관리'].map((h, idx) => (
                       <th key={h} style={{
                         padding: '20px 16px',
                         fontSize: '13px',
                         fontWeight: 800,
                         color: THEME.textMain,
-                        whiteSpace: idx === 3 || idx === 4 ? 'normal' : 'nowrap',
-                        minWidth: idx === 3 ? '200px' : (idx === 4 ? '150px' : 'auto')
+                        whiteSpace: idx === 4 || idx === 5 ? 'normal' : 'nowrap',
+                        minWidth: idx === 4 ? '200px' : (idx === 5 ? '150px' : 'auto')
                       }}>{h}</th>
                     ))}
                   </tr>
@@ -444,6 +448,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                       <tr key={l.id} style={{ borderBottom: `1px solid ${THEME.border}` }}>
                         <td style={{ padding: '18px 16px', whiteSpace: 'nowrap' }}>{filteredLeads.length - ((ui.currentPage - 1) * ITEMS_PER_PAGE) - i}</td>
                         <td style={{ padding: '18px 16px', fontWeight: 800, whiteSpace: 'nowrap' }}>{l.businessName}</td>
+                        <td style={{ padding: '18px 16px', fontWeight: 700, whiteSpace: 'nowrap' }}>{l.representativeName || "-"}</td>
                         <td style={{ padding: '18px 16px', whiteSpace: 'nowrap' }}>{l.phoneRaw}</td>
                         <td style={{ padding: '18px 16px', fontSize: '13px', minWidth: '200px', lineHeight: '1.4' }}>{l.addressRoad}</td>
                         <td style={{ padding: '18px 16px', fontSize: '13px', minWidth: '150px', lineHeight: '1.4' }}>{l.addressDetail || "-"}</td>

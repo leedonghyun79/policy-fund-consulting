@@ -5,6 +5,7 @@ import { sendConsultationEmail } from "@/src/lib/mail";
 
 type ConsultPayload = {
   businessName?: string;
+  representativeName?: string;
   phoneMiddle?: string;
   phoneLast?: string;
   addressRoad?: string;
@@ -43,6 +44,9 @@ export async function POST(req: NextRequest) {
     if (!body.businessName?.trim()) {
       return NextResponse.json({ message: "Business name is required." }, { status: 400 });
     }
+    if (!body.representativeName?.trim()) {
+      return NextResponse.json({ message: "Representative name is required." }, { status: 400 });
+    }
     if (!isValidPhonePart(body.phoneMiddle) || !isValidPhonePart(body.phoneLast)) {
       return NextResponse.json({ message: "Phone number format is invalid." }, { status: 400 });
     }
@@ -62,6 +66,7 @@ export async function POST(req: NextRequest) {
     const lead = await prisma.consultationLead.create({
       data: {
         businessName: body.businessName.trim(),
+        representativeName: body.representativeName.trim(),
         phoneMiddle: body.phoneMiddle!,
         phoneLast: body.phoneLast!,
         phoneRaw,
@@ -89,6 +94,7 @@ export async function POST(req: NextRequest) {
     // Send Notification Email
     await sendConsultationEmail({
       businessName: body.businessName.trim(),
+      representativeName: body.representativeName.trim(),
       phoneRaw,
       addressRoad: body.addressRoad.trim(),
       addressDetail: body.addressDetail?.trim(),

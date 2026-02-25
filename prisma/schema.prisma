@@ -34,6 +34,8 @@ enum AdminRole {
 model ConsultationLead {
   id                String       @id @default(cuid())
   businessName      String
+  representativeName String?
+
   phonePrefix       String       @default("010")
   phoneMiddle       String       @db.VarChar(4)
   phoneLast         String       @db.VarChar(4)

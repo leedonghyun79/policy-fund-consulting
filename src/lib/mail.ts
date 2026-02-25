@@ -12,6 +12,7 @@ const transporter = nodemailer.createTransport({
 
 export async function sendConsultationEmail(data: {
   businessName: string;
+  representativeName: string;
   phoneRaw: string;
   addressRoad: string;
   addressDetail?: string | null;
@@ -26,7 +27,7 @@ export async function sendConsultationEmail(data: {
     return;
   }
 
-  const subject = `[신규 상담 접수] ${data.businessName}님으로부터 신규 상담이 접수되었습니다.`;
+  const subject = `[신규 상담 접수] ${data.businessName} ${data.representativeName}님으로부터 신규 상담이 접수되었습니다.`;
   const html = `
     <div style="font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #f1f5f9; border-radius: 20px; overflow: hidden; background-color: #ffffff;">
       <div style="background-color: #0f172a; padding: 40px; text-align: center;">
@@ -42,6 +43,10 @@ export async function sendConsultationEmail(data: {
             <tr>
               <td style="padding: 10px 0; color: #64748b; font-size: 14px; font-weight: 700; width: 120px;">사업자명</td>
               <td style="padding: 10px 0; color: #0f172a; font-size: 14px; font-weight: 900;">${data.businessName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 0; color: #64748b; font-size: 14px; font-weight: 700;">대표자명</td>
+              <td style="padding: 10px 0; color: #0f172a; font-size: 14px; font-weight: 900;">${data.representativeName}</td>
             </tr>
             <tr>
               <td style="padding: 10px 0; color: #64748b; font-size: 14px; font-weight: 700;">연락처</td>

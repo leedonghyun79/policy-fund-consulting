@@ -99,6 +99,7 @@ export default function Home() {
 
     const payload = {
       businessName: String(formData.get("businessName") || ""),
+      representativeName: String(formData.get("representativeName") || ""),
       phoneMiddle: String(formData.get("phoneMiddle") || ""),
       phoneLast: String(formData.get("phoneLast") || ""),
       addressRoad: address,
@@ -372,6 +373,10 @@ export default function Home() {
               <input className="form-input" name="businessName" type="text" placeholder="회사명 입력" required />
             </div>
             <div className="form-group">
+              <label className="form-label">대표자명 *</label>
+              <input className="form-input" name="representativeName" type="text" placeholder="대표자성함 입력" required />
+            </div>
+            <div className="form-group">
               <label className="form-label">휴대폰번호 *</label>
               <div className="form-row" style={{ alignItems: 'center' }}>
                 <input className="form-input" type="text" value="010" readOnly style={{ width: '85px', textAlign: 'center', backgroundColor: '#f8fafc' }} />
@@ -556,7 +561,7 @@ export default function Home() {
 
               <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>개인정보처리방침</h3>
               <p><strong>가. 수집하는 개인정보 항목 및 수집방법</strong></p>
-              <p>- 성함(사업자명), 휴대폰번호, 지역(주소), 업종, 희망 자금 규모</p>
+              <p>- 사업자명, 대표자명, 휴대폰번호, 지역(주소), 업종, 희망 자금 규모</p>
 
               <p style={{ marginTop: 10 }}><strong>나. 개인정보의 수집 및 이용목적</strong></p>
               <p>수집한 개인정보를 다음의 목적을 위해 활용합니다.</p>
@@ -572,7 +577,7 @@ export default function Home() {
               <p>주식회사 비티씨는 원활한 서비스 제공을 위하여 아래와 같이 이용자의 개인정보를 제공하고 있습니다.</p>
               <p>1. 제공받는 자: 제휴 컨설턴트 및 전문 대행 기관</p>
               <p>2. 제공받는 자의 이용목적: 정책자금 상담 및 서비스 제공, 마케팅 및 광고 활용</p>
-              <p>3. 제공하는 항목: 성함, 연락처, 지역, 업종 등 신청 정보 일체</p>
+              <p>3. 제공하는 항목: 사업자명, 대표자명, 연락처, 지역, 업종 등 신청 정보 일체</p>
               <p>4. 보유 및 이용기간: 제공 목적 달성 시까지 (최대 3년)</p>
 
               <p style={{ marginTop: 20 }}><strong>개인정보의 파기</strong></p>
