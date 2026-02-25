@@ -623,7 +623,10 @@ body {
   min-height: 240px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
+  /* Center horizontally */
+  align-items: center;
+  /* Center vertically */
 }
 
 .card-item:hover {
@@ -645,32 +648,11 @@ body {
   position: relative;
   z-index: 2;
   color: #ffffff;
-  text-align: left;
-  /* Align text to the left for better professionalism */
+  text-align: center;
+  /* Center text */
 }
 
-.card-arrow {
-  position: absolute;
-  bottom: 25px;
-  right: 25px;
-  width: 36px;
-  height: 36px;
-  background: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #0f172a;
-  font-size: 1.2rem;
-  z-index: 2;
-  transition: all 0.3s ease;
-}
-
-.card-item:hover .card-arrow {
-  background: var(--blue-primary);
-  color: #fff;
-  transform: scale(1.1);
-}
+/* removed card-arrow styles */
 
 .card-item h4 {
   font-size: 1.8rem;
