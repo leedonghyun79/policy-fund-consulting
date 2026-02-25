@@ -744,7 +744,8 @@ body {
 
 .rolling-viewport {
   position: relative;
-  height: 350px;
+  height: 240px;
+  /* Exactly 4 rows (4 * 60px) */
   overflow: hidden;
 }
 

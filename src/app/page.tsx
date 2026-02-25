@@ -373,7 +373,7 @@ export default function Home() {
                   transform: `translateY(-${rollingIndex * 60}px)`,
                 }}
               >
-                {[...mergedLeads, mergedLeads[0]].map((row, i) => (
+                {[...mergedLeads, ...mergedLeads.slice(0, 4)].map((row, i) => (
                   <div className="tr-row" key={i}>
                     <div>{row.name}</div>
                     <div>{row.biz}</div>
