@@ -5,6 +5,10 @@ import {
   FiShield,
   FiCheck,
   FiCheckCircle,
+  FiAlertCircle,
+  FiDollarSign,
+  FiBarChart2,
+  FiTruck,
 } from "react-icons/fi";
 import DaumPostcodeEmbed from 'react-daum-postcode';
 
@@ -28,6 +32,53 @@ const INDUSTRY_TO_CODE: Record<string, string> = {
   서비스업: "SERVICE",
   요식업: "FOOD",
   기타: "OTHER",
+};
+
+const CountUp = ({ end, decimals = 0, suffix = "" }: { end: number, decimals?: number, suffix?: string }) => {
+  const [count, setCount] = useState(0);
+  const elementRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    let startTime: number | null = null;
+    const duration = 800; // Snappier 0.8 seconds animation
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+
+      // Easing function: easeOutExpo
+      const easing = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+
+      setCount(easing * end);
+
+      if (progress < 1) {
+        window.requestAnimationFrame(animate);
+      }
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        window.requestAnimationFrame(animate);
+        observer.disconnect();
+      }
+    }, { threshold: 0.1 });
+
+    if (elementRef.current) observer.observe(elementRef.current);
+
+    return () => observer.disconnect();
+  }, [end]);
+
+  return (
+    <span ref={elementRef}>
+      <span className="brand-stat-number">
+        {count.toLocaleString(undefined, {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals
+        })}
+      </span>
+      <span className="brand-stat-unit">{suffix}</span>
+    </span>
+  );
 };
 
 export default function Home() {
@@ -222,20 +273,27 @@ export default function Home() {
       <section className="section-padding reveal" style={{ background: '#fff' }}>
         <div className="container text-center">
           <p className="brand-stats-headcopy">
-            정부가 매년 준비하는 수조 원의 정책자금,
-            <span className="text-blue">비티씨는 그 기회를 현실로 만들어 왔습니다.</span>
+            <span style={{ color: '#000' }}>매년 수조 원의 정책자금,</span><br />
+            <span className="font-ria text-blue">비티씨는 그 기회를</span><br />
+            <span style={{ color: '#000' }}>현실로 만들어 왔습니다.</span>
           </p>
           <div className="brand-stats-grid">
             <div className="brand-stat-item">
-              <b>3.6조</b>
+              <b>
+                <CountUp end={3.6} decimals={1} suffix="조" />
+              </b>
               <span>연간 예산</span>
             </div>
             <div className="brand-stat-item">
-              <b>300개+</b>
+              <b>
+                <CountUp end={300} suffix="개+" />
+              </b>
               <span>지원 프로그램</span>
             </div>
             <div className="brand-stat-item">
-              <b>1.5만건</b>
+              <b>
+                <CountUp end={1.5} decimals={1} suffix="만건" />
+              </b>
               <span>누적 상담</span>
             </div>
           </div>
@@ -250,25 +308,27 @@ export default function Home() {
             정보는 넘칩니다. <br />부족한 건 <span style={{ color: "var(--blue-primary)" }}>'전략'</span>입니다.<br />
           </h2>
           <div className="section-subtitle-large">
-            "서류 준비만 하다 기회를 놓치진 않으셨나요?"<br />
+            <span className="hook-text">"서류 준비만 하다 기회를 놓치진 않셨나요?"</span>
             한 번의 탈락은 단순한 실패가 아니라<br />
-            <b>6개월 이상의 신청 제한</b>으로 이어질 수 있습니다.<br />
+            <span className="highlight-red">6개월 이상의 신청 제한</span>으로 이어질 수 있습니다.<br />
             비티씨는 수많은 거절 사례를 분석하여,<br />
-            승인 가능성을 극대화하는 맞춤형 전략을 설계합니다.
+            <span className="highlight-blue">승인 가능성을 극대화</span>하는 맞춤형 전략을 설계합니다.
           </div>
 
           <div style={{ marginTop: 80, paddingTop: 60 }}>
             <h3 className="section-title definition-title">
-              <FiShield /> 잠깐! 여기서 정책자금이란?
+              <FiShield /> 정책자금, 제대로 알고 계신가요?
             </h3>
             <div className="definition-box" style={{ marginTop: 20 }}>
               <h4>정책자금이란?</h4>
-              <p style={{ wordBreak: 'keep-all' }}>
-                정책자금은 정부 및 공공기관이 중소기업과 소상공인의
-                경영 안정과 성장을 위해 지원하는 저금리 자금입니다.
-                시중 금융권 대비 낮은 금리와 유연한 상환 조건이 적용되며,
-                업종·규모·사업 단계에 따라 맞춤 신청이 가능합니다.
+              <p>
+                정부가 중소기업·소상공인을 위해 지원하는 저금리 자금입니다.
               </p>
+              <ul className="definition-list">
+                <li>시중 금융권 대비 낮은 금리</li>
+                <li>유연한 상환 조건</li>
+                <li>업종·규모·사업 단계별 맞춤 신청 가능</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -283,28 +343,28 @@ export default function Home() {
             <div className="card-item card-startup">
               <div className="card-overlay"></div>
               <div className="card-content">
-                <h4>① 창업 지원 자금</h4>
+                <h4>창업 지원 자금</h4>
                 <p>초기 창업기업을 위한 자금<br />(사업화 자금, 시설자금, 운전자금)</p>
               </div>
             </div>
             <div className="card-item card-operating">
               <div className="card-overlay"></div>
               <div className="card-content">
-                <h4>② 운전자금</h4>
+                <h4>운전자금</h4>
                 <p>재료비, 인건비, 임대료 등<br />운영자금 지원</p>
               </div>
             </div>
             <div className="card-item card-facility">
               <div className="card-overlay"></div>
               <div className="card-content">
-                <h4>③ 시설자금</h4>
+                <h4>시설자금</h4>
                 <p>공장 설립, 기계 설비 도입,<br />사업장 확장</p>
               </div>
             </div>
             <div className="card-item card-tech">
               <div className="card-overlay"></div>
               <div className="card-content">
-                <h4>④ 기술·혁신 자금</h4>
+                <h4>기술·혁신 자금</h4>
                 <p>R&D 기업, 특허 보유 기업<br />대상 지원</p>
               </div>
             </div>
@@ -320,14 +380,14 @@ export default function Home() {
         </div>
         <div className="container">
           <h2 className="section-title white" style={{ marginBottom: 30 }}>
-            <span style={{ color: '#93c5fd' }}>어떤 고민</span> 때문에<br />
-            여기까지 보고 계신걸까요?
+            <span style={{ color: '#93c5fd' }}>어떤 고민으로</span><br />
+            여기까지 오셨나요?
           </h2>
 
           <div className="forest-desc">
             대표님의 고민, 맞춤 컨설팅으로 해결해드리겠습니다.<br />
-            제발 더 이상 혼자 고민하지 마세요.<br />
-            <span style={{ color: '#ff9033', fontWeight: 700 }}>10초만 투자해서 지금 바로 무료 상담 신청하세요</span>
+            더 이상 혼자 고민하지 마세요.<br />
+            <span style={{ color: '#ff9033', fontWeight: 700 }}>지금 바로 무료 상담 신청하세요</span>
           </div>
 
           <button onClick={scrollToForm} className="btn-vibrant">
@@ -336,20 +396,32 @@ export default function Home() {
 
           <div className="card-grid-2">
             <div className={`card-item ${activeTargetIndex === 1 ? "active-loop" : ""}`}>
-              <h4>고금리 대환 필요</h4>
-              <p>연 7% 이상의 높은 이자를 감당하고 계신 기업</p>
+              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}>
+                <FiAlertCircle />
+              </div>
+              <h4>긴급 운영자금</h4>
+              <p>갑작스러운 유동성 확보가<br />시급한 소상공인</p>
             </div>
             <div className={`card-item ${activeTargetIndex === 2 ? "active-loop" : ""}`}>
-              <h4>긴급 운영자금</h4>
-              <p>갑작스러운 유동성 확보가 시급한 소상공인</p>
+              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}>
+                <FiDollarSign />
+              </div>
+              <h4>고금리 대환 필요</h4>
+              <p>연 7% 이상의 높은 이자를<br />감당하고 계신 기업</p>
             </div>
             <div className={`card-item ${activeTargetIndex === 3 ? "active-loop" : ""}`}>
-              <h4>시설 투자 계획</h4>
-              <p>공장 및 기계 설비 도입을 준비 중인 기업</p>
+              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}>
+                <FiBarChart2 />
+              </div>
+              <h4>한도 부족 해결</h4>
+              <p>이미 은행 대출을 가득 받아<br />대안이 필요할 때</p>
             </div>
             <div className={`card-item ${activeTargetIndex === 4 ? "active-loop" : ""}`}>
-              <h4>한도 부족 해결</h4>
-              <p>이미 은행 대출을 가득 받아 대안이 필요할 때</p>
+              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}>
+                <FiTruck />
+              </div>
+              <h4>시설 투자 계획</h4>
+              <p>공장 및 기계 설비 도입을<br />준비 중인 기업</p>
             </div>
           </div>
         </div>
@@ -358,7 +430,7 @@ export default function Home() {
       {/* Section 4: Live Status */}
       <section className="rolling-section text-center reveal">
         <div className="container">
-          <h3 className="section-title">실시간 상담 신청 현황</h3>
+          <h3 className="section-title">최근 상담 사례</h3>
           <div className="table-wrapper text-center">
             <div className="tr-head">
               <div>성함</div>
@@ -370,7 +442,7 @@ export default function Home() {
               <div
                 className={`rolling-list ${!isRollingTransition ? 'no-transition' : ''}`}
                 style={{
-                  transform: `translateY(-${rollingIndex * 70}px)`,
+                  transform: `translateY(-${rollingIndex * 55}px)`,
                 }}
               >
                 {[...mergedLeads, ...mergedLeads.slice(0, 4)].map((row, i) => (
