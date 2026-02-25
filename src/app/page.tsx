@@ -143,7 +143,7 @@ export default function Home() {
   };
 
   return (
-    <div className="page-wrapper">
+    <main className="page-wrapper">
       {/* Header */}
       <header className="header">
         <div className="logo">주식회사 비티씨</div>
@@ -596,6 +596,6 @@ export default function Home() {
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }
