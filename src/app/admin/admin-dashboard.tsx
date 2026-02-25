@@ -7,14 +7,21 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUIStore } from "@/src/store/ui-store";
 import {
-  HiOutlineViewGrid,
-  HiOutlineClipboardList,
+  HiOutlineSquares2X2,
+  HiOutlineClipboardDocumentList,
   HiOutlineUsers,
-  HiOutlineCog,
-  HiOutlineLogout,
+  HiOutlineCog6Tooth,
+  HiOutlineArrowLeftOnRectangle,
   HiOutlineBell,
-  HiOutlineTrash
-} from "react-icons/hi";
+  HiOutlineTrash,
+  HiOutlineCircleStack,
+  HiOutlineBolt,
+  HiOutlineFunnel,
+  HiOutlineChartBar,
+  HiOutlineUserCircle,
+  HiChevronRight,
+  HiOutlineCube
+} from "react-icons/hi2";
 
 type LeadRow = {
   id: string;
@@ -38,14 +45,14 @@ type AdminUserRow = {
 
 // Premium Theme Constants
 const THEME = {
-  primary: "#2563eb",
-  primaryHover: "#1d4ed8",
-  secondary: "#0f172a",
-  bg: "#f8fafc",
+  primary: "#3366FF",
+  primaryHover: "#2952CC",
+  secondary: "#101828",
+  bg: "#F9FAFB",
   surface: "#ffffff",
-  border: "#f1f5f9",
-  textMain: "#0f172a",
-  textMuted: "#64748b",
+  border: "#EAECF0",
+  textMain: "#101828",
+  textMuted: "#667085",
 };
 
 const statusConfig: Record<LeadStatus, { label: string; color: string; bg: string; dot: string }> = {
@@ -166,8 +173,8 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const counters = useMemo(() => ({
     total: leads.length,
     today: leads.filter(l => new Date(l.createdAt).toDateString() === new Date().toDateString()).length,
-    inProgress: leads.filter(l => statusConfig[l.status]?.label === "진행중").length,
-    completed: leads.filter(l => statusConfig[l.status]?.label === "진행 완료").length,
+    pending: leads.filter(l => l.status === "NEW").length,
+    completed: leads.filter(l => l.status === "CONTACTED" || l.status === "CONVERTED").length,
   }), [leads]);
 
   const newLeads = useMemo(() => leads.filter(l => l.status === "NEW"), [leads]);
@@ -256,74 +263,141 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
     <div style={{ display: 'flex', height: '100vh', width: '100vw', backgroundColor: THEME.bg, overflow: 'hidden', position: 'fixed' }}>
 
       {/* 사이드바 */}
-      <aside style={{ width: ui.isSidebarCollapsed ? '90px' : '300px', backgroundColor: THEME.secondary, color: '#fff', display: 'flex', flexDirection: 'column', transition: 'width 0.4s' }}>
-        <div style={{ padding: '48px 24px', flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '40px' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: THEME.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>P</div>
-            {!ui.isSidebarCollapsed && <h2 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>PIXEL ADMIN</h2>}
+      <aside style={{ width: ui.isSidebarCollapsed ? '90px' : '280px', backgroundColor: THEME.secondary, color: '#fff', display: 'flex', flexDirection: 'column', transition: 'width 0.4s' }}>
+        <div style={{ padding: '32px 24px', flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '48px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: THEME.primary, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <HiOutlineCube size={24} />
+            </div>
+            {!ui.isSidebarCollapsed && (
+              <div>
+                <h2 style={{ fontSize: '16px', fontWeight: 900, margin: 0, letterSpacing: '-0.5px' }}>픽셀커넥트</h2>
+                <span style={{ fontSize: '10px', opacity: 0.5 }}>픽셀 엔진 v1.2</span>
+              </div>
+            )}
           </div>
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
+          <p style={{ fontSize: '11px', fontWeight: 800, color: 'rgba(255,255,255,0.3)', margin: '0 0 16px 12px' }}>주요 현황</p>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {[
-              { id: 'dashboard', label: '대시보드', icon: HiOutlineViewGrid },
-              { id: 'consultations', label: '상담 현황', icon: HiOutlineClipboardList },
-              { id: 'members', label: '관리자 제어', icon: HiOutlineUsers },
-              { id: 'settings', label: '시스템 설정', icon: HiOutlineCog },
+              { id: 'dashboard', label: '대시보드 통계', icon: HiOutlineSquares2X2 },
+              { id: 'consultations', label: '상담현황', icon: HiOutlineClipboardDocumentList },
+              { id: 'members', label: '접근 권한 제어', icon: HiOutlineUsers },
+              { id: 'settings', label: '시스템 설정', icon: HiOutlineCog6Tooth },
             ].map(item => (
-              <button key={item.id} onClick={() => ui.setActiveTab(item.id)} style={{ width: '100%', padding: '16px', borderRadius: '16px', border: 'none', background: ui.activeTab === item.id ? 'rgba(255,255,255,0.1)' : 'transparent', color: ui.activeTab === item.id ? '#fff' : 'rgba(255,255,255,0.5)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <item.icon size={22} />
-                {!ui.isSidebarCollapsed && <span style={{ fontWeight: 800 }}>{item.label}</span>}
+              <button key={item.id} onClick={() => ui.setActiveTab(item.id)} style={{
+                width: '100%',
+                padding: '14px 16px',
+                borderRadius: '12px',
+                border: 'none',
+                background: ui.activeTab === item.id ? 'rgba(255,255,255,0.08)' : 'transparent',
+                color: ui.activeTab === item.id ? '#fff' : 'rgba(255,255,255,0.5)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                position: 'relative'
+              }}>
+                {ui.activeTab === item.id && <div style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: '3px', backgroundColor: THEME.primary, borderRadius: '0 4px 4px 0' }} />}
+                <item.icon size={20} />
+                {!ui.isSidebarCollapsed && <span style={{ fontWeight: 700, fontSize: '14px' }}>{item.label}</span>}
               </button>
             ))}
           </nav>
         </div>
         <div style={{ padding: '24px' }}>
-          <button onClick={() => { if (confirm("로그아웃 하시겠습니까?")) { fetch("/api/admin/logout", { method: "POST" }).then(() => router.replace("/admin/login")); } }} style={{ width: '100%', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', color: '#fda4af', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <HiOutlineLogout size={18} /> {!ui.isSidebarCollapsed && "로그아웃"}
+          <button onClick={() => { if (confirm("로그아웃 하시겠습니까?")) { fetch("/api/admin/logout", { method: "POST" }).then(() => router.replace("/admin/login")); } }} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px' }}>
+            <HiOutlineArrowLeftOnRectangle size={16} /> {!ui.isSidebarCollapsed && "안전하게 로그아웃"}
           </button>
         </div>
       </aside>
 
       {/* 메인 영역 */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-        <header style={{ height: '100px', backgroundColor: '#fff', borderBottom: `1px solid ${THEME.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 64px' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: 900, color: THEME.textMain }}>{ui.activeTab.toUpperCase()}</h1>
-          <div style={{ position: 'relative' }}>
-            <button onClick={() => setShowNotiDropdown(!showNotiDropdown)} style={{ border: 'none', background: 'none', cursor: 'pointer', position: 'relative' }}>
-              <HiOutlineBell size={26} color={THEME.textMuted} />
-              {hasUnread && <div style={{ position: 'absolute', top: 0, right: 0, width: '10px', height: '10px', backgroundColor: '#ef4444', borderRadius: '50%', border: '2px solid #fff' }} />}
-            </button>
-            {showNotiDropdown && (
-              <>
-                <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setShowNotiDropdown(false)} />
-                <div style={{ position: 'absolute', top: '50px', right: 0, width: '320px', backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', zIndex: 100, padding: '20px' }}>
-                  <h4 style={{ margin: '0 0 16px', fontWeight: 900 }}>최신 알림</h4>
-                  {newLeads.map(l => (
-                    <div key={l.id} onClick={() => { ui.addReadNotiId(l.id); ui.setActiveTab('consultations'); ui.setSearchTerm(l.businessName); setShowNotiDropdown(false); }} style={{ padding: '12px', borderRadius: '12px', cursor: 'pointer', opacity: ui.readNotiIds.includes(l.id) ? 0.5 : 1 }}>
-                      <p style={{ margin: 0, fontSize: '13px', fontWeight: 800 }}>{l.businessName} 상담 신청</p>
-                      <small style={{ color: THEME.textMuted }}>{new Date(l.createdAt).toLocaleTimeString()}</small>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+        <header style={{ height: '80px', backgroundColor: '#fff', borderBottom: `1px solid ${THEME.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 40px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+            <h1 style={{ fontSize: '24px', fontWeight: 900, color: THEME.textMain, margin: 0 }}>{ui.activeTab === 'dashboard' ? '대시보드' : (ui.activeTab === 'consultations' ? '상담현황' : '관리제어')}</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#F2F4F7', padding: '6px 14px', borderRadius: '100px' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#12B76A' }} />
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#12B76A' }}>시스템 가동 중</span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: '#f8fafc', padding: '8px 16px', borderRadius: '16px', border: `1px solid ${THEME.border}` }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: THEME.secondary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '14px' }}>A</div>
+              <div style={{ textAlign: 'left' }}>
+                <p style={{ margin: 0, fontSize: '12px', fontWeight: 800 }}>수석 관리자</p>
+                <p style={{ margin: 0, fontSize: '10px', color: THEME.primary, fontWeight: 700 }}>전원: 마스터</p>
+              </div>
+            </div>
+
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => setShowNotiDropdown(!showNotiDropdown)} style={{ border: 'none', background: 'none', cursor: 'pointer', position: 'relative', padding: '8px' }}>
+                <HiOutlineBell size={24} color={THEME.textMuted} />
+                {hasUnread && <div style={{ position: 'absolute', top: '8px', right: '8px', width: '8px', height: '8px', backgroundColor: '#ef4444', borderRadius: '50%', border: '2px solid #fff' }} />}
+              </button>
+              {showNotiDropdown && (
+                <>
+                  <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setShowNotiDropdown(false)} />
+                  <div style={{ position: 'absolute', top: '50px', right: 0, width: '320px', backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', zIndex: 100, padding: '20px' }}>
+                    <h4 style={{ margin: '0 0 16px', fontWeight: 900 }}>최신 알림</h4>
+                    {newLeads.map(l => (
+                      <div key={l.id} onClick={() => { ui.addReadNotiId(l.id); ui.setActiveTab('consultations'); ui.setSearchTerm(l.businessName); setShowNotiDropdown(false); }} style={{ padding: '12px', borderRadius: '12px', cursor: 'pointer', opacity: ui.readNotiIds.includes(l.id) ? 0.5 : 1 }}>
+                        <p style={{ margin: 0, fontSize: '13px', fontWeight: 800 }}>{l.businessName} 상담 신청</p>
+                        <small style={{ color: THEME.textMuted }}>{new Date(l.createdAt).toLocaleTimeString()}</small>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </header>
 
         <div style={{ flex: 1, padding: '48px', overflowY: 'auto' }}>
           {ui.activeTab === 'dashboard' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
                 {[
-                  { label: '누적 건수', val: counters.total, color: '#3b82f6' },
-                  { label: '오늘 신청', val: counters.today, color: '#f59e0b' },
-                  { label: '진행중', val: counters.inProgress, color: '#8b5cf6' },
-                  { label: '완료 건수', val: counters.completed, color: '#10b981' }
+                  { label: '누적 접수 건', val: counters.total, icon: HiOutlineCircleStack, color: '#EEF4FF', iconColor: '#3366FF' },
+                  { label: '금일 실시간', val: counters.today, icon: HiOutlineBolt, color: '#FFF9EB', iconColor: '#F59E0B' },
+                  { label: '검토 대기중', val: counters.pending, icon: HiOutlineFunnel, color: '#F9F5FF', iconColor: '#7F56D9' },
+                  { label: '상담 완료 건', val: counters.completed, icon: HiOutlineChartBar, color: '#ECFDF3', iconColor: '#12B76A' }
                 ].map((c, i) => (
-                  <div key={i} style={{ backgroundColor: '#fff', padding: '32px', borderRadius: '24px', border: `1px solid ${THEME.border}` }}>
-                    <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: 800, color: THEME.textMuted }}>{c.label}</p>
-                    <h2 style={{ fontSize: '32px', fontWeight: 900, margin: 0 }}>{c.val}</h2>
+                  <div key={i} style={{ backgroundColor: '#fff', padding: '32px', borderRadius: '24px', border: `1px solid ${THEME.border}`, position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ marginBottom: '24px', width: '48px', height: '48px', borderRadius: '12px', backgroundColor: c.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <c.icon size={24} color={c.iconColor} />
+                    </div>
+                    <p style={{ margin: '0 0 8px', fontSize: '13px', fontWeight: 800, color: THEME.textMuted }}>{c.label}</p>
+                    <h2 style={{ fontSize: '42px', fontWeight: 900, margin: 0, letterSpacing: '-1px' }}>{c.val}</h2>
                   </div>
                 ))}
+              </div>
+
+              <div style={{ backgroundColor: '#fff', padding: '40px', borderRadius: '32px', border: `1px solid ${THEME.border}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                  <h3 style={{ fontSize: '20px', fontWeight: 900, margin: 0 }}>신청 프로세스 현황</h3>
+                  <div style={{ backgroundColor: '#F2F4F7', padding: '6px 14px', borderRadius: '100px', fontSize: '12px', fontWeight: 700, color: THEME.primary }}>주간 목표 전환율: 75%</div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                  {[
+                    { label: '신규 유입 스트림', val: counters.total, percent: 100 },
+                    { label: '조건 충족 매칭', val: counters.pending, percent: Math.round((counters.pending / Math.max(1, counters.total)) * 100) },
+                    { label: '내부 관리 프로세스', val: counters.completed, percent: Math.round((counters.completed / Math.max(1, counters.total)) * 100) }
+                  ].map((p, i) => (
+                    <div key={i}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', alignItems: 'center' }}>
+                        <p style={{ margin: 0, fontSize: '14px', fontWeight: 800 }}>{p.label} <span style={{ color: THEME.textMuted, fontWeight: 500, fontSize: '12px' }}>({p.val}건)</span></p>
+                        <span style={{ fontSize: '14px', fontWeight: 900 }}>{p.percent}%</span>
+                      </div>
+                      <div style={{ height: '8px', backgroundColor: '#F2F4F7', borderRadius: '100px', overflow: 'hidden' }}>
+                        <div style={{ width: `${p.percent}%`, height: '100%', backgroundColor: THEME.primary, borderRadius: '100px', transition: 'width 1s ease-out' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
