@@ -83,7 +83,7 @@ export async function sendConsultationEmail(data: {
   `;
 
   const { error } = await resend.emails.send({
-    from: "정책자금 컨설팅 <onboarding@resend.dev>",
+    from: "정책자금 컨설팅 <noreply@btccompany.co.kr>",
     to: [mailTo],
     subject,
     html,
