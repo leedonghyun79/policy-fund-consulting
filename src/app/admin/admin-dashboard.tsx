@@ -35,6 +35,7 @@ type LeadRow = {
   desiredAmountText: string | null;
   status: LeadStatus;
   createdAt: string;
+  deletedAt?: string | null;
 };
 
 type AdminUserRow = {
@@ -88,6 +89,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const [adminMessage, setAdminMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [pendingStatuses, setPendingStatuses] = useState<Record<string, LeadStatus>>({});
   const [showNotiDropdown, setShowNotiDropdown] = useState(false);
+  const [showDeletedPanel, setShowDeletedPanel] = useState(false);
 
   // Queries & Mutations
   const { data: leads = initialLeads } = useQuery({
@@ -140,6 +142,28 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
       if (!res.ok) throw new Error("Delete failed");
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["leads"] })
+  });
+
+  const { data: deletedLeads = [], refetch: refetchDeleted } = useQuery({
+    queryKey: ["deleted-leads"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/consultations/deleted");
+      if (!res.ok) throw new Error("Fetch failed");
+      const json = await res.json();
+      return json.leads as LeadRow[];
+    },
+    enabled: showDeletedPanel,
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/consultations/${id}/restore`, { method: "POST" });
+      if (!res.ok) throw new Error("Restore failed");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      refetchDeleted();
+    }
   });
 
   useEffect(() => {
@@ -422,12 +446,13 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
 
           {ui.activeTab === 'consultations' && (
             <div style={{ backgroundColor: '#fff', borderRadius: '24px', border: `1px solid ${THEME.border}`, overflow: 'hidden' }}>
-              <div style={{ padding: '32px', borderBottom: `1px solid ${THEME.border}`, display: 'flex', gap: '20px' }}>
-                <input type="text" placeholder="사업자명, 대표자명, 주소, 업종으로 검색" value={ui.searchTerm} onChange={e => ui.setSearchTerm(e.target.value)} style={{ flex: 1, padding: '16px 24px', borderRadius: '16px', border: `1px solid ${THEME.border}`, outline: 'none' }} />
+              <div style={{ padding: '32px', borderBottom: `1px solid ${THEME.border}`, display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                <input type="text" placeholder="사업자명, 대표자명, 주소, 업종으로 검색" value={ui.searchTerm} onChange={e => ui.setSearchTerm(e.target.value)} style={{ flex: 1, minWidth: '200px', padding: '16px 24px', borderRadius: '16px', border: `1px solid ${THEME.border}`, outline: 'none' }} />
                 <select value={ui.statusFilter} onChange={e => ui.setStatusFilter(e.target.value)} style={{ padding: '0 20px', borderRadius: '16px', border: `1px solid ${THEME.border}` }}>
                   <option value="ALL">전체 상태</option><option value="진행중">진행중</option><option value="진행 완료">진행 완료</option><option value="진행 불가">진행 불가</option>
                 </select>
-                <button onClick={exportToExcel} style={{ padding: '0 24px', backgroundColor: THEME.secondary, color: '#fff', borderRadius: '16px', border: 'none', fontWeight: 800 }}>내보내기</button>
+                <button onClick={() => setShowDeletedPanel(true)} style={{ padding: '0 20px', backgroundColor: '#fff', color: '#ef4444', borderRadius: '16px', border: '1px solid #ef4444', fontWeight: 800, cursor: 'pointer' }}>🗑 삭제된 항목</button>
+                <button onClick={exportToExcel} style={{ padding: '0 24px', backgroundColor: THEME.secondary, color: '#fff', borderRadius: '16px', border: 'none', fontWeight: 800, cursor: 'pointer' }}>내보내기</button>
               </div>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead style={{ background: '#f8fafc' }}>
@@ -616,6 +641,59 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
           )}
         </div>
       </main>
+
+      {/* 삭제된 항목 패널 */}
+      {showDeletedPanel && (
+        <>
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15,23,42,0.5)', zIndex: 200 }} onClick={() => setShowDeletedPanel(false)} />
+          <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90vw', maxWidth: '900px', maxHeight: '80vh', backgroundColor: '#fff', borderRadius: '24px', zIndex: 201, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.15)' }}>
+            <div style={{ padding: '28px 32px', borderBottom: `1px solid ${THEME.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 900 }}>🗑 삭제된 항목</h3>
+                <p style={{ margin: '4px 0 0', fontSize: '13px', color: THEME.textMuted }}>복구 버튼을 눌러 항목을 복원할 수 있습니다.</p>
+              </div>
+              <button onClick={() => setShowDeletedPanel(false)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: THEME.textMuted }}>×</button>
+            </div>
+            <div style={{ overflowY: 'auto', flex: 1 }}>
+              {deletedLeads.length === 0 ? (
+                <div style={{ padding: '80px 20px', textAlign: 'center', color: THEME.textMuted }}>
+                  <p style={{ fontSize: '48px', marginBottom: '16px' }}>✅</p>
+                  <p style={{ fontWeight: 700 }}>삭제된 항목이 없습니다.</p>
+                </div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead style={{ background: '#f8fafc', position: 'sticky', top: 0, zIndex: 1 }}>
+                    <tr>
+                      {['사업자명', '대표자명', '연락처', '업종', '삭제일시', '복구'].map(h => (
+                        <th key={h} style={{ padding: '16px 20px', textAlign: 'left', fontSize: '13px', fontWeight: 800, color: THEME.textMuted, whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {deletedLeads.map(l => (
+                      <tr key={l.id} style={{ borderBottom: `1px solid ${THEME.border}` }}>
+                        <td style={{ padding: '16px 20px', fontWeight: 800 }}>{l.businessName}</td>
+                        <td style={{ padding: '16px 20px' }}>{l.representativeName || '-'}</td>
+                        <td style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>{l.phoneRaw}</td>
+                        <td style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>{industryLabels[l.industry] || l.industry}</td>
+                        <td style={{ padding: '16px 20px', fontSize: '12px', color: '#ef4444', whiteSpace: 'nowrap' }}>{l.deletedAt ? new Date(l.deletedAt).toLocaleString() : '-'}</td>
+                        <td style={{ padding: '16px 20px' }}>
+                          <button
+                            onClick={() => { if (confirm(`"${l.businessName}" 항목을 복구하시겠습니까?`)) restoreMutation.mutate(l.id); }}
+                            style={{ padding: '8px 16px', backgroundColor: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0', borderRadius: '10px', fontWeight: 800, cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap' }}
+                          >
+                            ↩ 복구
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

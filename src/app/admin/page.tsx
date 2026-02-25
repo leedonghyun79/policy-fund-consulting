@@ -11,6 +11,7 @@ export default async function AdminPage() {
 
   try {
     const leads = await prisma.consultationLead.findMany({
+      where: { deletedAt: null },
       orderBy: { createdAt: "desc" },
       take: 300,
       select: {
