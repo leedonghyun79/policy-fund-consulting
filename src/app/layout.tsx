@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     description:
       "복잡한 정책자금 절차는 줄이고, 승인 가능성은 높이세요. 소상공인·중소기업 맞춤 자금 진단부터 서류 준비까지 비티씨가 도와드립니다.",
     type: "website",
-    url: "https://policyfund.pixelconnect.co.kr",
+    url: "https://btccompany.co.kr",
     images: [
       {
         url: "/og-image.png",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     ],
   },
   alternates: {
-    canonical: "https://policyfund.pixelconnect.co.kr",
+    canonical: "https://btccompany.co.kr",
   },
 };
 
@@ -59,7 +59,7 @@ export default function RootLayout({
               "@type": "ConsultingService",
               "name": "비티씨 정책자금 컨설팅",
               "description": "중소기업 및 소상공인을 위한 정부 정책자금 정밀 진단 및 컨설팅 서비스",
-              "url": "https://policyfund.pixelconnect.co.kr",
+              "url": "https://btccompany.co.kr",
               "address": {
                 "@type": "PostalAddress",
                 "addressLocality": "부천시",
@@ -70,7 +70,7 @@ export default function RootLayout({
               "provider": {
                 "@type": "Organization",
                 "name": "비티씨",
-                "url": "https://policyfund.pixelconnect.co.kr"
+                "url": "https://btccompany.co.kr"
               }
             }),
           }}

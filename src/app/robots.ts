@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/admin/',
     },
-    sitemap: 'https://policyfund.pixelconnect.co.kr/sitemap.xml',
+    sitemap: 'https://btccompany.co.kr/sitemap.xml',
   }
 }
