@@ -452,7 +452,13 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                           {(() => {
                             if (!l.desiredAmountText) return "-";
                             const clean = l.desiredAmountText.replace(/,/g, "").replace(/원/g, "").trim();
-                            if (/^\d+$/.test(clean)) return Number(clean).toLocaleString() + "원";
+                            if (/^\d+$/.test(clean)) {
+                              const val = Number(clean);
+                              if (val >= 100000) {
+                                return (val / 10000).toFixed(1).replace(/\.0$/, "") + "만";
+                              }
+                              return val.toLocaleString() + "원";
+                            }
                             return l.desiredAmountText.includes("원") ? l.desiredAmountText : l.desiredAmountText + "원";
                           })()}
                         </td>
