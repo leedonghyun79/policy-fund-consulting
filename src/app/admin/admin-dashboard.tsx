@@ -190,9 +190,10 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
       "상세주소": l.addressDetail || "",
       "업종": industryLabels[l.industry] || l.industry,
       "필요자금": (() => {
-        if (!l.desiredAmountText) return "";
+        if (!l.desiredAmountText) return "-";
         const clean = l.desiredAmountText.replace(/,/g, "").replace(/원/g, "").trim();
-        return /^\d+$/.test(clean) ? Number(clean).toLocaleString() + "원" : l.desiredAmountText;
+        if (/^\d+$/.test(clean)) return Number(clean).toLocaleString() + "원";
+        return l.desiredAmountText.includes("원") ? l.desiredAmountText : l.desiredAmountText + "원";
       })(),
       "진행 상태": statusConfig[l.status]?.label,
       "신청일시": new Date(l.createdAt).toLocaleString()
@@ -437,11 +438,12 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                         <td style={{ padding: '18px 16px', fontSize: '13px', minWidth: '200px', lineHeight: '1.4' }}>{l.addressRoad}</td>
                         <td style={{ padding: '18px 16px', fontSize: '13px', minWidth: '150px', lineHeight: '1.4' }}>{l.addressDetail || "-"}</td>
                         <td style={{ padding: '18px 16px', whiteSpace: 'nowrap' }}>{industryLabels[l.industry] || l.industry}</td>
-                        <td style={{ padding: '18px 16px', fontWeight: 700, whiteSpace: 'nowrap', textAlign: 'right' }}>
+                        <td style={{ padding: '18px 16px', fontWeight: 700, whiteSpace: 'nowrap', textAlign: 'right', fontSize: '14px' }}>
                           {(() => {
                             if (!l.desiredAmountText) return "-";
                             const clean = l.desiredAmountText.replace(/,/g, "").replace(/원/g, "").trim();
-                            return /^\d+$/.test(clean) ? Number(clean).toLocaleString() + "원" : l.desiredAmountText;
+                            if (/^\d+$/.test(clean)) return Number(clean).toLocaleString() + "원";
+                            return l.desiredAmountText.includes("원") ? l.desiredAmountText : l.desiredAmountText + "원";
                           })()}
                         </td>
                         <td style={{ padding: '18px 16px', whiteSpace: 'nowrap' }}>
