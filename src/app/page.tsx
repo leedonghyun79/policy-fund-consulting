@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { FormEvent, useEffect, useRef, useState, useMemo } from "react";
+import { CSSProperties, FormEvent, useEffect, useRef, useState, useMemo } from "react";
 import {
   FiShield,
   FiCheck,
@@ -42,6 +42,8 @@ export default function Home() {
   const [activeTargetIndex, setActiveTargetIndex] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [realLeads, setRealLeads] = useState<any[]>([]);
+  const [rollingIndex, setRollingIndex] = useState(0);
+  const [isRollingTransition, setIsRollingTransition] = useState(true);
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -81,6 +83,32 @@ export default function Home() {
     }, 2000);
     return () => clearInterval(interval);
   }, []);
+
+  // Rolling Status logic
+  useEffect(() => {
+    if (mergedLeads.length === 0) return;
+    const interval = setInterval(() => {
+      setRollingIndex((prev) => {
+        if (prev >= mergedLeads.length) {
+          // Snap back will happen in another effect
+          return prev + 1;
+        }
+        return prev + 1;
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [mergedLeads.length]);
+
+  useEffect(() => {
+    if (rollingIndex > mergedLeads.length) {
+      const timeout = setTimeout(() => {
+        setIsRollingTransition(false);
+        setRollingIndex(0);
+        setTimeout(() => setIsRollingTransition(true), 50);
+      }, 650); // Match CSS transition
+      return () => clearTimeout(timeout);
+    }
+  }, [rollingIndex, mergedLeads.length]);
 
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -339,8 +367,13 @@ export default function Home() {
               <div>상태</div>
             </div>
             <div className="rolling-viewport">
-              <div className="rolling-list">
-                {[...mergedLeads, ...mergedLeads, ...mergedLeads].map((row, i) => (
+              <div
+                className={`rolling-list ${!isRollingTransition ? 'no-transition' : ''}`}
+                style={{
+                  transform: `translateY(-${rollingIndex * 60}px)`,
+                }}
+              >
+                {[...mergedLeads, mergedLeads[0]].map((row, i) => (
                   <div className="tr-row" key={i}>
                     <div>{row.name}</div>
                     <div>{row.biz}</div>

@@ -726,16 +726,18 @@ body {
   background: var(--blue-deep);
   color: #fff;
   padding: 16px;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
 }
 
 .tr-row {
   display: grid;
   grid-template-columns: 1fr 1.5fr 1.5fr 1fr;
-  padding: 18px;
+  height: 60px;
+  /* Fixed height for precise rolling */
+  padding: 0 18px;
   border-bottom: 1px solid #f5f5f5;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   text-align: center;
   align-items: center;
 }
@@ -768,9 +770,9 @@ body {
 }
 
 .tag-status {
-  padding: 6px 12px;
+  padding: 7px 14px;
   border-radius: var(--radius-full);
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 700;
 }
 
@@ -1023,7 +1025,19 @@ input[type="number"] {
 }
 
 .rolling-list {
-  animation: scrollUp 20s linear infinite;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  /* Snappy step movement */
+  will-change: transform;
+}
+
+.rolling-list.no-transition {
+  transition: none !important;
+}
+
+.rolling-viewport:hover .rolling-list {
+  animation-play-state: paused;
 }
 
 /* Scroll Indicator */
@@ -1234,7 +1248,7 @@ input[type="number"] {
   .tr-row {
     grid-template-columns: 1fr 1fr 1fr;
     padding: 12px 10px;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
   }
 
   .tr-head div:nth-child(2),
