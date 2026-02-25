@@ -327,8 +327,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: '#f8fafc', padding: '8px 16px', borderRadius: '16px', border: `1px solid ${THEME.border}` }}>
               <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: THEME.secondary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '14px' }}>A</div>
               <div style={{ textAlign: 'left' }}>
-                <p style={{ margin: 0, fontSize: '12px', fontWeight: 800 }}>수석 관리자</p>
-                <p style={{ margin: 0, fontSize: '10px', color: THEME.primary, fontWeight: 700 }}>전원: 마스터</p>
+                <p style={{ margin: 0, fontSize: '12px', fontWeight: 800 }}>최고 관리자</p>
               </div>
             </div>
 
@@ -500,7 +499,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead style={{ backgroundColor: '#f8fafc' }}>
                     <tr>
-                      {['이름', '아이디', '권한', '등록일'].map((h) => (
+                      {['이름', '아이디', '등급', '등록일'].map((h) => (
                         <th key={h} style={{ textAlign: 'left', padding: '14px 20px', fontSize: '12px', color: THEME.textMuted }}>{h}</th>
                       ))}
                     </tr>
@@ -516,7 +515,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                         <td style={{ padding: '14px 20px', fontWeight: 700 }}>{u.name}</td>
                         <td style={{ padding: '14px 20px', color: THEME.textMuted }}>{u.username}</td>
                         <td style={{ padding: '14px 20px' }}>
-                          {u.role === 'SUPER' ? '최고관리자' : (u.role === 'MANAGER' ? '매니저' : u.role)}
+                          {u.role === 'SUPER' ? '시스템 관리자' : (u.role === 'MANAGER' ? '최고 관리자' : u.role)}
                         </td>
                         <td style={{ padding: '14px 20px', color: THEME.textMuted }}>{new Date(u.createdAt).toLocaleString()}</td>
                       </tr>
@@ -543,8 +542,8 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                           onChange={(e) => setAdminForm((prev) => ({ ...prev, role: e.target.value }))}
                           style={{ width: '100%', height: '44px', borderRadius: '10px', border: `1px solid ${THEME.border}`, padding: '0 12px' }}
                         >
-                          <option value="MANAGER">매니저</option>
-                          <option value="SUPER">최고관리자</option>
+                          <option value="MANAGER">최고 관리자</option>
+                          <option value="SUPER">시스템 관리자</option>
                           <option value="CUSTOM">직접 작성</option>
                         </select>
                       </div>
