@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import * as XLSX from "xlsx";
-import { LeadStatus } from "@prisma/client";
+import { AdminRole, LeadStatus } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUIStore } from "@/src/store/ui-store";
@@ -25,6 +25,14 @@ type LeadRow = {
   industry: string;
   desiredAmountText: string | null;
   status: LeadStatus;
+  createdAt: string;
+};
+
+type AdminUserRow = {
+  id: string;
+  name: string;
+  username: string;
+  role: AdminRole;
   createdAt: string;
 };
 
@@ -66,7 +74,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const [isMounted, setIsMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isAddAdminModalOpen, setIsAddAdminModalOpen] = useState(false);
-  const [adminForm, setAdminForm] = useState({ name: "", username: "", password: "", role: "MANAGER" });
+  const [adminForm, setAdminForm] = useState({ name: "", username: "", password: "", role: "MANAGER", customRole: "" });
   const [adminLoading, setAdminLoading] = useState(false);
   const [adminMessage, setAdminMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [pendingStatuses, setPendingStatuses] = useState<Record<string, LeadStatus>>({});
@@ -89,6 +97,17 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
       return 3000;
     },
     refetchIntervalInBackground: true,
+  });
+
+  const { data: adminUsers = [] } = useQuery({
+    queryKey: ["admin-users"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/users");
+      if (!res.ok) throw new Error("Fetch failed");
+      const json = await res.json();
+      return json.users as AdminUserRow[];
+    },
+    enabled: ui.activeTab === "members",
   });
 
   const updateMutation = useMutation({
@@ -160,20 +179,61 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
       "No.": filteredLeads.length - i,
       "사업자명": l.businessName,
       "연락처": l.phoneRaw,
-      "주소": l.addressRoad,
+      "도로명주소": l.addressRoad,
+      "상세주소": l.addressDetail || "",
       "업종": industryLabels[l.industry] || l.industry,
-      "희망자금": (() => {
-        if (!l.desiredAmountText) return "";
-        const num = l.desiredAmountText.replace(/,/g, "").replace(/원/g, "").trim();
-        return /^\d+$/.test(num) ? Number(num) : l.desiredAmountText;
-      })(),
-      "상태": statusConfig[l.status]?.label,
-      "날짜": new Date(l.createdAt).toLocaleString()
+      "희망자금": l.desiredAmountText || "",
+      "진행 상태": statusConfig[l.status]?.label,
+      "신청일시": new Date(l.createdAt).toLocaleString()
     }));
     const ws = XLSX.utils.json_to_sheet(data);
+
+    // Set Column Widths (Characters approximately)
+    ws['!cols'] = [
+      { wch: 5 },  // No.
+      { wch: 20 }, // 사업자명
+      { wch: 15 }, // 연락처
+      { wch: 35 }, // 도로명주소
+      { wch: 25 }, // 상세주소
+      { wch: 15 }, // 업종
+      { wch: 15 }, // 희망자금
+      { wch: 12 }, // 진행 상태
+      { wch: 25 }, // 신청일시
+    ];
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Leads");
     XLSX.writeFile(wb, `Leads_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
+  const createAdminUser = async () => {
+    setAdminLoading(true);
+    setAdminMessage(null);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...adminForm,
+          role: adminForm.role === "CUSTOM" ? adminForm.customRole : adminForm.role
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.message || "관리자 등록에 실패했습니다.");
+      }
+
+      setAdminMessage({ type: "success", text: "관리자 계정이 등록되었습니다." });
+      setAdminForm({ name: "", username: "", password: "", role: "MANAGER", customRole: "" });
+      setIsAddAdminModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "관리자 등록에 실패했습니다.";
+      setAdminMessage({ type: "error", text: message });
+    } finally {
+      setAdminLoading(false);
+    }
   };
 
   if (!isMounted) return null;
@@ -267,32 +327,38 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
           {ui.activeTab === 'consultations' && (
             <div style={{ backgroundColor: '#fff', borderRadius: '24px', border: `1px solid ${THEME.border}`, overflow: 'hidden' }}>
               <div style={{ padding: '32px', borderBottom: `1px solid ${THEME.border}`, display: 'flex', gap: '20px' }}>
-                <input type="text" placeholder="검색어 입력..." value={ui.searchTerm} onChange={e => ui.setSearchTerm(e.target.value)} style={{ flex: 1, padding: '16px 24px', borderRadius: '16px', border: `1px solid ${THEME.border}`, outline: 'none' }} />
+                <input type="text" placeholder="사업자명, 주소, 업종으로 검색" value={ui.searchTerm} onChange={e => ui.setSearchTerm(e.target.value)} style={{ flex: 1, padding: '16px 24px', borderRadius: '16px', border: `1px solid ${THEME.border}`, outline: 'none' }} />
                 <select value={ui.statusFilter} onChange={e => ui.setStatusFilter(e.target.value)} style={{ padding: '0 20px', borderRadius: '16px', border: `1px solid ${THEME.border}` }}>
                   <option value="ALL">전체 상태</option><option value="진행중">진행중</option><option value="진행 완료">진행 완료</option><option value="진행 불가">진행 불가</option>
                 </select>
                 <button onClick={exportToExcel} style={{ padding: '0 24px', backgroundColor: THEME.secondary, color: '#fff', borderRadius: '16px', border: 'none', fontWeight: 800 }}>내보내기</button>
               </div>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead style={{ background: '#f8fafc' }}><tr style={{ textAlign: 'left' }}>{['No.', '이름', '연락처', '업종', '상태', '관리'].map(h => <th key={h} style={{ padding: '20px 32px', fontSize: '11px', fontWeight: 800, color: THEME.textMuted }}>{h}</th>)}</tr></thead>
+                <thead style={{ background: '#f8fafc' }}><tr style={{ textAlign: 'left' }}>{['No.', '사업자명', '연락처', '도로명주소', '상세주소', '업종', '희망자금', '진행 상태', '신청일시', '관리'].map(h => <th key={h} style={{ padding: '20px 24px', fontSize: '11px', fontWeight: 800, color: THEME.textMuted }}>{h}</th>)}</tr></thead>
                 <tbody>
                   {paginatedLeads.map((l, i) => {
                     const status = pendingStatuses[l.id] || l.status;
                     const st = statusConfig[status] || statusConfig.NEW;
                     return (
                       <tr key={l.id} style={{ borderBottom: `1px solid ${THEME.border}` }}>
-                        <td style={{ padding: '24px 32px' }}>{filteredLeads.length - ((ui.currentPage - 1) * ITEMS_PER_PAGE) - i}</td>
-                        <td style={{ padding: '24px 32px', fontWeight: 800 }}>{l.businessName}</td>
-                        <td style={{ padding: '24px 32px' }}>{l.phoneRaw}</td>
-                        <td style={{ padding: '24px 32px' }}>{industryLabels[l.industry] || l.industry}</td>
-                        <td style={{ padding: '24px 32px' }}>
-                          <select value={status} onChange={e => setPendingStatuses(p => ({ ...p, [l.id]: e.target.value as LeadStatus }))} style={{ padding: '8px', borderRadius: '8px', border: `1px solid ${st.color}44`, color: st.color, fontWeight: 800 }}>
-                            <option value="NEW">진행중</option><option value="CONTACTED">진행 완료</option><option value="CLOSED">진행 불가</option>
-                          </select>
-                          {pendingStatuses[l.id] && status !== l.status && <button onClick={() => updateMutation.mutate({ id: l.id, status })} style={{ marginLeft: '10px', padding: '6px 12px', borderRadius: '8px', background: THEME.primary, color: '#fff', border: 'none' }}>저장</button>}
+                        <td style={{ padding: '18px 24px' }}>{filteredLeads.length - ((ui.currentPage - 1) * ITEMS_PER_PAGE) - i}</td>
+                        <td style={{ padding: '18px 24px', fontWeight: 800 }}>{l.businessName}</td>
+                        <td style={{ padding: '18px 24px' }}>{l.phoneRaw}</td>
+                        <td style={{ padding: '18px 24px', fontSize: '13px' }}>{l.addressRoad}</td>
+                        <td style={{ padding: '18px 24px', fontSize: '13px' }}>{l.addressDetail || "-"}</td>
+                        <td style={{ padding: '18px 24px' }}>{industryLabels[l.industry] || l.industry}</td>
+                        <td style={{ padding: '18px 24px' }}>{l.desiredAmountText || "-"}</td>
+                        <td style={{ padding: '18px 24px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <select value={status} onChange={e => setPendingStatuses(p => ({ ...p, [l.id]: e.target.value as LeadStatus }))} style={{ padding: '6px', borderRadius: '8px', border: `1px solid ${st.color}44`, color: st.color, fontWeight: 800, fontSize: '13px' }}>
+                              <option value="NEW">진행중</option><option value="CONTACTED">진행 완료</option><option value="CLOSED">진행 불가</option>
+                            </select>
+                            {pendingStatuses[l.id] && status !== l.status && <button onClick={() => updateMutation.mutate({ id: l.id, status })} style={{ padding: '6px 10px', borderRadius: '8px', background: THEME.primary, color: '#fff', border: 'none', fontSize: '12px' }}>저장</button>}
+                          </div>
                         </td>
-                        <td style={{ padding: '24px 32px' }}>
-                          {(status === "CONTACTED" || status === "CONVERTED") && <button onClick={() => { if (confirm("삭제하시겠습니까?")) deleteMutation.mutate(l.id); }} style={{ color: '#ef4444', border: 'none', background: 'none', cursor: 'pointer' }}><HiOutlineTrash size={18} /></button>}
+                        <td style={{ padding: '18px 24px', fontSize: '12px', color: THEME.textMuted }}>{new Date(l.createdAt).toLocaleString()}</td>
+                        <td style={{ padding: '18px 24px' }}>
+                          {(status === "CONTACTED" || status === "CONVERTED" || status === "CLOSED" || status === "SPAM") && <button onClick={() => { if (confirm("삭제하시겠습니까?")) deleteMutation.mutate(l.id); }} style={{ color: '#ef4444', border: 'none', background: 'none', cursor: 'pointer' }}><HiOutlineTrash size={18} /></button>}
                         </td>
                       </tr>
                     )
@@ -310,6 +376,109 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
           )}
 
           {ui.activeTab === 'members' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', border: `1px solid ${THEME.border}`, borderRadius: '20px', padding: '24px 28px' }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 900, color: THEME.textMain }}>관리자 계정 관리</h3>
+                  <p style={{ margin: '8px 0 0', color: THEME.textMuted, fontSize: '13px' }}>로그인 가능한 관리자 계정을 등록하고 권한을 관리합니다.</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setAdminMessage(null);
+                    setIsAddAdminModalOpen(true);
+                  }}
+                  style={{ height: '44px', padding: '0 20px', borderRadius: '12px', border: 'none', backgroundColor: THEME.primary, color: '#fff', fontWeight: 800, cursor: 'pointer' }}
+                >
+                  관리자 등록
+                </button>
+              </div>
+
+              {adminMessage && (
+                <div style={{ padding: '14px 18px', borderRadius: '14px', backgroundColor: adminMessage.type === 'success' ? '#ecfdf5' : '#fef2f2', color: adminMessage.type === 'success' ? '#047857' : '#b91c1c', border: `1px solid ${adminMessage.type === 'success' ? '#a7f3d0' : '#fecaca'}` }}>
+                  {adminMessage.text}
+                </div>
+              )}
+
+              <div style={{ backgroundColor: '#fff', border: `1px solid ${THEME.border}`, borderRadius: '20px', overflow: 'hidden' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead style={{ backgroundColor: '#f8fafc' }}>
+                    <tr>
+                      {['이름', '아이디', '권한', '등록일'].map((h) => (
+                        <th key={h} style={{ textAlign: 'left', padding: '14px 20px', fontSize: '12px', color: THEME.textMuted }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {adminUsers.length === 0 && (
+                      <tr>
+                        <td colSpan={4} style={{ padding: '40px 20px', textAlign: 'center', color: THEME.textMuted }}>등록된 관리자 계정이 없습니다.</td>
+                      </tr>
+                    )}
+                    {adminUsers.map((u) => (
+                      <tr key={u.id} style={{ borderTop: `1px solid ${THEME.border}` }}>
+                        <td style={{ padding: '14px 20px', fontWeight: 700 }}>{u.name}</td>
+                        <td style={{ padding: '14px 20px', color: THEME.textMuted }}>{u.username}</td>
+                        <td style={{ padding: '14px 20px' }}>
+                          {u.role === 'SUPER' ? '최고관리자' : (u.role === 'MANAGER' ? '매니저' : u.role)}
+                        </td>
+                        <td style={{ padding: '14px 20px', color: THEME.textMuted }}>{new Date(u.createdAt).toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {isAddAdminModalOpen && (
+                <>
+                  <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15,23,42,0.45)', zIndex: 100 }} onClick={() => setIsAddAdminModalOpen(false)} />
+                  <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '460px', backgroundColor: '#fff', borderRadius: '18px', border: `1px solid ${THEME.border}`, padding: '24px', zIndex: 101 }}>
+                    <h4 style={{ margin: 0, fontSize: '20px', fontWeight: 900 }}>관리자 등록</h4>
+                    <p style={{ margin: '8px 0 20px', fontSize: '13px', color: THEME.textMuted }}>새로운 관리자 계정을 생성합니다.</p>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <input value={adminForm.name} onChange={(e) => setAdminForm((prev) => ({ ...prev, name: e.target.value }))} placeholder="이름" style={{ height: '44px', borderRadius: '10px', border: `1px solid ${THEME.border}`, padding: '0 12px' }} />
+                      <input value={adminForm.username} onChange={(e) => setAdminForm((prev) => ({ ...prev, username: e.target.value }))} placeholder="아이디 (영문 소문자/숫자, 4자 이상)" style={{ height: '44px', borderRadius: '10px', border: `1px solid ${THEME.border}`, padding: '0 12px' }} />
+                      <input type="password" value={adminForm.password} onChange={(e) => setAdminForm((prev) => ({ ...prev, password: e.target.value }))} placeholder="비밀번호 (8자 이상)" style={{ height: '44px', borderRadius: '10px', border: `1px solid ${THEME.border}`, padding: '0 12px' }} />
+                      <div style={{ marginTop: '10px' }}>
+                        <p style={{ margin: '0 0 8px', fontSize: '13px', fontWeight: 800, color: THEME.textMain }}>관리자 등급 설정</p>
+                        <select
+                          value={adminForm.role}
+                          onChange={(e) => setAdminForm((prev) => ({ ...prev, role: e.target.value }))}
+                          style={{ width: '100%', height: '44px', borderRadius: '10px', border: `1px solid ${THEME.border}`, padding: '0 12px' }}
+                        >
+                          <option value="MANAGER">매니저</option>
+                          <option value="SUPER">최고관리자</option>
+                          <option value="CUSTOM">직접 작성</option>
+                        </select>
+                      </div>
+
+                      {adminForm.role === "CUSTOM" && (
+                        <input
+                          value={adminForm.customRole}
+                          onChange={(e) => setAdminForm((prev) => ({ ...prev, customRole: e.target.value }))}
+                          placeholder="등급 이름을 입력하세요 (예: 부관리자)"
+                          style={{ height: '44px', borderRadius: '10px', border: `1px solid ${THEME.border}`, padding: '0 12px' }}
+                        />
+                      )}
+                    </div>
+
+                    <div style={{ marginTop: '18px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                      <button onClick={() => setIsAddAdminModalOpen(false)} style={{ height: '40px', padding: '0 16px', borderRadius: '10px', border: `1px solid ${THEME.border}`, backgroundColor: '#fff', cursor: 'pointer' }}>취소</button>
+                      <button
+                        onClick={createAdminUser}
+                        disabled={adminLoading}
+                        style={{ height: '40px', padding: '0 16px', borderRadius: '10px', border: 'none', backgroundColor: THEME.primary, color: '#fff', cursor: 'pointer', fontWeight: 700, opacity: adminLoading ? 0.6 : 1 }}
+                      >
+                        {adminLoading ? '등록 중...' : '등록'}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {false && (
             <div style={{ padding: '120px 0', textAlign: 'center' }}>
               <h3 style={{ fontSize: '24px', fontWeight: 950 }}>접근 권한 제어</h3>
               <p style={{ color: THEME.textMuted, marginTop: '16px' }}>시스템 관리자 계정 및 보안 등급을 설정합니다. (준비 중..)</p>

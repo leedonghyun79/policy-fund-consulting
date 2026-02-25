@@ -17,13 +17,6 @@ function getSessionSecret(): string {
   return process.env.ADMIN_SESSION_SECRET || "dev-only-change-me";
 }
 
-export function getAdminCredentials() {
-  return {
-    username: process.env.ADMIN_USERNAME || "admin",
-    password: process.env.ADMIN_PASSWORD || "root",
-  };
-}
-
 export function createAdminSessionToken(username: string): string {
   const exp = Math.floor(Date.now() / 1000) + SESSION_MAX_AGE_SEC;
   const payload = JSON.stringify({ username, exp });

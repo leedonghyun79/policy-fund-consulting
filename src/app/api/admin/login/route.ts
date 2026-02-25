@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   ADMIN_SESSION_COOKIE,
   createAdminSessionToken,
-  getAdminCredentials,
   getAdminSessionMaxAgeSec,
 } from "@/src/lib/admin-auth";
+import { prisma } from "@/src/lib/prisma";
+import { verifyAdminPassword } from "@/src/lib/admin-password";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,8 +14,16 @@ export async function POST(req: NextRequest) {
       password?: string;
     };
 
-    const admin = getAdminCredentials();
-    if (username !== admin.username || password !== admin.password) {
+    if (!username || !password) {
+      return NextResponse.json({ message: "Username and password are required." }, { status: 400 });
+    }
+
+    const dbAdmin = await prisma.adminUser.findUnique({
+      where: { username },
+      select: { username: true, passwordHash: true },
+    });
+
+    if (!dbAdmin || !verifyAdminPassword(password, dbAdmin.passwordHash)) {
       return NextResponse.json({ message: "Invalid credentials." }, { status: 401 });
     }
 
