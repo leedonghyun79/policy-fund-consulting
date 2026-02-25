@@ -587,8 +587,9 @@ body {
 
 /* Buttons */
 .btn-vibrant {
-  background: #ff9033;
-  /* Vibrant contrast color */
+  background: linear-gradient(-45deg, #ff9033, #ffb347, #ff9033, #ff7e14);
+  background-size: 300% 300%;
+  animation: moveGradient 4s ease infinite;
   color: #fff;
   border: none;
   padding: 20px 40px;
@@ -602,10 +603,25 @@ body {
   box-shadow: 0 10px 20px rgba(255, 144, 51, 0.2);
 }
 
+@keyframes moveGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 .btn-vibrant:hover {
   transform: translateY(-4px) scale(1.03);
   box-shadow: 0 15px 30px rgba(255, 144, 51, 0.4);
-  background: #ff7e14;
+  filter: brightness(1.05);
+  /* Subtle brightness boost on hover instead of background override */
 }
 
 /* Expertise Cards (Reference Image Style) */
