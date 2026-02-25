@@ -370,7 +370,7 @@ export default function Home() {
               <div
                 className={`rolling-list ${!isRollingTransition ? 'no-transition' : ''}`}
                 style={{
-                  transform: `translateY(-${rollingIndex * 60}px)`,
+                  transform: `translateY(-${rollingIndex * 70}px)`,
                 }}
               >
                 {[...mergedLeads, ...mergedLeads.slice(0, 4)].map((row, i) => (

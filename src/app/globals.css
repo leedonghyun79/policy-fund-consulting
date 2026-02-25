@@ -725,27 +725,29 @@ body {
   grid-template-columns: 1fr 1.5fr 1.5fr 1fr;
   background: var(--blue-deep);
   color: #fff;
-  padding: 16px;
-  font-size: 1.2rem;
+  padding: 20px 16px;
+  font-size: 1.4rem;
+  /* Increased from 1.2rem */
   font-weight: 700;
 }
 
 .tr-row {
   display: grid;
   grid-template-columns: 1fr 1.5fr 1.5fr 1fr;
-  height: 60px;
-  /* Fixed height for precise rolling */
+  height: 70px;
+  /* Increased from 60px to accommodate larger font */
   padding: 0 18px;
   border-bottom: 1px solid #f5f5f5;
-  font-size: 1.2rem;
+  font-size: 1.45rem;
+  /* Increased from 1.2rem */
   text-align: center;
   align-items: center;
 }
 
 .rolling-viewport {
   position: relative;
-  height: 240px;
-  /* Exactly 4 rows (4 * 60px) */
+  height: 280px;
+  /* 4 rows * 70px = 280px */
   overflow: hidden;
 }
 
@@ -771,9 +773,10 @@ body {
 }
 
 .tag-status {
-  padding: 7px 14px;
+  padding: 8px 16px;
   border-radius: var(--radius-full);
-  font-size: 1rem;
+  font-size: 1.1rem;
+  /* Increased slightly */
   font-weight: 700;
 }
 
