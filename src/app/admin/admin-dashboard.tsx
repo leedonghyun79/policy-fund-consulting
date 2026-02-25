@@ -20,7 +20,8 @@ import {
   HiOutlineChartBar,
   HiOutlineUserCircle,
   HiChevronRight,
-  HiOutlineCube
+  HiOutlineCube,
+  HiOutlineHome
 } from "react-icons/hi2";
 
 type LeadRow = {
@@ -320,8 +321,11 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
             ))}
           </nav>
         </div>
-        <div style={{ padding: '24px' }}>
-          <button onClick={() => { if (confirm("로그아웃 하시겠습니까?")) { fetch("/api/admin/logout", { method: "POST" }).then(() => router.replace("/admin/login")); } }} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px' }}>
+        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <button onClick={() => router.push("/")} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', background: 'transparent' }}>
+            <HiOutlineHome size={16} /> {!ui.isSidebarCollapsed && "메인페이지 이동"}
+          </button>
+          <button onClick={() => { if (confirm("로그아웃 하시겠습니까?")) { fetch("/api/admin/logout", { method: "POST" }).then(() => router.replace("/admin/login")); } }} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', background: 'transparent' }}>
             <HiOutlineArrowLeftOnRectangle size={16} /> {!ui.isSidebarCollapsed && "안전하게 로그아웃"}
           </button>
         </div>
