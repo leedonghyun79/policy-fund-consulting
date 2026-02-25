@@ -16,6 +16,7 @@ export default async function AdminPage() {
       select: {
         id: true,
         businessName: true,
+        representativeName: true,
         phoneRaw: true,
         addressRoad: true,
         addressDetail: true,
@@ -28,9 +29,10 @@ export default async function AdminPage() {
 
     return (
       <AdminDashboard
-        initialLeads={leads.map((row) => ({
+        initialLeads={leads.map((row: any) => ({
           ...row,
           createdAt: row.createdAt.toISOString(),
+          representativeName: row.representativeName ?? '',
         }))}
       />
     );
