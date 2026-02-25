@@ -236,7 +236,7 @@ export default function Home() {
         <div className="container" style={{ maxWidth: 1200 }}>
           <div className="hero-inner-content reveal">
             <h1 className="hero-main-title">
-              정책자금, <span className="hero-point">제대로</span> 알고 <br /> <span className="hero-point">제대로</span> 받으세요.
+              정책자금, <span className="hero-point">제대로</span> 알고<br className="mo-only" /> <span className="hero-point">제대로</span> 받으세요.
             </h1>
             <p className="hero-desc">
               중소기업·소상공인을 위한 정부 정책자금<br />
@@ -380,8 +380,7 @@ export default function Home() {
         </div>
         <div className="container">
           <h2 className="section-title white" style={{ marginBottom: 30 }}>
-            <span style={{ color: '#93c5fd' }}>어떤 고민으로</span><br />
-            여기까지 오셨나요?
+            <span style={{ color: '#93c5fd' }}>어떤 고민으로</span><br className="mo-only" /> 여기까지 오셨나요?
           </h2>
 
           <div className="forest-desc">
