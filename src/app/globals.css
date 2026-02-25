@@ -636,7 +636,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.2));
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.4) 100%);
   z-index: 1;
 }
 
@@ -644,43 +644,69 @@ body {
   position: relative;
   z-index: 2;
   color: #ffffff;
+  text-align: left;
+  /* Align text to the left for better professionalism */
+}
+
+.card-arrow {
+  position: absolute;
+  bottom: 25px;
+  right: 25px;
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f172a;
+  font-size: 1.2rem;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.card-item:hover .card-arrow {
+  background: var(--blue-primary);
+  color: #fff;
+  transform: scale(1.1);
 }
 
 .card-item h4 {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   font-weight: 800;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   color: #fff;
   letter-spacing: -0.05em;
   word-break: keep-all;
 }
 
 .card-item p {
-  font-size: 1rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
 }
 
 .card-startup {
-  background-image: url('../assets/images/policy-fund-item1.webp');
+  background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=800&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
 }
 
 .card-operating {
-  background-image: url('../assets/images/policy-fund-item2.webp');
+  background-image: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=800&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
 }
 
 .card-facility {
-  background-image: url('../assets/images/policy-fund-item3.webp');
+  background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
 }
 
 .card-tech {
-  background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop');
+  background-image: url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800&auto=format&fit=crop');
   background-size: cover;
   background-position: center;
 }
