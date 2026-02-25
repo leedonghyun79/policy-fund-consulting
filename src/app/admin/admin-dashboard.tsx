@@ -182,23 +182,33 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
 
   // Handlers
   const exportToExcel = () => {
-    const data = filteredLeads.map((l, i) => ({
-      "No.": filteredLeads.length - i,
-      "사업자명": l.businessName,
-      "연락처": l.phoneRaw,
-      "도로명주소": l.addressRoad,
-      "상세주소": l.addressDetail || "",
-      "업종": industryLabels[l.industry] || l.industry,
-      "필요자금": (() => {
-        if (!l.desiredAmountText) return "-";
-        const clean = l.desiredAmountText.replace(/,/g, "").replace(/원/g, "").trim();
-        if (/^\d+$/.test(clean)) return Number(clean).toLocaleString() + "원";
-        return l.desiredAmountText.includes("원") ? l.desiredAmountText : l.desiredAmountText + "원";
-      })(),
-      "진행 상태": statusConfig[l.status]?.label,
-      "신청일시": new Date(l.createdAt).toLocaleString()
-    }));
+    const data = filteredLeads.map((l, i) => {
+      const amountRaw = l.desiredAmountText ? l.desiredAmountText.replace(/,/g, "").replace(/원/g, "").trim() : "";
+      const isNumeric = amountRaw !== "" && /^\d+$/.test(amountRaw);
+
+      return {
+        "No.": filteredLeads.length - i,
+        "사업자명": l.businessName,
+        "연락처": l.phoneRaw,
+        "도로명주소": l.addressRoad,
+        "상세주소": l.addressDetail || "",
+        "업종": industryLabels[l.industry] || l.industry,
+        "필요자금": isNumeric ? Number(amountRaw) : (l.desiredAmountText || "-"),
+        "진행 상태": statusConfig[l.status]?.label,
+        "신청일시": new Date(l.createdAt).toLocaleString()
+      };
+    });
+
     const ws = XLSX.utils.json_to_sheet(data);
+
+    // Apply currency format to '필요자금' column (Column G / Index 6)
+    const range = XLSX.utils.decode_range(ws['!ref'] || "A1:I1");
+    for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+      const cell = ws[XLSX.utils.encode_cell({ r: R, c: 6 })];
+      if (cell && cell.t === 'n') {
+        cell.z = '#,##0"원"'; // Right-aligns numbers and adds suffix
+      }
+    }
 
     // Set Column Widths (Characters approximately)
     ws['!cols'] = [
