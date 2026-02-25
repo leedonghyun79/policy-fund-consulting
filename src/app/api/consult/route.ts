@@ -63,16 +63,22 @@ export async function POST(req: NextRequest) {
     const phoneRaw = `010-${body.phoneMiddle}-${body.phoneLast}`;
     const userAgent = req.headers.get("user-agent");
 
-    const lead = await prisma.consultationLead.create({
+    console.log("Creating lead with payload:", {
+      businessName: body.businessName?.trim(),
+      representativeName: body.representativeName?.trim(),
+      phoneRaw,
+    });
+
+    const lead = await (prisma.consultationLead as any).create({
       data: {
-        businessName: body.businessName.trim(),
-        representativeName: body.representativeName.trim(),
+        businessName: body.businessName!.trim(),
+        representativeName: body.representativeName!.trim(),
         phoneMiddle: body.phoneMiddle!,
         phoneLast: body.phoneLast!,
         phoneRaw,
-        addressRoad: body.addressRoad.trim(),
+        addressRoad: body.addressRoad!.trim(),
         addressDetail: body.addressDetail?.trim() || null,
-        industry: body.industry,
+        industry: body.industry!,
         desiredAmountText: body.desiredAmountText?.trim() || null,
         consentAgreedAt: new Date(),
         consentVersion: body.consentVersion?.trim() || "v1",
@@ -91,20 +97,32 @@ export async function POST(req: NextRequest) {
       select: { id: true, createdAt: true },
     });
 
+    console.log("Lead created successfully:", lead.id);
+
     // Send Notification Email
-    await sendConsultationEmail({
-      businessName: body.businessName.trim(),
-      representativeName: body.representativeName.trim(),
-      phoneRaw,
-      addressRoad: body.addressRoad.trim(),
-      addressDetail: body.addressDetail?.trim(),
-      industry: body.industry,
-      desiredAmountText: body.desiredAmountText?.trim(),
-    });
+    try {
+      await sendConsultationEmail({
+        businessName: body.businessName!.trim(),
+        representativeName: body.representativeName!.trim(),
+        phoneRaw,
+        addressRoad: body.addressRoad!.trim(),
+        addressDetail: body.addressDetail?.trim(),
+        industry: body.industry!,
+        desiredAmountText: body.desiredAmountText?.trim(),
+      });
+      console.log("Email sent successfully.");
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+      // Non-critical error, continue
+    }
 
     return NextResponse.json({ ok: true, lead }, { status: 201 });
   } catch (error) {
-    console.error("Consultation create error:", error);
+    console.error("Consultation create error detailed:", error);
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
     return NextResponse.json({ message: "Internal server error." }, { status: 500 });
   }
 }
