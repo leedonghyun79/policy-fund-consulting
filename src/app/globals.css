@@ -1493,6 +1493,16 @@ input[type="number"] {
     white-space: nowrap;
     letter-spacing: -0.05em;
   }
+
+  .mobile-br {
+    display: block;
+    content: "";
+    margin-top: 5px;
+  }
+}
+
+.mobile-br {
+  display: none;
 }
 
 /* Admin Sidebar Hover */
