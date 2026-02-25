@@ -182,7 +182,11 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
       "도로명주소": l.addressRoad,
       "상세주소": l.addressDetail || "",
       "업종": industryLabels[l.industry] || l.industry,
-      "희망자금": l.desiredAmountText || "",
+      "필요자금": (() => {
+        if (!l.desiredAmountText) return "";
+        const clean = l.desiredAmountText.replace(/,/g, "").replace(/원/g, "").trim();
+        return /^\d+$/.test(clean) ? Number(clean).toLocaleString() + "원" : l.desiredAmountText;
+      })(),
       "진행 상태": statusConfig[l.status]?.label,
       "신청일시": new Date(l.createdAt).toLocaleString()
     }));
@@ -190,15 +194,15 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
 
     // Set Column Widths (Characters approximately)
     ws['!cols'] = [
-      { wch: 5 },  // No.
-      { wch: 20 }, // 사업자명
-      { wch: 15 }, // 연락처
-      { wch: 35 }, // 도로명주소
-      { wch: 25 }, // 상세주소
-      { wch: 15 }, // 업종
-      { wch: 15 }, // 희망자금
-      { wch: 12 }, // 진행 상태
-      { wch: 25 }, // 신청일시
+      { wch: 8 },   // No.
+      { wch: 30 },  // 사업자명
+      { wch: 20 },  // 연락처
+      { wch: 60 },  // 도로명주소
+      { wch: 45 },  // 상세주소
+      { wch: 20 },  // 업종
+      { wch: 20 },  // 필요자금
+      { wch: 15 },  // 진행 상태
+      { wch: 30 },  // 신청일시
     ];
 
     const wb = XLSX.utils.book_new();
@@ -334,31 +338,50 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                 <button onClick={exportToExcel} style={{ padding: '0 24px', backgroundColor: THEME.secondary, color: '#fff', borderRadius: '16px', border: 'none', fontWeight: 800 }}>내보내기</button>
               </div>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead style={{ background: '#f8fafc' }}><tr style={{ textAlign: 'left' }}>{['No.', '사업자명', '연락처', '도로명주소', '상세주소', '업종', '희망자금', '진행 상태', '신청일시', '관리'].map(h => <th key={h} style={{ padding: '20px 24px', fontSize: '11px', fontWeight: 800, color: THEME.textMuted }}>{h}</th>)}</tr></thead>
+                <thead style={{ background: '#f8fafc' }}>
+                  <tr style={{ textAlign: 'left' }}>
+                    {['No.', '사업자명', '연락처', '도로명주소', '상세주소', '업종', '필요자금', '진행 상태', '신청일시', '관리'].map((h, idx) => (
+                      <th key={h} style={{
+                        padding: '20px 16px',
+                        fontSize: '13px',
+                        fontWeight: 800,
+                        color: THEME.textMain,
+                        whiteSpace: idx === 3 || idx === 4 ? 'normal' : 'nowrap',
+                        minWidth: idx === 3 ? '200px' : (idx === 4 ? '150px' : 'auto')
+                      }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
                 <tbody>
                   {paginatedLeads.map((l, i) => {
                     const status = pendingStatuses[l.id] || l.status;
                     const st = statusConfig[status] || statusConfig.NEW;
                     return (
                       <tr key={l.id} style={{ borderBottom: `1px solid ${THEME.border}` }}>
-                        <td style={{ padding: '18px 24px' }}>{filteredLeads.length - ((ui.currentPage - 1) * ITEMS_PER_PAGE) - i}</td>
-                        <td style={{ padding: '18px 24px', fontWeight: 800 }}>{l.businessName}</td>
-                        <td style={{ padding: '18px 24px' }}>{l.phoneRaw}</td>
-                        <td style={{ padding: '18px 24px', fontSize: '13px' }}>{l.addressRoad}</td>
-                        <td style={{ padding: '18px 24px', fontSize: '13px' }}>{l.addressDetail || "-"}</td>
-                        <td style={{ padding: '18px 24px' }}>{industryLabels[l.industry] || l.industry}</td>
-                        <td style={{ padding: '18px 24px' }}>{l.desiredAmountText || "-"}</td>
-                        <td style={{ padding: '18px 24px' }}>
+                        <td style={{ padding: '18px 16px', whiteSpace: 'nowrap' }}>{filteredLeads.length - ((ui.currentPage - 1) * ITEMS_PER_PAGE) - i}</td>
+                        <td style={{ padding: '18px 16px', fontWeight: 800, whiteSpace: 'nowrap' }}>{l.businessName}</td>
+                        <td style={{ padding: '18px 16px', whiteSpace: 'nowrap' }}>{l.phoneRaw}</td>
+                        <td style={{ padding: '18px 16px', fontSize: '13px', minWidth: '200px', lineHeight: '1.4' }}>{l.addressRoad}</td>
+                        <td style={{ padding: '18px 16px', fontSize: '13px', minWidth: '150px', lineHeight: '1.4' }}>{l.addressDetail || "-"}</td>
+                        <td style={{ padding: '18px 16px', whiteSpace: 'nowrap' }}>{industryLabels[l.industry] || l.industry}</td>
+                        <td style={{ padding: '18px 16px', fontWeight: 700, whiteSpace: 'nowrap', textAlign: 'right' }}>
+                          {(() => {
+                            if (!l.desiredAmountText) return "-";
+                            const clean = l.desiredAmountText.replace(/,/g, "").replace(/원/g, "").trim();
+                            return /^\d+$/.test(clean) ? Number(clean).toLocaleString() + "원" : l.desiredAmountText;
+                          })()}
+                        </td>
+                        <td style={{ padding: '18px 16px', whiteSpace: 'nowrap' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <select value={status} onChange={e => setPendingStatuses(p => ({ ...p, [l.id]: e.target.value as LeadStatus }))} style={{ padding: '6px', borderRadius: '8px', border: `1px solid ${st.color}44`, color: st.color, fontWeight: 800, fontSize: '13px' }}>
+                            <select value={status} onChange={e => setPendingStatuses(p => ({ ...p, [l.id]: e.target.value as LeadStatus }))} style={{ padding: '6px', borderRadius: '8px', border: `1px solid ${st.color}44`, color: st.color, fontWeight: 800, fontSize: '13px', backgroundColor: '#fff' }}>
                               <option value="NEW">진행중</option><option value="CONTACTED">진행 완료</option><option value="CLOSED">진행 불가</option>
                             </select>
-                            {pendingStatuses[l.id] && status !== l.status && <button onClick={() => updateMutation.mutate({ id: l.id, status })} style={{ padding: '6px 10px', borderRadius: '8px', background: THEME.primary, color: '#fff', border: 'none', fontSize: '12px' }}>저장</button>}
+                            {pendingStatuses[l.id] && status !== l.status && <button onClick={() => updateMutation.mutate({ id: l.id, status })} style={{ padding: '6px 10px', borderRadius: '8px', background: THEME.primary, color: '#fff', border: 'none', fontSize: '12px', cursor: 'pointer' }}>저장</button>}
                           </div>
                         </td>
-                        <td style={{ padding: '18px 24px', fontSize: '12px', color: THEME.textMuted }}>{new Date(l.createdAt).toLocaleString()}</td>
-                        <td style={{ padding: '18px 24px' }}>
-                          {(status === "CONTACTED" || status === "CONVERTED" || status === "CLOSED" || status === "SPAM") && <button onClick={() => { if (confirm("삭제하시겠습니까?")) deleteMutation.mutate(l.id); }} style={{ color: '#ef4444', border: 'none', background: 'none', cursor: 'pointer' }}><HiOutlineTrash size={18} /></button>}
+                        <td style={{ padding: '18px 16px', fontSize: '12px', color: THEME.textMuted, whiteSpace: 'nowrap' }}>{new Date(l.createdAt).toLocaleString()}</td>
+                        <td style={{ padding: '18px 16px', textAlign: 'center' }}>
+                          {(status === "CONTACTED" || status === "CONVERTED" || status === "CLOSED" || status === "SPAM") && <button onClick={() => { if (confirm("삭제하시겠습니까?")) deleteMutation.mutate(l.id); }} style={{ color: '#ef4444', border: 'none', background: 'none', cursor: 'pointer', padding: '4px' }}><HiOutlineTrash size={18} /></button>}
                         </td>
                       </tr>
                     )
