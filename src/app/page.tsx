@@ -588,9 +588,9 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer style={{ marginTop: "-1px", padding: "60px 20px", background: "#eef3ff", fontSize: "0.85rem", color: "var(--text-muted)" }} className="text-center">
-        <div className="container">
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+      <footer style={{ marginTop: "-1px", padding: "60px 20px", background: "#eef3ff", fontSize: "0.85rem", color: "var(--text-muted)", wordBreak: "keep-all" }} className="text-center">
+        <div className="container" style={{ maxWidth: "600px", margin: "0 auto" }}>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
             <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="32" height="32" rx="8" fill="#1E40AF" />
               <path d="M9 7H16.5C18.9853 7 21 9.01472 21 11.5C21 13.9853 18.9853 16 16.5 16H9V7Z" fill="white" />
@@ -600,11 +600,14 @@ export default function Home() {
               <rect x="23" y="5" width="4" height="12" rx="1" fill="#3B82F6" />
               <path d="M21 12L25 4L29 12H21Z" fill="#60A5FA" />
             </svg>
-            <p style={{ fontWeight: 700, color: "var(--text-dark)", marginBottom: 0 }}>주식회사 비티씨</p>
+            <p style={{ fontWeight: 800, color: "var(--text-dark)", marginBottom: 0, fontSize: "1rem" }}>주식회사 비티씨</p>
           </div>
-          <p>상호명: 주식회사 비티씨 | 사업자번호: 452-81-03847</p>
-          <p>대표전화: 010-4148-0242 | 경기도 부천시 원미구 옥산로7, 상가 a동 116호</p>
-          <p style={{ marginTop: 25, opacity: 0.8 }}>© 2026 주식회사 비티씨. All rights reserved.</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <p>상호명: 주식회사 비티씨 | 사업자번호: 452-81-03847</p>
+            <p>대표전화: 010-4148-0242</p>
+            <p>경기도 부천시 원미구 옥산로7, 상가 a동 116호</p>
+          </div>
+          <p style={{ marginTop: 30, opacity: 0.6, fontSize: "0.75rem" }}>© 2026 주식회사 비티씨. All rights reserved.</p>
         </div>
       </footer>
 
