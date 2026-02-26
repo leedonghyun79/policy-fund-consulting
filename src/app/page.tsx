@@ -471,14 +471,14 @@ export default function Home() {
           </h2>
           <p className="section-subtitle" style={{ marginBottom: 40 }}>먼저 편하게 말씀해 주세요.<br className="mo-only" /> 방향은 저희가 잡아드리겠습니다.</p>
 
-          <form onSubmit={handleSubmit} style={{ textAlign: "left", maxWidth: 500, margin: "0 auto" }}>
+          <form onSubmit={handleSubmit} autoComplete="off" style={{ textAlign: "left", maxWidth: 500, margin: "0 auto" }}>
             <div className="form-group">
               <label className="form-label">사업자명 *</label>
-              <input className="form-input" name="businessName" type="text" placeholder="회사명 입력" required />
+              <input className="form-input" name="businessName" type="text" placeholder="회사명 입력" required autoComplete="off" />
             </div>
             <div className="form-group">
               <label className="form-label">대표자명 *</label>
-              <input className="form-input" name="representativeName" type="text" placeholder="대표자성함 입력" required />
+              <input className="form-input" name="representativeName" type="text" placeholder="대표자성함 입력" required autoComplete="off" />
             </div>
             <div className="form-group">
               <label className="form-label">휴대폰번호 *</label>
@@ -491,6 +491,7 @@ export default function Home() {
                   type="number"
                   placeholder="0000"
                   required
+                  autoComplete="off"
                   style={{ textAlign: 'center' }}
                   onInput={(e: any) => {
                     if (e.target.value.length > 4) e.target.value = e.target.value.slice(0, 4);
@@ -503,6 +504,7 @@ export default function Home() {
                   type="number"
                   placeholder="0000"
                   required
+                  autoComplete="off"
                   style={{ textAlign: 'center' }}
                   onInput={(e: any) => {
                     if (e.target.value.length > 4) e.target.value = e.target.value.slice(0, 4);
@@ -530,6 +532,7 @@ export default function Home() {
                 value={extraAddress}
                 onChange={(e) => setExtraAddress(e.target.value)}
                 placeholder="상세 주소를 입력해주세요"
+                autoComplete="off"
               />
             </div>
 
@@ -551,7 +554,7 @@ export default function Home() {
 
             <div className="form-group">
               <label className="form-label">희망 자금 규모 (선택)</label>
-              <input className="form-input" name="desiredAmountText" type="text" placeholder="예: 5,000만원" />
+              <input className="form-input" name="desiredAmountText" type="text" placeholder="예: 5,000만원" autoComplete="off" />
             </div>
 
             <div style={{ marginTop: 20, fontSize: "0.85rem", color: "#666" }}>

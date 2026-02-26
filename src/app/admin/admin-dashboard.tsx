@@ -85,7 +85,10 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
   const [isMobile, setIsMobile] = useState(false);
   const [isAddAdminModalOpen, setIsAddAdminModalOpen] = useState(false);
   const [adminForm, setAdminForm] = useState({ name: "", username: "", password: "", role: "MANAGER", customRole: "" });
+  const [isEditAdminModalOpen, setIsEditAdminModalOpen] = useState(false);
+  const [editAdminForm, setEditAdminForm] = useState({ id: "", name: "", username: "", password: "" });
   const [adminLoading, setAdminLoading] = useState(false);
+  const [editAdminLoading, setEditAdminLoading] = useState(false);
   const [adminMessage, setAdminMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [pendingStatuses, setPendingStatuses] = useState<Record<string, LeadStatus>>({});
   const [showNotiDropdown, setShowNotiDropdown] = useState(false);
@@ -173,6 +176,15 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (adminMessage) {
+      const timer = setTimeout(() => {
+        setAdminMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [adminMessage]);
 
   // Filter & Pagination Logic
   const filteredLeads = useMemo(() => {
@@ -287,6 +299,37 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
     }
   };
 
+  const updateAdminUser = async () => {
+    setEditAdminLoading(true);
+    setAdminMessage(null);
+    try {
+      const res = await fetch(`/api/admin/users/${editAdminForm.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editAdminForm.name,
+          username: editAdminForm.username,
+          password: editAdminForm.password,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.message || "관리자 수정에 실패했습니다. 권한이 없거나 중복된 아이디일 수 있습니다.");
+      }
+
+      setAdminMessage({ type: "success", text: "관리자 계정이 수정되었습니다." });
+      setEditAdminForm({ id: "", name: "", username: "", password: "" });
+      setIsEditAdminModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "관리자 수정에 실패했습니다.";
+      setAdminMessage({ type: "error", text: message });
+    } finally {
+      setEditAdminLoading(false);
+    }
+  };
+
   if (!isMounted) return null;
 
   if (isMobile) {
@@ -311,8 +354,8 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
             </div>
             {!ui.isSidebarCollapsed && (
               <div>
-                <h2 style={{ fontSize: '16px', fontWeight: 900, margin: 0, letterSpacing: '-0.5px' }}>픽셀커넥트</h2>
-                <span style={{ fontSize: '10px', opacity: 0.5 }}>픽셀 엔진 v1.2</span>
+                <h2 style={{ fontSize: '16px', fontWeight: 900, margin: 0, letterSpacing: '-0.5px' }}>주식회사 비티씨</h2>
+                <span style={{ fontSize: '10px', opacity: 0.5 }}>통합 관리 시스템 v1.2</span>
               </div>
             )}
           </div>
@@ -325,7 +368,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
               { id: 'members', label: '접근 권한 제어', icon: HiOutlineUsers },
               { id: 'settings', label: '시스템 설정', icon: HiOutlineCog6Tooth },
             ].map(item => (
-              <button key={item.id} onClick={() => ui.setActiveTab(item.id)} style={{
+              <button key={item.id} className="nav-btn" onClick={() => ui.setActiveTab(item.id)} style={{
                 width: '100%',
                 padding: '14px 16px',
                 borderRadius: '12px',
@@ -346,17 +389,18 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
           </nav>
         </div>
         <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <button onClick={() => router.push("/")} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', background: 'transparent' }}>
+          <button className="nav-bottom-btn" onClick={() => router.push("/")} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', background: 'transparent' }}>
             <HiOutlineHome size={16} /> {!ui.isSidebarCollapsed && "메인페이지 이동"}
           </button>
-          <button onClick={() => { if (confirm("로그아웃 하시겠습니까?")) { fetch("/api/admin/logout", { method: "POST" }).then(() => router.replace("/admin/login")); } }} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', background: 'transparent' }}>
+          <button className="nav-bottom-btn" onClick={() => { if (confirm("로그아웃 하시겠습니까?")) { fetch("/api/admin/logout", { method: "POST" }).then(() => router.replace("/admin/login")); } }} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', background: 'transparent' }}>
             <HiOutlineArrowLeftOnRectangle size={16} /> {!ui.isSidebarCollapsed && "안전하게 로그아웃"}
           </button>
         </div>
-      </aside>
+      </aside >
 
       {/* 메인 영역 */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      < main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }
+      }>
         <header style={{ height: '80px', backgroundColor: '#fff', borderBottom: `1px solid ${THEME.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 40px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
             <h1 style={{ fontSize: '24px', fontWeight: 900, color: THEME.textMain, margin: 0 }}>{ui.activeTab === 'dashboard' ? '대시보드' : (ui.activeTab === 'consultations' ? '상담현황' : '관리제어')}</h1>
@@ -541,17 +585,11 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                 </button>
               </div>
 
-              {adminMessage && (
-                <div style={{ padding: '14px 18px', borderRadius: '14px', backgroundColor: adminMessage.type === 'success' ? '#ecfdf5' : '#fef2f2', color: adminMessage.type === 'success' ? '#047857' : '#b91c1c', border: `1px solid ${adminMessage.type === 'success' ? '#a7f3d0' : '#fecaca'}` }}>
-                  {adminMessage.text}
-                </div>
-              )}
-
               <div style={{ backgroundColor: '#fff', border: `1px solid ${THEME.border}`, borderRadius: '20px', overflow: 'hidden' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead style={{ backgroundColor: '#f8fafc' }}>
                     <tr>
-                      {['이름', '아이디', '등급', '등록일'].map((h) => (
+                      {['이름', '아이디', '등급', '등록일', '관리'].map((h) => (
                         <th key={h} style={{ textAlign: 'left', padding: '14px 20px', fontSize: '12px', color: THEME.textMuted }}>{h}</th>
                       ))}
                     </tr>
@@ -559,7 +597,7 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                   <tbody>
                     {adminUsers.length === 0 && (
                       <tr>
-                        <td colSpan={4} style={{ padding: '40px 20px', textAlign: 'center', color: THEME.textMuted }}>등록된 관리자 계정이 없습니다.</td>
+                        <td colSpan={5} style={{ padding: '40px 20px', textAlign: 'center', color: THEME.textMuted }}>등록된 관리자 계정이 없습니다.</td>
                       </tr>
                     )}
                     {adminUsers.map((u) => (
@@ -570,6 +608,18 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                           {u.role === 'SUPER' ? '시스템 관리자' : (u.role === 'MANAGER' ? '최고 관리자' : u.role)}
                         </td>
                         <td style={{ padding: '14px 20px', color: THEME.textMuted }}>{new Date(u.createdAt).toLocaleString()}</td>
+                        <td style={{ padding: '14px 20px' }}>
+                          <button
+                            onClick={() => {
+                              setAdminMessage(null);
+                              setEditAdminForm({ id: u.id, name: u.name, username: u.username, password: "" });
+                              setIsEditAdminModalOpen(true);
+                            }}
+                            style={{ padding: '6px 12px', borderRadius: '8px', border: `1px solid ${THEME.border}`, backgroundColor: '#fff', fontSize: '12px', fontWeight: 700, cursor: 'pointer', color: THEME.textMain }}
+                          >
+                            수정
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -623,6 +673,38 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
                   </div>
                 </>
               )}
+
+              {isEditAdminModalOpen && (
+                <>
+                  <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15,23,42,0.45)', zIndex: 100 }} onClick={() => setIsEditAdminModalOpen(false)} />
+                  <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '460px', backgroundColor: '#fff', borderRadius: '18px', border: `1px solid ${THEME.border}`, padding: '24px', zIndex: 101 }}>
+                    <h4 style={{ margin: 0, fontSize: '20px', fontWeight: 900 }}>관리자 정보 수정</h4>
+                    <p style={{ margin: '8px 0 20px', fontSize: '13px', color: THEME.textMuted }}>관리자 정보를 수정합니다. 빈 칸으로 남겨두는 항목은 변경되지 않습니다.</p>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted }}>이름</label>
+                      <input value={editAdminForm.name} onChange={(e) => setEditAdminForm((prev) => ({ ...prev, name: e.target.value }))} placeholder="이름" style={{ height: '44px', borderRadius: '10px', border: `1px solid ${THEME.border}`, padding: '0 12px' }} />
+
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, marginTop: '4px' }}>아이디</label>
+                      <input value={editAdminForm.username} onChange={(e) => setEditAdminForm((prev) => ({ ...prev, username: e.target.value }))} placeholder="아이디 (영문 소문자/숫자, 4자 이상)" style={{ height: '44px', borderRadius: '10px', border: `1px solid ${THEME.border}`, padding: '0 12px' }} />
+
+                      <label style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, marginTop: '4px' }}>새 비밀번호 (변경시에만 입력)</label>
+                      <input type="password" value={editAdminForm.password} onChange={(e) => setEditAdminForm((prev) => ({ ...prev, password: e.target.value }))} placeholder="새 비밀번호 (8자 이상)" style={{ height: '44px', borderRadius: '10px', border: `1px solid ${THEME.border}`, padding: '0 12px' }} />
+                    </div>
+
+                    <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                      <button onClick={() => setIsEditAdminModalOpen(false)} style={{ height: '40px', padding: '0 16px', borderRadius: '10px', border: `1px solid ${THEME.border}`, backgroundColor: '#fff', cursor: 'pointer' }}>취소</button>
+                      <button
+                        onClick={updateAdminUser}
+                        disabled={editAdminLoading}
+                        style={{ height: '40px', padding: '0 16px', borderRadius: '10px', border: 'none', backgroundColor: THEME.primary, color: '#fff', cursor: 'pointer', fontWeight: 700, opacity: editAdminLoading ? 0.6 : 1 }}
+                      >
+                        {editAdminLoading ? '저장 중...' : '저장'}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -640,60 +722,97 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
             </div>
           )}
         </div>
-      </main>
+      </main >
 
       {/* 삭제된 항목 패널 */}
-      {showDeletedPanel && (
-        <>
-          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15,23,42,0.5)', zIndex: 200 }} onClick={() => setShowDeletedPanel(false)} />
-          <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90vw', maxWidth: '900px', maxHeight: '80vh', backgroundColor: '#fff', borderRadius: '24px', zIndex: 201, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.15)' }}>
-            <div style={{ padding: '28px 32px', borderBottom: `1px solid ${THEME.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 900 }}>🗑 삭제된 항목</h3>
-                <p style={{ margin: '4px 0 0', fontSize: '13px', color: THEME.textMuted }}>복구 버튼을 눌러 항목을 복원할 수 있습니다.</p>
-              </div>
-              <button onClick={() => setShowDeletedPanel(false)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: THEME.textMuted }}>×</button>
-            </div>
-            <div style={{ overflowY: 'auto', flex: 1 }}>
-              {deletedLeads.length === 0 ? (
-                <div style={{ padding: '80px 20px', textAlign: 'center', color: THEME.textMuted }}>
-                  <p style={{ fontSize: '48px', marginBottom: '16px' }}>✅</p>
-                  <p style={{ fontWeight: 700 }}>삭제된 항목이 없습니다.</p>
+      {
+        showDeletedPanel && (
+          <>
+            <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15,23,42,0.5)', zIndex: 200 }} onClick={() => setShowDeletedPanel(false)} />
+            <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90vw', maxWidth: '900px', maxHeight: '80vh', backgroundColor: '#fff', borderRadius: '24px', zIndex: 201, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.15)' }}>
+              <div style={{ padding: '28px 32px', borderBottom: `1px solid ${THEME.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 900 }}>🗑 삭제된 항목</h3>
+                  <p style={{ margin: '4px 0 0', fontSize: '13px', color: THEME.textMuted }}>복구 버튼을 눌러 항목을 복원할 수 있습니다.</p>
                 </div>
-              ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead style={{ background: '#f8fafc', position: 'sticky', top: 0, zIndex: 1 }}>
-                    <tr>
-                      {['사업자명', '대표자명', '연락처', '업종', '삭제일시', '복구'].map(h => (
-                        <th key={h} style={{ padding: '16px 20px', textAlign: 'left', fontSize: '13px', fontWeight: 800, color: THEME.textMuted, whiteSpace: 'nowrap' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {deletedLeads.map(l => (
-                      <tr key={l.id} style={{ borderBottom: `1px solid ${THEME.border}` }}>
-                        <td style={{ padding: '16px 20px', fontWeight: 800 }}>{l.businessName}</td>
-                        <td style={{ padding: '16px 20px' }}>{l.representativeName || '-'}</td>
-                        <td style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>{l.phoneRaw}</td>
-                        <td style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>{industryLabels[l.industry] || l.industry}</td>
-                        <td style={{ padding: '16px 20px', fontSize: '12px', color: '#ef4444', whiteSpace: 'nowrap' }}>{l.deletedAt ? new Date(l.deletedAt).toLocaleString() : '-'}</td>
-                        <td style={{ padding: '16px 20px' }}>
-                          <button
-                            onClick={() => { if (confirm(`"${l.businessName}" 항목을 복구하시겠습니까?`)) restoreMutation.mutate(l.id); }}
-                            style={{ padding: '8px 16px', backgroundColor: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0', borderRadius: '10px', fontWeight: 800, cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap' }}
-                          >
-                            ↩ 복구
-                          </button>
-                        </td>
+                <button onClick={() => setShowDeletedPanel(false)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: THEME.textMuted }}>×</button>
+              </div>
+              <div style={{ overflowY: 'auto', flex: 1 }}>
+                {deletedLeads.length === 0 ? (
+                  <div style={{ padding: '80px 20px', textAlign: 'center', color: THEME.textMuted }}>
+                    <p style={{ fontSize: '48px', marginBottom: '16px' }}>✅</p>
+                    <p style={{ fontWeight: 700 }}>삭제된 항목이 없습니다.</p>
+                  </div>
+                ) : (
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead style={{ background: '#f8fafc', position: 'sticky', top: 0, zIndex: 1 }}>
+                      <tr>
+                        {['사업자명', '대표자명', '연락처', '업종', '삭제일시', '복구'].map(h => (
+                          <th key={h} style={{ padding: '16px 20px', textAlign: 'left', fontSize: '13px', fontWeight: 800, color: THEME.textMuted, whiteSpace: 'nowrap' }}>{h}</th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+                    </thead>
+                    <tbody>
+                      {deletedLeads.map(l => (
+                        <tr key={l.id} style={{ borderBottom: `1px solid ${THEME.border}` }}>
+                          <td style={{ padding: '16px 20px', fontWeight: 800 }}>{l.businessName}</td>
+                          <td style={{ padding: '16px 20px' }}>{l.representativeName || '-'}</td>
+                          <td style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>{l.phoneRaw}</td>
+                          <td style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>{industryLabels[l.industry] || l.industry}</td>
+                          <td style={{ padding: '16px 20px', fontSize: '12px', color: '#ef4444', whiteSpace: 'nowrap' }}>{l.deletedAt ? new Date(l.deletedAt).toLocaleString() : '-'}</td>
+                          <td style={{ padding: '16px 20px' }}>
+                            <button
+                              onClick={() => { if (confirm(`"${l.businessName}" 항목을 복구하시겠습니까?`)) restoreMutation.mutate(l.id); }}
+                              style={{ padding: '8px 16px', backgroundColor: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0', borderRadius: '10px', fontWeight: 800, cursor: 'pointer', fontSize: '13px', whiteSpace: 'nowrap' }}
+                            >
+                              ↩ 복구
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             </div>
-          </div>
-        </>
+          </>
+        )
+      }
+
+      {/* Toast Notification */}
+      {adminMessage && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '50%',
+          transform: 'translateX(50%)',
+          padding: '16px 24px',
+          borderRadius: '12px',
+          backgroundColor: adminMessage.type === 'success' ? '#10b981' : '#f43f5e',
+          color: '#fff',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          fontWeight: 600,
+          animation: 'slideUpFade 0.3s ease-out forwards'
+        }}>
+          {adminMessage.text}
+        </div>
       )}
-    </div>
+
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .nav-btn { transition: all 0.2s ease; }
+        .nav-btn:hover { background-color: rgba(255,255,255,0.08) !important; color: #fff !important; }
+        .nav-bottom-btn { transition: all 0.2s ease; }
+        .nav-bottom-btn:hover { background-color: rgba(255,255,255,0.05) !important; color: #fff !important; }
+        @keyframes slideUpFade {
+          from { opacity: 0; transform: translate(50%, 20px); }
+          to { opacity: 1; transform: translate(50%, 0); }
+        }
+      `}} />
+    </div >
   );
 }
