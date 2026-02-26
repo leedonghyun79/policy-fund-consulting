@@ -35,7 +35,7 @@ const INDUSTRY_TO_CODE: Record<string, string> = {
 };
 
 const CountUp = ({ end, decimals = 0, suffix = "" }: { end: number, decimals?: number, suffix?: string }) => {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(end);
   const elementRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
