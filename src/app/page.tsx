@@ -380,7 +380,7 @@ export default function Home() {
         </div>
         <div className="container">
           <h2 className="section-title white" style={{ marginBottom: 30 }}>
-            <span style={{ color: '#93c5fd' }}>어떤 고민으로</span><br className="mo-only" /> 여기까지 오셨나요?
+            <span style={{ color: '#93c5fd' }}>어떤 고민으로</span><br className="mo-only" /> <span style={{ whiteSpace: 'nowrap' }}>여기까지 오셨나요?</span>
           </h2>
 
           <div className="forest-desc">
