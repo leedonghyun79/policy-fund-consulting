@@ -394,27 +394,29 @@ body {
 .brand-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 0;
   max-width: 900px;
   margin: 0 auto;
+  align-items: center;
 }
 
 .brand-stat-item {
-  background: #f8fafc;
-  padding: 30px 20px;
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  transition: transform 0.3s ease;
-  border: 1px solid #eff2f5;
+  background: transparent;
+  padding: 20px 10px;
+  border: none;
   text-align: center;
+  position: relative;
 }
 
-.brand-stat-item:hover {
-  transform: translateY(-5px);
-}
-
-.brand-stat-item::after {
-  display: none !important;
+.brand-stat-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 40%;
+  background-color: #e2e8f0;
 }
 
 .brand-stat-item b {
@@ -441,11 +443,8 @@ body {
   vertical-align: baseline;
 }
 
-/* removed unit-text in favor of brand-stat-unit */
-
 .brand-stat-item span {
   font-size: 18px;
-  /* Increased from 1rem */
   color: var(--text-muted);
   font-weight: 600;
   opacity: 0.8;
@@ -453,8 +452,24 @@ body {
 
 @media (max-width: 600px) {
   .brand-stats-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+
+  .brand-stat-item {
+    padding: 15px 5px;
+  }
+
+  .brand-stat-number {
+    font-size: 28px !important;
+  }
+
+  .brand-stat-unit {
+    font-size: 20px !important;
+  }
+
+  .brand-stat-item span {
+    font-size: 13px;
   }
 }
 
