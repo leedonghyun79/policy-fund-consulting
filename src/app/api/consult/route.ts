@@ -134,6 +134,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
       select: {
         businessName: true,
+        representativeName: true,
         industry: true,
         status: true,
       },
@@ -147,20 +148,22 @@ export async function GET() {
       OTHER: "기타",
     };
 
-    const formattedLeads = leads.map((l) => {
-      // Mask name (e.g., "홍길동" -> "홍*동" or "가나다라" -> "가**라")
-      const name = l.businessName.trim();
-      let maskedName = name;
+    function maskName(input: string | null): string {
+      if (!input) return "-";
+      const name = input.trim();
       if (name.length > 2) {
-        maskedName = name[0] + "*".repeat(name.length - 2) + name[name.length - 1];
+        return name[0] + "*".repeat(name.length - 2) + name[name.length - 1];
       } else if (name.length === 2) {
-        maskedName = name[0] + "*";
+        return name[0] + "*";
       }
+      return name;
+    }
 
+    const formattedLeads = leads.map((l) => {
       return {
-        name: maskedName,
-        biz: "사업자", // Or we can use simplified biz type
-        product: industryMap[l.industry] || "자금컨설팅",
+        bizName: maskName(l.businessName),
+        repName: maskName(l.representativeName),
+        industry: industryMap[l.industry] || "자금컨설팅",
         tag: l.status === "NEW" ? "진행중" : "진행 완료",
       };
     });

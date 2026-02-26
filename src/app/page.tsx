@@ -13,11 +13,11 @@ import {
 import DaumPostcodeEmbed from 'react-daum-postcode';
 
 const STATUS_DATA = [
-  { name: "김재*", biz: "법인사업자", product: "운전·시설자금", tag: "진행 완료" },
-  { name: "이정*", biz: "법인사업자", product: "고용지원금", tag: "진행 완료" },
-  { name: "강하*", biz: "개인사업자", product: "고용지원금", tag: "진행중" },
-  { name: "장우*", biz: "법인사업자", product: "운전·시설자금", tag: "진행 완료" },
-  { name: "나정*", biz: "개인사업자", product: "고용지원금", tag: "진행중" },
+  { bizName: "픽셀*넷", repName: "김*수", industry: "도·소매업", tag: "진행중" },
+  { bizName: "비티*컴퍼니", repName: "이*정", industry: "제조업", tag: "진행 완료" },
+  { bizName: "한성*테크", repName: "박*호", industry: "서비스업", tag: "진행 완료" },
+  { bizName: "그린*푸드", repName: "최*아", industry: "요식업", tag: "진행 완료" },
+  { bizName: "스타*물류", repName: "강*하", industry: "도·소매업", tag: "진행중" },
 ];
 
 const REGIONS = [
@@ -432,9 +432,9 @@ export default function Home() {
           <h3 className="section-title">최근 상담 사례</h3>
           <div className="table-wrapper text-center">
             <div className="tr-head">
-              <div>성함</div>
-              <div>사업장</div>
-              <div>신청항목</div>
+              <div>사업자</div>
+              <div>대표자</div>
+              <div>업종</div>
               <div>상태</div>
             </div>
             <div className="rolling-viewport">
@@ -446,9 +446,9 @@ export default function Home() {
               >
                 {[...mergedLeads, ...mergedLeads.slice(0, 4)].map((row, i) => (
                   <div className="tr-row" key={i}>
-                    <div>{row.name}</div>
-                    <div>{row.biz}</div>
-                    <div>{row.product}</div>
+                    <div>{row.bizName}</div>
+                    <div>{row.repName}</div>
+                    <div>{row.industry}</div>
                     <div>
                       <span className={`tag-status ${row.tag?.includes("진행중") ? "ing" : "done"}`}>
                         {row.tag}
