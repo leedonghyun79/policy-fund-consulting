@@ -319,7 +319,7 @@ export default function Home() {
             정보는 넘칩니다. <br />부족한 건 <span style={{ color: "var(--blue-primary)" }}>'전략'</span>입니다.<br />
           </h2>
           <div className="section-subtitle-large">
-            <span className="hook-text">"서류 준비만 하다 기회를 놓치진 않셨나요?"</span>
+            <span className="hook-text">"서류 준비만 하다 기회를 놓치진 않으셨나요?"</span>
             한 번의 탈락은 단순한 실패가 아니라<br />
             <span className="highlight-red">6개월 이상의 신청 제한</span>으로 이어질 수 있습니다.<br />
             비티씨는 수많은 거절 사례를 분석하여,<br />
