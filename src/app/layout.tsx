@@ -31,6 +31,7 @@ export const metadata: Metadata = {
         alt: "비티씨 정책자금 컨설팅",
       },
     ],
+    siteName: "(주)비티씨",
   },
   alternates: {
     canonical: "https://btccompany.co.kr",
@@ -57,7 +58,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "ConsultingService",
-              "name": "비티씨 정책자금 컨설팅",
+              "name": "(주)비티씨",
               "description": "중소기업 및 소상공인을 위한 정부 정책자금 정밀 진단 및 컨설팅 서비스",
               "url": "https://btccompany.co.kr",
               "address": {
