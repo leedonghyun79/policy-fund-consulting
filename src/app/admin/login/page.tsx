@@ -75,7 +75,15 @@ export default function AdminLoginPage() {
           marginBottom: '32px',
           border: '1px solid rgba(255,255,255,0.1)'
         }}>
-          <HiOutlineDatabase size={40} color="#2563eb" />
+          <svg width="48" height="48" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#1E40AF" />
+            <path d="M9 7H16.5C18.9853 7 21 9.01472 21 11.5C21 13.9853 18.9853 16 16.5 16H9V7Z" fill="white" />
+            <path d="M9 16H18.5C20.9853 16 23 18.0147 23 20.5C23 22.9853 20.9853 25 18.5 25H9V16Z" fill="white" />
+            <path d="M11 11H15V13H11V11Z" fill="#1E40AF" />
+            <path d="M11 19H17V21H11V19Z" fill="#1E40AF" />
+            <rect x="23" y="5" width="4" height="12" rx="1" fill="#3B82F6" />
+            <path d="M21 12L25 4L29 12H21Z" fill="#60A5FA" />
+          </svg>
         </div>
         <h2 style={{ fontSize: '24px', fontWeight: 900, marginBottom: '16px', letterSpacing: '-0.04em' }}>관리자 터미널 안내</h2>
         <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.7, marginBottom: '40px', wordBreak: 'keep-all' }}>
@@ -109,22 +117,19 @@ export default function AdminLoginPage() {
 
         {/* Logo/Header */}
         <div style={{ marginBottom: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
-          <div style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '100%',
-            backgroundColor: '#1e293b',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)'
-          }}>
-            <span className="text-white font-black text-2xl italic select-none">P</span>
-          </div>
+          <svg width="56" height="56" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#1E40AF" />
+            <path d="M9 7H16.5C18.9853 7 21 9.01472 21 11.5C21 13.9853 18.9853 16 16.5 16H9V7Z" fill="white" />
+            <path d="M9 16H18.5C20.9853 16 23 18.0147 23 20.5C23 22.9853 20.9853 25 18.5 25H9V16Z" fill="white" />
+            <path d="M11 11H15V13H11V11Z" fill="#1E40AF" />
+            <path d="M11 19H17V21H11V19Z" fill="#1E40AF" />
+            <rect x="23" y="5" width="4" height="12" rx="1" fill="#3B82F6" />
+            <path d="M21 12L25 4L29 12H21Z" fill="#60A5FA" />
+          </svg>
           <h1 className="text-slate-800 flex items-center gap-3" style={{ margin: 0 }}>
             <span style={{ fontWeight: 900, fontSize: '30px', letterSpacing: '-0.05em' }}>ADMIN</span>
             <div style={{ width: '1.5px', height: '20px', backgroundColor: '#cbd5e1' }}></div>
-            <span style={{ fontWeight: 600, fontSize: '20px', color: '#94a3b8' }}>포털 관리자</span>
+            <span style={{ fontWeight: 600, fontSize: '20px', color: '#94a3b8' }}>비티씨 시스템</span>
           </h1>
         </div>
 

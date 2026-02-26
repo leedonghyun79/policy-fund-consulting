@@ -349,9 +349,15 @@ export default function AdminDashboard({ initialLeads }: { initialLeads: LeadRow
       <aside style={{ width: ui.isSidebarCollapsed ? '90px' : '280px', backgroundColor: THEME.secondary, color: '#fff', display: 'flex', flexDirection: 'column', transition: 'width 0.4s' }}>
         <div style={{ padding: '32px 24px', flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '48px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: THEME.primary, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <HiOutlineCube size={24} />
-            </div>
+            <svg width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="8" fill="#1E40AF" />
+              <path d="M9 7H16.5C18.9853 7 21 9.01472 21 11.5C21 13.9853 18.9853 16 16.5 16H9V7Z" fill="white" />
+              <path d="M9 16H18.5C20.9853 16 23 18.0147 23 20.5C23 22.9853 20.9853 25 18.5 25H9V16Z" fill="white" />
+              <path d="M11 11H15V13H11V11Z" fill="#1E40AF" />
+              <path d="M11 19H17V21H11V19Z" fill="#1E40AF" />
+              <rect x="23" y="5" width="4" height="12" rx="1" fill="#3B82F6" />
+              <path d="M21 12L25 4L29 12H21Z" fill="#60A5FA" />
+            </svg>
             {!ui.isSidebarCollapsed && (
               <div>
                 <h2 style={{ fontSize: '16px', fontWeight: 900, margin: 0, letterSpacing: '-0.5px' }}>주식회사 비티씨</h2>

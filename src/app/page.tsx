@@ -225,7 +225,18 @@ export default function Home() {
     <main className="page-wrapper">
       {/* Header */}
       <header className="header">
-        <div className="logo">주식회사 비티씨</div>
+        <div className="logo">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#1E40AF" />
+            <path d="M9 7H16.5C18.9853 7 21 9.01472 21 11.5C21 13.9853 18.9853 16 16.5 16H9V7Z" fill="white" />
+            <path d="M9 16H18.5C20.9853 16 23 18.0147 23 20.5C23 22.9853 20.9853 25 18.5 25H9V16Z" fill="white" />
+            <path d="M11 11H15V13H11V11Z" fill="#1E40AF" />
+            <path d="M11 19H17V21H11V19Z" fill="#1E40AF" />
+            <rect x="23" y="5" width="4" height="12" rx="1" fill="#3B82F6" />
+            <path d="M21 12L25 4L29 12H21Z" fill="#60A5FA" />
+          </svg>
+          <span>주식회사 비티씨</span>
+        </div>
         <button className="header-cta-btn" onClick={scrollToForm}>
           무료 상담 신청
         </button>
@@ -579,7 +590,18 @@ export default function Home() {
       {/* Footer */}
       <footer style={{ marginTop: "-1px", padding: "60px 20px", background: "#eef3ff", fontSize: "0.85rem", color: "var(--text-muted)" }} className="text-center">
         <div className="container">
-          <p style={{ fontWeight: 700, color: "var(--text-dark)", marginBottom: 10 }}>주식회사 비티씨</p>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+            <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="8" fill="#1E40AF" />
+              <path d="M9 7H16.5C18.9853 7 21 9.01472 21 11.5C21 13.9853 18.9853 16 16.5 16H9V7Z" fill="white" />
+              <path d="M9 16H18.5C20.9853 16 23 18.0147 23 20.5C23 22.9853 20.9853 25 18.5 25H9V16Z" fill="white" />
+              <path d="M11 11H15V13H11V11Z" fill="#1E40AF" />
+              <path d="M11 19H17V21H11V19Z" fill="#1E40AF" />
+              <rect x="23" y="5" width="4" height="12" rx="1" fill="#3B82F6" />
+              <path d="M21 12L25 4L29 12H21Z" fill="#60A5FA" />
+            </svg>
+            <p style={{ fontWeight: 700, color: "var(--text-dark)", marginBottom: 0 }}>주식회사 비티씨</p>
+          </div>
           <p>상호명: 주식회사 비티씨 | 사업자번호: 452-81-03847</p>
           <p>대표전화: 010-4148-0242 | 경기도 부천시 원미구 옥산로7, 상가 a동 116호</p>
           <p style={{ marginTop: 25, opacity: 0.8 }}>© 2026 주식회사 비티씨. All rights reserved.</p>

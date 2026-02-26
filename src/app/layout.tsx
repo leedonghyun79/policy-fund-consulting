@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     url: "https://btccompany.co.kr",
     images: [
       {
-        url: "/og-image.png",
+        url: "https://btccompany.co.kr/og-image.png",
         width: 1200,
         height: 630,
         alt: "비티씨 정책자금 컨설팅",
