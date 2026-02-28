@@ -390,7 +390,7 @@ export default function Home() {
           <div className="deco-shape deco-2"></div>
         </div>
         <div className="container">
-          <h2 className="section-title white" style={{ marginBottom: 30, fontSize: '50px' }}>
+          <h2 className="section-title white" style={{ marginBottom: 30 }}>
             <span style={{ color: '#93c5fd' }}>어떤 고민으로</span><br /> 여기까지 오셨나요?
           </h2>
 
