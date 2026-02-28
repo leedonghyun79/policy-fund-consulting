@@ -107,7 +107,7 @@ body {
 /* Typography */
 .section-title {
   font-family: 'Ria', sans-serif !important;
-  font-size: 55px;
+  font-size: 50px;
   font-weight: normal !important;
   line-height: 1.2;
   word-break: keep-all;
@@ -131,7 +131,7 @@ body {
   /* Increased for better readability */
   font-size: 20px;
   /* Slightly larger */
-  color: var(--text-body);
+  color: #363636;
   word-break: keep-all;
 }
 
@@ -145,7 +145,7 @@ body {
 }
 
 .highlight-red {
-  color: #ef4444;
+  color: #f08c00;
   font-weight: 700;
 }
 
@@ -193,7 +193,7 @@ body {
 }
 
 .header-cta-btn {
-  background: var(--blue-primary);
+  background: #f08c00;
   color: #fff;
   border: none;
   padding: 12px 28px;
@@ -205,9 +205,7 @@ body {
 }
 
 .header-cta-btn:hover {
-  background: #1d4ed8;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px) scale(1.05);
 }
 
 /* Hero Style from Image */
@@ -285,7 +283,7 @@ body {
 
 .hero-point {
   color: #fff;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: #367AF1;
   padding: 0 20px;
   height: 74px;
   /* Original proportional height */
@@ -493,9 +491,8 @@ body {
   color: #fff;
   position: relative;
   overflow: hidden;
-  padding: 160px 0;
+  padding: 80px 0;
   /* Slightly more padding for stability */
-  min-height: 1000px;
   width: 100%;
   /* Fix sub-pixel white gaps by bleeding the color 1px via box-shadow */
   box-shadow: 0 0 0 1px var(--blue-forest);
@@ -615,7 +612,7 @@ body {
 
 /* Buttons */
 .btn-vibrant {
-  background: linear-gradient(-45deg, #ff9033, #ffb347, #ff9033, #ff7e14);
+  background: linear-gradient(-45deg, #f08c00, #ffa633, #f08c00, #d97e00);
   background-size: 300% 300%;
   animation: moveGradient 4s ease infinite;
   color: #fff;
@@ -628,7 +625,6 @@ body {
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 10px 20px rgba(255, 144, 51, 0.2);
 }
 
 @keyframes moveGradient {
@@ -647,7 +643,6 @@ body {
 
 .btn-vibrant:hover {
   transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 15px 30px rgba(255, 144, 51, 0.4);
   filter: brightness(1.05);
   /* Subtle brightness boost on hover instead of background override */
 }

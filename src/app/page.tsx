@@ -323,7 +323,7 @@ export default function Home() {
             한 번의 탈락은 단순한 실패가 아니라<br />
             <span className="highlight-red">6개월 이상의 신청 제한</span>으로 이어질 수 있습니다.<br />
             비티씨는 수많은 거절 사례를 분석하여,<br />
-            <span className="highlight-blue">승인 가능성을 극대화</span>하는 맞춤형 전략을 설계합니다.
+            <span style={{ fontWeight: 700 }}>승인 가능성을 극대화</span>하는 맞춤형 전략을 설계합니다.
           </div>
 
           <div style={{ marginTop: 80, paddingTop: 60 }}>
@@ -384,25 +384,20 @@ export default function Home() {
       </section>
 
       {/* Section 3: Targeted (Forest Green) */}
-      <section className="section-padding bg-forest text-center reveal">
+      <section className="bg-forest text-center reveal">
         <div className="deco-wrap">
           <div className="deco-shape deco-1"></div>
           <div className="deco-shape deco-2"></div>
         </div>
         <div className="container">
-          <h2 className="section-title white" style={{ marginBottom: 30 }}>
-            <span style={{ color: '#93c5fd' }}>어떤 고민으로</span><br className="mo-only" /> <span style={{ whiteSpace: 'nowrap' }}>여기까지 오셨나요?</span>
+          <h2 className="section-title white" style={{ marginBottom: 30, fontSize: '50px' }}>
+            <span style={{ color: '#93c5fd' }}>어떤 고민으로</span><br /> 여기까지 오셨나요?
           </h2>
 
           <div className="forest-desc">
             대표님의 고민, 맞춤 컨설팅으로 해결해드리겠습니다.<br />
-            더 이상 혼자 고민하지 마세요.<br />
-            <span style={{ color: '#ff9033', fontWeight: 700 }}>지금 바로 무료 상담 신청하세요</span>
+            더 이상 혼자 고민하지 마세요.
           </div>
-
-          <button onClick={scrollToForm} className="btn-vibrant">
-            무료 상담 신청
-          </button>
 
           <div className="card-grid-2">
             <div className={`card-item ${activeTargetIndex === 1 ? "active-loop" : ""}`}>
