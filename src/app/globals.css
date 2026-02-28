@@ -155,7 +155,7 @@ body {
 }
 
 .forest-desc {
-  margin-bottom: 40px;
+  margin-bottom: 80px;
   color: rgba(255, 255, 255, 0.8);
   font-size: 1.1rem;
   line-height: 1.6;
@@ -1052,7 +1052,7 @@ input[type="number"] {
 
 .btn-search {
   padding: 0 15px;
-  background: var(--text-dark);
+  background: #014099;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -1400,7 +1400,7 @@ input[type="number"] {
   }
 
   .hero-main-title {
-    font-size: 26px;
+    font-size: 25px;
     /* Slightly smaller to prevent awkward wraps */
     line-height: 1.4;
     margin-bottom: 20px;
@@ -1410,9 +1410,9 @@ input[type="number"] {
 
   .hero-point {
     height: 50px;
-    padding: 0 16px;
+    padding: 0 12px;
     border-radius: 10px;
-    margin: 8px 4px;
+    margin: 4px 2px;
     transform: translateY(0);
   }
 
@@ -1431,9 +1431,9 @@ input[type="number"] {
   }
 
   .text-blue {
-    display: block;
-    /* Make the blue part start on a new line on mobile for balance */
-    margin-top: 5px;
+    display: inline;
+    /* Use br tags for line breaks */
+    margin-top: 0;
   }
 
   .section-subtitle-large {
@@ -1442,10 +1442,15 @@ input[type="number"] {
     line-height: 1.5;
   }
 
+  .bg-forest {
+    padding: 60px 0;
+  }
+
   .forest-desc {
     font-size: 0.95rem;
     padding: 0 10px;
     line-height: 1.5;
+    margin-bottom: 60px;
   }
 
   .hero-checkpoints {

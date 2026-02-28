@@ -284,9 +284,9 @@ export default function Home() {
       <section className="section-padding reveal" style={{ background: '#fff' }}>
         <div className="container text-center">
           <p className="brand-stats-headcopy">
-            <span style={{ color: '#000' }}>매년 수조 원의 정책자금,</span><br />
+            <span style={{ color: '#363636' }}>매년 수조 원의 정책자금,</span><br />
             <span className="font-ria text-blue">비티씨는 그 기회를</span><br />
-            <span style={{ color: '#000' }}>현실로 만들어 왔습니다.</span>
+            <span style={{ color: '#363636' }}>현실로 만들어 왔습니다.</span>
           </p>
           <div className="brand-stats-grid">
             <div className="brand-stat-item">
@@ -319,11 +319,11 @@ export default function Home() {
             정보는 넘칩니다. <br />부족한 건 <span style={{ color: "var(--blue-primary)" }}>'전략'</span>입니다.<br />
           </h2>
           <div className="section-subtitle-large">
-            <span className="hook-text">"서류 준비만 하다 기회를 놓치진 않으셨나요?"</span>
+            <span className="hook-text">"서류 준비만 하다 기회를<br className="mo-only" /> 놓치진 않으셨나요?"</span>
             한 번의 탈락은 단순한 실패가 아니라<br />
             <span className="highlight-red">6개월 이상의 신청 제한</span>으로 이어질 수 있습니다.<br />
             비티씨는 수많은 거절 사례를 분석하여,<br />
-            <span style={{ fontWeight: 700 }}>승인 가능성을 극대화</span>하는 맞춤형 전략을 설계합니다.
+            승인 가능성을 극대화하는 맞춤형 전략을 설계합니다.
           </div>
 
           <div style={{ marginTop: 80, paddingTop: 60 }}>
