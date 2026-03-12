@@ -55,25 +55,34 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "ConsultingService",
-              "name": "(주)비티씨",
-              "description": "중소기업 및 소상공인을 위한 정부 정책자금 정밀 진단 및 컨설팅 서비스",
-              "url": "https://btccompany.co.kr",
-              "address": {
-                "@type": "PostalAddress",
-                "addressLocality": "부천시",
-                "addressRegion": "경기도",
-                "addressCountry": "KR"
-              },
-              "areaServed": "KR",
-              "provider": {
-                "@type": "Organization",
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
                 "name": "비티씨",
-                "url": "https://btccompany.co.kr"
+                "alternateName": ["(주)비티씨", "비티씨 정책자금"],
+                "url": "https://btccompany.co.kr",
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "ConsultingService",
+                "name": "(주)비티씨",
+                "description": "중소기업 및 소상공인을 위한 정부 정책자금 정밀 진단 및 컨설팅 서비스",
+                "url": "https://btccompany.co.kr",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": "부천시",
+                  "addressRegion": "경기도",
+                  "addressCountry": "KR"
+                },
+                "areaServed": "KR",
+                "provider": {
+                  "@type": "Organization",
+                  "name": "비티씨",
+                  "url": "https://btccompany.co.kr"
+                }
               }
-            }),
+            ]),
           }}
         />
         <Providers>{children}</Providers>
