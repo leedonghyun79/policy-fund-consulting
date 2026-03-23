@@ -85,8 +85,34 @@ export default function RootLayout({
             ]),
           }}
         />
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <a
+            href="https://blog.naver.com/biz-support-center"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="naver-floating"
+            title="네이버 블로그"
+          >
+            <img
+              src="/btc_blogicon.png"
+              alt="네이버 블로그"
+              className="pc-only"
+              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+            />
+            <img
+              src="/btc_blogicon_80.png"
+              alt="네이버 블로그"
+              className="mo-only"
+              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+            />
+
+
+          </a>
+
+        </Providers>
       </body>
+
     </html>
   );
 }

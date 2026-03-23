@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 @font-face {
   font-family: 'Ria';
@@ -1350,10 +1350,19 @@ input[type="number"] {
   display: none !important;
 }
 
+.pc-only {
+  display: block !important;
+}
+
 @media (max-width: 768px) {
   .mo-only {
     display: block !important;
   }
+
+  .pc-only {
+    display: none !important;
+  }
+
 
   .section-padding {
     padding: 60px 0;
@@ -1621,4 +1630,40 @@ input[type="number"] {
 
 .sidebar-nav-btn:active {
   transform: scale(0.98);
+}
+
+/* Naver Floating Banner */
+.naver-floating {
+  position: fixed;
+  bottom: 30px;
+  right: max(20px, calc(50% - 400px + 20px));
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  background-color: #03C75A;
+
+  color: white;
+  border-radius: 50%;
+  box-shadow: 0 8px 16px rgba(3, 199, 90, 0.25);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.naver-floating:hover {
+  transform: scale(1.1) translateY(-5px);
+  box-shadow: 0 12px 24px rgba(3, 199, 90, 0.35);
+}
+
+@media (max-width: 800px) {
+  .naver-floating {
+    bottom: 25px;
+    right: 15px;
+    width: 70px;
+    height: 70px;
+  }
 }
