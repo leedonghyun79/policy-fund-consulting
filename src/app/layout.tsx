@@ -95,19 +95,17 @@ export default function RootLayout({
             title="네이버 블로그"
           >
             <img
-              src="/btc_blogicon.png"
+              src="/nav_b_100.png"
               alt="네이버 블로그"
               className="pc-only"
               style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
             />
             <img
-              src="/btc_blogicon_80.png"
+              src="/nav_b_500.png"
               alt="네이버 블로그"
               className="mo-only"
               style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
             />
-
-
           </a>
 
         </Providers>
