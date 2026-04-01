@@ -17,21 +17,19 @@ export const metadata: Metadata = {
     "비티씨, 정책자금, 소상공인 저금리 대출, 사업자 대출, 중소기업 지원금, 부천정책자금, 정부지원금, 창업자금, 운영자금, 시설자금",
   viewport: "width=device-width, initial-scale=1",
   robots: "index, follow",
+  applicationName: "비티씨",
   openGraph: {
     title: "비티씨 부천정책자금 컨설팅 | 소상공인 저금리 대출 · 사업자 대출",
     description:
       "소상공인 저금리 대출, 사업자 대출, 정부지원금 승인 가능성을 높이세요. 창업자금, 운영자금, 시설자금 등 중소기업 맞춤 자금 진단부터 부천 및 전 지역 무료 상담까지 비티씨가 도와드립니다.",
     type: "website",
     url: "https://btccompany.co.kr",
-    images: [
-      {
-        url: "https://btccompany.co.kr/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "비티씨 정책자금 컨설팅",
-      },
-    ],
-    siteName: "(주)비티씨",
+    siteName: "비티씨",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "비티씨 부천정책자금 컨설팅 | 소상공인 저금리 대출 · 사업자 대출",
+    description: "소상공인 저금리 대출, 사업자 대출, 정부지원금 승인 가능성을 높이세요. 창업자금, 운영자금, 시설자금 등 중소기업 맞춤 자금 진단부터 부천 및 전 지역 무료 상담까지 비티씨가 도와드립니다.",
   },
   alternates: {
     canonical: "https://btccompany.co.kr",
@@ -60,13 +58,13 @@ export default function RootLayout({
                 "@context": "https://schema.org",
                 "@type": "WebSite",
                 "name": "비티씨",
-                "alternateName": ["(주)비티씨", "비티씨 정책자금"],
+                "alternateName": ["비티씨 정책자금"],
                 "url": "https://btccompany.co.kr",
               },
               {
                 "@context": "https://schema.org",
                 "@type": "ConsultingService",
-                "name": "(주)비티씨",
+                "name": "비티씨",
                 "description": "중소기업 및 소상공인을 위한 정부 정책자금 정밀 진단 및 컨설팅 서비스",
                 "url": "https://btccompany.co.kr",
                 "address": {
