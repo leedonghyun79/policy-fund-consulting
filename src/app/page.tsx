@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { CSSProperties, FormEvent, useEffect, useRef, useState, useMemo } from "react";
 import {
@@ -602,7 +602,7 @@ export default function Home() {
             <p>대표전화: 010-4148-0242</p>
             <p>경기도 부천시 원미구 옥산로7, 상가 a동 116호</p>
           </div>
-          <p style={{ marginTop: 30, opacity: 0.6, fontSize: "0.75rem" }}>© 2026 주식회사 비티씨. All rights reserved.</p>
+          <p style={{ marginTop: 20, opacity: 0.6, fontSize: "0.75rem" }}>© 2026 주식회사 비티씨. All rights reserved.</p>
         </div>
       </footer>
 
@@ -655,64 +655,100 @@ export default function Home() {
               <button onClick={() => setShowTermsModal(false)} style={{ background: "none", border: "none", fontSize: "1.5rem", cursor: "pointer", color: "#666" }}>&times;</button>
             </div>
 
-            <div style={{ fontSize: "0.9rem", color: "#475569", lineHeight: 1.6 }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>이용약관</h3>
+            <div style={{ fontSize: "0.9rem", color: "#475569", lineHeight: 1.8 }}>
+
+              {/* 이용약관 */}
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 12 }}>이용약관</h3>
+
               <p><strong>제 1 장 총칙</strong></p>
-              <p><strong>제 1 조 (목적)</strong> 이 약관은 주식회사 비티씨(이하 "회사")가 제공하는 서비스 이용에 관한 조건 및 절차와 기타 필요한 사항을 규정하는 것을 목적으로 합니다.</p>
+              <p><strong>제 1 조 (목적)</strong> 이 약관은 이 페이지의 이용에 관한 조건 및 절차와 기타 필요한 사항을 규정하는 것을 목적으로 합니다.</p>
               <p><strong>제 2 조 (용어의 정의)</strong> 이 약관에서 사용하는 용어의 정의는 다음과 같습니다.</p>
-              <p><strong>제 3 조 (약관의 효력과 변경)</strong> 회사는 본 약관의 내용을 서비스 화면에 게시하거나 기타의 방법으로 이용자에게 공지함으로써 효력이 발생합니다.</p>
+              <p><strong>제 3 조 (약관의 효력과 변경)</strong></p>
               <p><strong>제 4 조 (약관외 준칙)</strong> 이 약관에 명시되지 않은 사항이 관계 법령에 규정되어 있을 경우 그 규정에 따르며, 그렇지 않은 경우에는 일반적인 관례에 따릅니다.</p>
-              <p><strong>제 5 조 (적용범위)</strong> 본 약관은 서비스 이용자 모두에게 적용됩니다.</p>
+              <p><strong>제 5 조 (적용범위)</strong></p>
 
-              <p style={{ marginTop: 15 }}><strong>제 2 장 서비스 이용 계약</strong></p>
-              <p><strong>제 6 조 (이용계약의 성립)</strong> 이용계약은 이용자의 이용신청에 대한 회사의 이용승낙과 이용자의 약관내용에 대한 동의로 성립됩니다.</p>
-              <p><strong>제 7 조 (이용계약 승인의 유보)</strong> 회사는 서비스 관련 설비의 여유가 없거나 기술상 사유가 있는 경우 승인을 유보할 수 있습니다.</p>
+              <p style={{ marginTop: 12 }}><strong>제 2 장 서비스 이용 계약</strong></p>
+              <p><strong>제 6 조 (이용계약의 성립)</strong></p>
+              <p><strong>제 7 조 (이용계약 승인의 유보)</strong></p>
 
-              <p style={{ marginTop: 15 }}><strong>제 3 장 서비스의 이용</strong></p>
-              <p><strong>제 8 조 (서비스 이용시간)</strong> 서비스 이용은 회사의 업무상 또는 기술상 특별한 지장이 없는 한 연중무휴, 1일 24시간을 원칙으로 합니다.</p>
-              <p><strong>제 9 조 (이용계약의 해지 및 서비스 이용의 제한)</strong> 이용자가 이용계약을 해지하고자 하는 때에는 이용자 본인이 온라인을 통해 회사에 해지 신청을 하여야 합니다.</p>
-              <p><strong>제 10 조 (이용자 게시물의 삭제 이용 제한)</strong> 회사는 이용자가 게시하거나 등록하는 서비스 내의 내용물이 규정에 위반되는 경우 사전 통지 없이 삭제할 수 있습니다.</p>
-              <p><strong>제 11 조 (서비스의 중지 및 제한)</strong> 회사는 긴급한 시스템 점검, 증설 및 교체 등 부득이한 사유로 인하여 사전 공지 없이 일시적으로 서비스를 중단할 수 있습니다.</p>
+              <p style={{ marginTop: 12 }}><strong>제 3 장 서비스의 이용</strong></p>
+              <p><strong>제 8 조 (서비스 이용시간)</strong></p>
+              <p><strong>제 9 조 (이용계약의 해지 및 서비스 이용의 제한)</strong></p>
+              <p><strong>제 10 조 (이용자 게시물의 삭제 이용 제한)</strong></p>
+              <p><strong>제 11 조 (서비스의 중지 및 제한)</strong></p>
 
-              <p style={{ marginTop: 15 }}><strong>제 4 장 의무</strong></p>
-              <p><strong>제 12 조 (회사의 의무)</strong> 회사는 특별한 사정이 없는 한 이용자가 신청한 서비스 제공 개시일에 서비스를 이용할 수 있도록 합니다.</p>
-              <p><strong>제 12조의 1 (개인정보보호)</strong> 회사는 관련 법령이 정하는 바에 따라서 이용자 등록정보를 포함한 이용자의 개인정보를 보호하기 위하여 노력합니다.</p>
-              <p><strong>제 13 조 (이용자의 의무)</strong> 이용자는 관계 법령, 본 약관의 규정, 이용안내 및 서비스 상에 공지한 주의사항 등을 준수하여야 합니다.</p>
-              <p><strong>제 13 조의 1 (입력정보등)</strong> 이용자는 상담 신청 시 정확한 정보를 입력해야 하며, 허위 정보 입력 시 서비스 이용에 제한이 있을 수 있습니다.</p>
+              <p style={{ marginTop: 12 }}><strong>제 4 장 의무</strong></p>
+              <p><strong>제 12 조 (시스템의 의무)</strong></p>
+              <p><strong>제 12조의 1 (개인정보보호)</strong></p>
+              <p><strong>제 13 조 (이용자의 의무)</strong></p>
+              <p><strong>제 13 조의 1 (입력정보등)</strong></p>
 
-              <p style={{ marginTop: 15 }}><strong>제 5 장 저작권 및 면책</strong></p>
-              <p><strong>제 14 조 (게재된 자료에 대한 권리)</strong> 서비스에 게재된 자료에 대한 권리는 회사에 있습니다.</p>
-              <p><strong>제 15 조 (면책)</strong> 회사는 천재지변 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는 서비스 제공에 관한 책임이 면제됩니다.</p>
+              <p style={{ marginTop: 12 }}><strong>제 5 장 저작권 및 면책</strong></p>
+              <p><strong>제 14 조 (게재된 자료에 대한 권리)</strong></p>
+              <p><strong>제 15 조 (면책)</strong></p>
 
-              <hr style={{ margin: "25px 0", border: 0, borderTop: "1px solid #eee" }} />
+              <hr style={{ margin: "20px 0", border: 0, borderTop: "1px solid #eee" }} />
 
-              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>개인정보처리방침</h3>
+              {/* 개인정보보호정책 */}
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 12 }}>개인정보보호정책</h3>
+
               <p><strong>가. 수집하는 개인정보 항목 및 수집방법</strong></p>
               <p>- 사업자명, 대표자명, 휴대폰번호, 지역(주소), 업종, 희망 자금 규모</p>
 
               <p style={{ marginTop: 10 }}><strong>나. 개인정보의 수집 및 이용목적</strong></p>
               <p>수집한 개인정보를 다음의 목적을 위해 활용합니다.</p>
-              <p>- 정책자금 컨설팅 및 담당 전문가의 전화 상담/안내</p>
+              <p>- 담당자들의 전화 상담</p>
 
               <p style={{ marginTop: 10 }}><strong>다. 수집한 개인정보의 보유 및 이용기간</strong></p>
-              <p>- 원칙적으로 개인정보 수집 및 이용목적이 달성된 후(상담 완료 등)에는 해당 정보를 지체 없이 파기합니다. 단, 관계법령의 규정에 의하여 보존할 필요가 있는 경우 일정 기간 보존합니다.</p>
+              <p>- 원칙적으로 개인정보 수집 및 이용목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다.</p>
 
-              <p style={{ marginTop: 10 }}><strong>라. 동의 거부권 및 거부 시 불이익</strong></p>
-              <p>- 이용자는 개인정보 수집 및 이용에 대한 동의를 거부할 권리가 있으며, 동의를 거부할 경우 상담 신청 서비스 이용이 제한됩니다.</p>
+              <p style={{ marginTop: 10 }}><strong>라. 동의를 거부할 경우 신청정보가 제공되지 않습니다.</strong></p>
 
-              <p style={{ marginTop: 20 }}><strong>개인정보 제3자 제공 정책</strong></p>
-              <p>주식회사 비티씨는 원활한 서비스 제공을 위하여 아래와 같이 이용자의 개인정보를 제공하고 있습니다.</p>
-              <p>1. 제공받는 자: 제휴 컨설턴트 및 전문 대행 기관</p>
-              <p>2. 제공받는 자의 이용목적: 정책자금 상담 및 서비스 제공, 마케팅 및 광고 활용</p>
-              <p>3. 제공하는 항목: 사업자명, 대표자명, 연락처, 지역, 업종 등 신청 정보 일체</p>
-              <p>4. 보유 및 이용기간: 제공 목적 달성 시까지 (최대 3년)</p>
+              <hr style={{ margin: "20px 0", border: 0, borderTop: "1px solid #eee" }} />
 
-              <p style={{ marginTop: 20 }}><strong>개인정보의 파기</strong></p>
+              {/* 개인정보 제3자 제공 */}
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 12 }}>개인정보 제3자 제공 정책</h3>
+              <p>회사는 제3자 서비스와의 연결을 위해서 아래와 같이 이용자의 개인정보를 제공하고 있습니다.</p>
+              <p style={{ marginTop: 8 }}>1. 제공하는 개인정보 항목 : 성함, 연락처</p>
+              <p style={{ marginTop: 8 }}>2. 제공받는 자의 개인정보 이용목적</p>
+              <p>- 서비스 제공에 관한 이행 및 서비스 제공에 따른 콘텐츠 제공</p>
+              <p>- 고객을 대상으로 제품 상담 응대 및 판매 서비스 제공에 관한 계약 이행 및 서비스 제공에 따른 상담, 요금정산, 구매 및 요금결제, 구매내역, 물품배송 또는 청구지 등 발송</p>
+              <p>- 마케팅 및 광고에 활용 : 신규 서비스(제품) 개발 및 특화, 이벤트 등 광고성 정보 전달, 인구통계학적 특성에 따른 서비스 제공 및 광고 게재, 접속 빈도 파악 또는 회원의 서비스 이용에 대한 통계</p>
+              <p style={{ marginTop: 8 }}>3. 제공하는 개인정보 항목 : 이름, 나이, 연락처, 주소</p>
+              <p style={{ marginTop: 8 }}>4. 제공받는 자의 보유 이용기간 : 3년</p>
+              <p style={{ marginTop: 8 }}>5. 고객은 제3자 개인정보 제공에 대하여 동의를 거부할 권리가 있으며 동의를 거부할 경우 서비스 제공 및 서비스 제공에 따른 콘텐츠 제공에 제한이 있을 수 있습니다.</p>
+
+              <hr style={{ margin: "20px 0", border: 0, borderTop: "1px solid #eee" }} />
+
+              {/* 개인정보의 파기 */}
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 12 }}>개인정보의 파기</h3>
               <p>1. 회사는 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체 없이 해당 개인정보를 파기합니다.</p>
-              <p>2. 전자적 파일 형태의 정보는 기록을 재생할 수 없는 기술적 방법을 사용하며, 종이에 출력된 개인정보는 분쇄 기를 통해 파기합니다.</p>
+              <p style={{ marginTop: 8 }}>2. 정보주체로부터 동의 받은 개인정보 보유기간이 경과하거나 처리목적이 달성되었음에도 불구하고 다른 법령에 따라 개인정보를 계속 보존하여야 하는 경우에는, 해당 개인정보를 별도의 데이터베이스(DB)로 옮기거나 보관 장소를 달리하여 보존합니다.</p>
+              <p style={{ marginTop: 8 }}>3. 개인정보 파기의 절차 및 방법은 다음과 같습니다.</p>
+              <p style={{ marginTop: 6 }}>1) 파기절차 : 회사는 파기 사유가 발생한 개인정보를 선정하고, 개인정보 보호책임자의 승인을 받아 개인정보를 파기합니다.</p>
+              <p style={{ marginTop: 6 }}>2) 파기방법 : 전자적 파일 형태의 정보는 기록을 재생할 수 없는 기술적 방법을 사용합니다. 종이에 출력된 개인정보는 분쇄기로 분쇄하거나 소각을 통하여 파기합니다.</p>
 
-              <p style={{ marginTop: 20 }}><strong>기술적·관리적 보호 대책</strong></p>
-              <p>회사는 이용자들의 개인정보 보호를 위해 암호화 저장, 해킹 대비 침입차단 시스템 운영, 백신 프로그램 설치, 개인정보 취급 직원 최소화 및 교육 등 최선을 다하고 있습니다.</p>
+              <hr style={{ margin: "20px 0", border: 0, borderTop: "1px solid #eee" }} />
+
+              {/* 기술적·관리적 보호 대책 */}
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 12 }}>개인정보 보호를 위한 기술적·관리적 보호 대책</h3>
+              <p>회사는 이용자들의 개인정보 보호를 위해 다음과 같은 기술적, 관리적 대책을 강구하고 있습니다.</p>
+              <p style={{ marginTop: 8 }}>1. 개인정보 암호화 : 이용자의 비밀번호 등 중요 정보는 암호화되어 저장 및 관리되고 있으며, 개인정보의 확인 및 변경은 본인에 의해서만 가능합니다.</p>
+              <p style={{ marginTop: 8 }}>2. 해킹 등에 대비한 대책 : 회사는 해킹이나 악성코드에 의하여 이용자들의 개인정보가 유출·훼손되는 것을 방지하기 위하여 침입차단 시스템을 24시간 운영하여 외부로부터의 무단접근을 통제하고 있으며, 백신 프로그램을 설치하여 시스템이 악성코드나 바이러스에 감염되지 않도록 노력하고 있습니다.</p>
+              <p style={{ marginTop: 8 }}>3. 개인정보 취급 직원의 최소화 및 교육 : 개인정보를 처리하는 직원을 최소한으로 관리하며, 개인정보취급자에 대한 정기 교육, 전사 임직원에 대한 수시 교육을 통해 개인정보의 중요성을 인식하고 있습니다.</p>
+              <p style={{ marginTop: 8 }}>4. 개인정보 보호전담 인력의 운영 : 개인정보 보호를 위해 개인정보 보호전담 인력을 운영하고 있으며, 개인정보 처리방침의 이행사항 및 개인정보 처리자의 준수 여부를 확인하여 문제가 발견될 경우 즉시 수정하고 바로 잡을 수 있도록 노력하고 있습니다.</p>
+              <p style={{ marginTop: 8 }}>5. 위와 같은 노력 이외에 이용자 스스로도 제3자에게 개인정보가 노출되지 않도록 주의하셔야 합니다.</p>
+              <p style={{ marginTop: 8 }}>6. 비인가자에 대한 출입 통제 : 개인정보를 보관하고 있는 물리적 보관 장소를 별도로 두고 이에 대해 출입통제 절차를 수립, 운영하고 있습니다.</p>
+
+              <hr style={{ margin: "20px 0", border: 0, borderTop: "1px solid #eee" }} />
+
+              {/* 쿠키 안내 */}
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#1e293b", marginBottom: 12 }}>쿠키(Cookie) 사용 안내</h3>
+              <p>회사는 서비스 품질 개선 및 광고 성과 분석을 위해 쿠키를 사용합니다.</p>
+              <p style={{ marginTop: 8 }}><strong>수집 도구 및 목적</strong></p>
+              <p>- Google Analytics: 방문 통계 분석 및 광고 성과 측정 (쿠키명: _ga, _gid, _gat / 보유 최대 2년)</p>
+              <p style={{ marginTop: 8 }}><strong>쿠키 관련 안내</strong></p>
+              <p>쿠키는 이용자의 편의 향상 및 서비스 개선 목적으로만 활용됩니다. 브라우저 설정에서 쿠키 저장 방식을 조정할 수 있으나, 변경 시 일부 서비스가 정상적으로 동작하지 않을 수 있습니다.</p>
             </div>
 
             <div style={{ marginTop: 30, display: "flex", justifyContent: "flex-end" }}>
