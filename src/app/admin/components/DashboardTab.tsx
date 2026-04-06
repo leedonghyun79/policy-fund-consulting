@@ -66,7 +66,10 @@ export default function DashboardTab({
         {/* 방문자 통계 */}
         <div style={{ backgroundColor: '#fff', padding: '32px', borderRadius: '24px', border: `1px solid ${THEME.border}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>방문자 통계</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>방문자 통계</h3>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, opacity: 0.8 }}>최근 30일</span>
+            </div>
             <button onClick={() => setActiveTab('analytics')} style={{ fontSize: '13px', fontWeight: 700, color: THEME.textMuted, background: 'none', border: 'none', cursor: 'pointer' }}>자세히 보기 &rarr;</button>
           </div>
           <div style={{ height: '300px', position: 'relative' }}>
@@ -99,7 +102,10 @@ export default function DashboardTab({
         {/* 유입 경로 분석 */}
         <div style={{ backgroundColor: '#fff', padding: '32px', borderRadius: '24px', border: `1px solid ${THEME.border}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>유입 경로 분석</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>유입 경로 분석</h3>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, opacity: 0.8 }}>최근 30일</span>
+            </div>
             <button onClick={() => setActiveTab('analytics')} style={{ fontSize: '13px', fontWeight: 700, color: THEME.textMuted, background: 'none', border: 'none', cursor: 'pointer' }}>자세히 보기 &rarr;</button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', height: '300px', position: 'relative' }}>

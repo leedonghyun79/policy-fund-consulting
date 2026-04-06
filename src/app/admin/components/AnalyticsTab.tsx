@@ -43,7 +43,10 @@ export default function AnalyticsTab({
 
       <div style={{ background: '#fff', borderRadius: '24px', border: `1px solid ${THEME.border}`, padding: '32px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>방문자 통계 (요약)</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>방문자 통계 (요약)</h3>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, opacity: 0.8 }}>최근 30일</span>
+          </div>
         </div>
         <div style={{ height: '300px', position: 'relative' }}>
           {activeVisitorData.length === 0 ? (
@@ -76,6 +79,7 @@ export default function AnalyticsTab({
         <div style={{ padding: '32px', borderBottom: `1px solid ${THEME.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <h3 style={{ fontSize: '20px', fontWeight: 900, margin: 0 }}>기간별 분석</h3>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, opacity: 0.8 }}>최근 30일</span>
             <div style={{ backgroundColor: '#F2F4F7', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700 }}>요약</div>
           </div>
           <button onClick={() => setActiveTab('analytics_period')} style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, background: 'none', border: 'none', cursor: 'pointer' }}>상세 보기 &rarr;</button>
@@ -116,7 +120,10 @@ export default function AnalyticsTab({
 
       <div style={{ background: '#fff', borderRadius: '24px', border: `1px solid ${THEME.border}`, padding: '40px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-          <h3 style={{ fontSize: '20px', fontWeight: 900, margin: 0 }}>유입 경로 분석</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h3 style={{ fontSize: '20px', fontWeight: 900, margin: 0 }}>유입 경로 분석</h3>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, opacity: 0.8 }}>최근 30일</span>
+          </div>
           <button onClick={() => setActiveTab('analytics_sites')} style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, background: 'none', border: 'none', cursor: 'pointer' }}>상세 보기 &rarr;</button>
         </div>
         <div style={{ position: 'relative', minHeight: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -176,7 +183,10 @@ export default function AnalyticsTab({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
         <div style={{ background: '#fff', borderRadius: '24px', border: `1px solid ${THEME.border}`, padding: '32px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>유입 사이트 분석</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>유입 사이트 분석</h3>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, opacity: 0.8 }}>최근 30일</span>
+            </div>
             <button onClick={() => setActiveTab('analytics_sites')} style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, background: 'none', border: 'none', cursor: 'pointer' }}>상세 보기 &rarr;</button>
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -210,7 +220,10 @@ export default function AnalyticsTab({
 
         <div style={{ background: '#fff', borderRadius: '24px', border: `1px solid ${THEME.border}`, padding: '32px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>자주 찾는 검색어</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>자주 찾는 검색어</h3>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, opacity: 0.8 }}>최근 30일</span>
+            </div>
             <button onClick={() => setActiveTab('analytics_keywords')} style={{ fontSize: '12px', fontWeight: 700, color: THEME.textMuted, background: 'none', border: 'none', cursor: 'pointer' }}>상세 보기 &rarr;</button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

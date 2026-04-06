@@ -5,6 +5,8 @@ import Providers from "./providers";
 import Script from "next/script";
 import FloatingBlogButton from "../components/FloatingBlogButton";
 
+import GoogleAnalytics from "../components/GoogleAnalytics";
+
 const outfit = Outfit({
   subsets: ["latin"],
   weight: ["800"],
@@ -44,7 +46,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
-  const isDev = process.env.NODE_ENV === 'development';
 
   return (
     <html lang="ko" className={outfit.variable}>
@@ -53,22 +54,7 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
           rel="stylesheet"
         />
-        {!isDev && GA_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){window.dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${GA_ID}');
-              `}
-            </Script>
-          </>
-        )}
+        {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
       </head>
       <body>
         <script

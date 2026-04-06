@@ -63,7 +63,15 @@ export async function GET(request: Request) {
       const totalSessions = response.rows?.reduce((acc, row) => acc + parseInt(row.metricValues?.[0].value || '0'), 0) || 1;
 
       const referrerSites = response.rows?.map(row => {
-        const source = row.dimensionValues?.[0].value || 'Direct';
+        let source = row.dimensionValues?.[0].value || '직접 유입(URL 입력 등)';
+        
+        // (direct) / (none) 또는 유사한 이름을 한글로 변환
+        if (source === '(direct) / (none)' || source === 'Direct' || source === '(none)') {
+          source = '직접 유입(URL 입력 등)';
+        } else if (source === '(not set)') {
+          source = '분류 중(데이터 수집 중)';
+        }
+
         const sessions = parseInt(row.metricValues?.[0].value || '0');
         const bounceRate = parseFloat(row.metricValues?.[1].value || '0') * 100;
         const rate = totalSessions > 0 ? ((sessions / totalSessions) * 100).toFixed(1) + '%' : '0%';
