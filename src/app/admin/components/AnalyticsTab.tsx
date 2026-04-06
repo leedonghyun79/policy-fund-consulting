@@ -126,32 +126,44 @@ export default function AnalyticsTab({
               <p style={{ fontWeight: 800, fontSize: '16px', opacity: 0.6 }}>수집된 데이터가 없습니다.</p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', alignItems: 'center', width: '100%' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.2fr)', gap: '48px', alignItems: 'center', width: '100%' }}>
               <div style={{ height: '360px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={mockFunnelData} cx="50%" cy="50%" innerRadius={100} outerRadius={140} paddingAngle={4} dataKey="value" stroke="none">
-                      {mockFunnelData.map((entry, index) => <Cell key={`cell-${index}`} fill={FUNNEL_COLORS[index % FUNNEL_COLORS.length]} />)}
+                    <Pie 
+                      data={activeReferrerSites.slice(0, 5).map(r => ({
+                        name: r.site,
+                        value: parseFloat(r.rate.replace('%', ''))
+                      }))} 
+                      cx="50%" 
+                      cy="50%" 
+                      innerRadius={100} 
+                      outerRadius={140} 
+                      paddingAngle={4} 
+                      dataKey="value" 
+                      stroke="none"
+                    >
+                      {activeReferrerSites.slice(0, 5).map((entry, index) => <Cell key={`cell-${index}`} fill={FUNNEL_COLORS[index % FUNNEL_COLORS.length]} />)}
                     </Pie>
                     <RechartsTooltip contentStyle={{ borderRadius: '12px', border: `1px solid ${THEME.border}`, fontWeight: 700 }} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {mockFunnelData.map((item, idx) => (
-                  <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px', background: '#f8fafc', borderRadius: '16px', border: `1px solid ${THEME.border}` }}>
+                {activeReferrerSites.slice(0, 5).map((item, idx) => (
+                  <div key={item.site} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px', background: '#f8fafc', borderRadius: '16px', border: `1px solid ${THEME.border}` }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: `${FUNNEL_COLORS[idx]}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: FUNNEL_COLORS[idx] }} />
+                      <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: `${FUNNEL_COLORS[idx % FUNNEL_COLORS.length]}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: FUNNEL_COLORS[idx % FUNNEL_COLORS.length] }} />
                       </div>
-                      <div>
-                        <span style={{ fontSize: '16px', fontWeight: 900, color: THEME.textMain, display: 'block' }}>{item.name}</span>
-                        <span style={{ fontSize: '13px', fontWeight: 700, color: THEME.textMuted, marginTop: '4px', display: 'block' }}>총 {Math.round(item.value * 32.4)}회 유입</span>
+                      <div style={{ overflow: 'hidden' }}>
+                        <span style={{ fontSize: '16px', fontWeight: 900, color: THEME.textMain, display: 'block', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{item.site}</span>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: THEME.textMuted, marginTop: '4px', display: 'block' }}>최근 30일 {item.views.toLocaleString()}회</span>
                       </div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '20px', fontWeight: 950, color: FUNNEL_COLORS[idx] }}>{item.value}%</div>
-                      <div style={{ fontSize: '13px', color: THEME.textMuted, marginTop: '6px', fontWeight: 700 }}>이탈률: {Math.round(item.value * 0.8)}%</div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <div style={{ fontSize: '20px', fontWeight: 950, color: FUNNEL_COLORS[idx % FUNNEL_COLORS.length] }}>{item.rate}</div>
+                      <div style={{ fontSize: '13px', color: THEME.textMuted, marginTop: '6px', fontWeight: 700 }}>이탈률: {item.bounceRate}</div>
                     </div>
                   </div>
                 ))}

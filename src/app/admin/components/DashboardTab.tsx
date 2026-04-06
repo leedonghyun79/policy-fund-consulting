@@ -74,7 +74,6 @@ export default function DashboardTab({
               <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: THEME.textMuted }}>
                 <HiOutlineChartBar size={48} style={{ opacity: 0.1, marginBottom: '16px' }} />
                 <p style={{ fontWeight: 800, fontSize: '14px', opacity: 0.6 }}>수집된 데이터가 없습니다.</p>
-                <p style={{ fontSize: '12px', opacity: 0.4, marginTop: '4px' }}>Google Analytics 연동 상태를 확인해 주세요.</p>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
@@ -111,11 +110,23 @@ export default function DashboardTab({
               </div>
             ) : (
               <>
-                <div style={{ width: '50%', height: '100%' }}>
+                <div style={{ width: '45%', height: '100%' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={mockFunnelData} cx="50%" cy="50%" innerRadius={80} outerRadius={110} paddingAngle={3} dataKey="value" stroke="none">
-                        {mockFunnelData.map((entry, index) => (
+                      <Pie 
+                        data={activeReferrerSites.slice(0, 5).map(r => ({
+                          name: r.site,
+                          value: parseFloat(r.rate.replace('%', ''))
+                        }))} 
+                        cx="50%" 
+                        cy="50%" 
+                        innerRadius={80} 
+                        outerRadius={110} 
+                        paddingAngle={3} 
+                        dataKey="value" 
+                        stroke="none"
+                      >
+                        {activeReferrerSites.slice(0, 5).map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={FUNNEL_COLORS[index % FUNNEL_COLORS.length]} />
                         ))}
                       </Pie>
@@ -123,14 +134,14 @@ export default function DashboardTab({
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div style={{ width: '50%', paddingLeft: '24px' }}>
-                  {mockFunnelData.map((item, idx) => (
-                    <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: FUNNEL_COLORS[idx] }} />
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: THEME.textMain }}>{item.name}</span>
+                <div style={{ width: '55%', paddingLeft: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  {activeReferrerSites.slice(0, 5).map((item, idx) => (
+                    <div key={item.site} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
+                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: FUNNEL_COLORS[idx % FUNNEL_COLORS.length], flexShrink: 0 }} />
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: THEME.textMain, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{item.site}</span>
                       </div>
-                      <span style={{ fontSize: '15px', fontWeight: 900 }}>{item.value}%</span>
+                      <span style={{ fontSize: '14px', fontWeight: 900, flexShrink: 0, marginLeft: '8px' }}>{item.rate}</span>
                     </div>
                   ))}
                 </div>
