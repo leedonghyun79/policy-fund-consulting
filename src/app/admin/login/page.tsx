@@ -12,6 +12,12 @@ export default function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [saveId, setSaveId] = useState(false);
+
+  // 비밀번호 찾기 모달 상태
+  const [showFindPw, setShowFindPw] = useState(false);
+  const [findUsername, setFindUsername] = useState("");
+  const [findLoading, setFindLoading] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -20,6 +26,13 @@ export default function AdminLoginPage() {
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
+
+    const savedUsername = localStorage.getItem("admin_saved_username");
+    if (savedUsername) {
+      setUsername(savedUsername);
+      setSaveId(true);
+    }
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -27,6 +40,13 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (saveId) {
+      localStorage.setItem("admin_saved_username", username);
+    } else {
+      localStorage.removeItem("admin_saved_username");
+    }
+
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
@@ -44,6 +64,30 @@ export default function AdminLoginPage() {
       setError(message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onFindPassword = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFindLoading(true);
+    try {
+      const res = await fetch("/api/admin/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: findUsername }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message || "오류가 발생했습니다.");
+      } else {
+        alert(data.message || "대표 이메일로 임시 비밀번호가 발송되었습니다.");
+        setShowFindPw(false);
+        setFindUsername("");
+      }
+    } catch (err) {
+      alert("서버 오류가 발생했습니다.");
+    } finally {
+      setFindLoading(false);
     }
   };
 
@@ -176,10 +220,15 @@ export default function AdminLoginPage() {
 
           <div className="flex justify-between items-center text-[14px] text-slate-400 px-2" style={{ marginBottom: '64px' }}>
             <label className="flex items-center gap-2 cursor-pointer group select-none">
-              <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-500 cursor-pointer" />
+              <input 
+                type="checkbox" 
+                checked={saveId}
+                onChange={(e) => setSaveId(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 text-blue-500 cursor-pointer" 
+              />
               <span className="font-bold group-hover:text-slate-500 transition-colors">아이디 저장</span>
             </label>
-            <button type="button" className="font-bold hover:text-slate-500 transition-colors">비밀번호 찾기</button>
+            <button type="button" onClick={() => setShowFindPw(true)} className="font-bold hover:text-slate-500 transition-colors">비밀번호 찾기</button>
           </div>
         </form>
 
@@ -187,6 +236,50 @@ export default function AdminLoginPage() {
           ⓒPIXELCONNECT SYSTEMS
         </p>
       </div>
+
+      {showFindPw && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all" style={{ zIndex: 9999 }}>
+          <div 
+            className="bg-white rounded-3xl w-full max-w-[420px] shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+            style={{ padding: '40px 32px' }}
+          >
+            <h3 className="text-2xl font-black text-slate-800 text-left tracking-tight" style={{ marginBottom: '16px' }}>비밀번호 찾기</h3>
+            <p className="text-[15px] text-slate-500 font-bold text-left leading-relaxed break-keep" style={{ marginBottom: '32px' }}>
+              등록된 관리자 아이디를 입력하시면,<br/>
+              <span className="text-blue-500">최고 관리자(대표 이메일)</span>로 임시 비밀번호가 발송됩니다.
+            </p>
+            <form onSubmit={onFindPassword}>
+              <div style={{ marginBottom: '32px' }}>
+                <input
+                  type="text"
+                  placeholder="관리자 아이디를 입력하세요"
+                  required
+                  value={findUsername}
+                  autoFocus
+                  onChange={(e) => setFindUsername(e.target.value)}
+                  className="w-full h-14 bg-slate-100/80 border border-slate-200 rounded-2xl px-5 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-[15px] placeholder:text-slate-400"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowFindPw(false)}
+                  className="flex-[1] h-14 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all text-[15px]"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={findLoading}
+                  className="flex-[2] h-14 bg-[#4E8DFF] hover:bg-blue-600 text-white font-black rounded-2xl transition-all text-[15px] shadow-[0_8px_15px_-4px_rgba(78,141,255,0.3)] disabled:opacity-50 disabled:shadow-none hover:shadow-[0_12px_20px_-6px_rgba(78,141,255,0.4)] active:scale-[0.98]"
+                >
+                  {findLoading ? "발송 중..." : "발송하기"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

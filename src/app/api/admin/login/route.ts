@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!dbAdmin || !verifyAdminPassword(password, dbAdmin.passwordHash)) {
-      return NextResponse.json({ message: "Invalid credentials." }, { status: 401 });
+      return NextResponse.json({ message: "비밀번호가 일치하지 않습니다." }, { status: 401 });
     }
 
     const token = createAdminSessionToken(username);
