@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import Script from "next/script";
+import FloatingBlogButton from "../components/FloatingBlogButton";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -41,6 +43,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+  const isDev = process.env.NODE_ENV === 'development';
+
   return (
     <html lang="ko" className={outfit.variable}>
       <head>
@@ -48,6 +53,22 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
           rel="stylesheet"
         />
+        {!isDev && GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){window.dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_ID}');
+              `}
+            </Script>
+          </>
+        )}
       </head>
       <body>
         <script
@@ -85,30 +106,9 @@ export default function RootLayout({
         />
         <Providers>
           {children}
-          <a
-            href="https://blog.naver.com/biz-support-center"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="naver-floating"
-            title="네이버 블로그"
-          >
-            <img
-              src="/blog_512.png"
-              alt="네이버 블로그"
-              className="pc-only"
-              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
-            />
-            <img
-              src="/blog_512.png"
-              alt="네이버 블로그"
-              className="mo-only"
-              style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
-            />
-          </a>
-
+          <FloatingBlogButton />
         </Providers>
       </body>
-
     </html>
   );
 }

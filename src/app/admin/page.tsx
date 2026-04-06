@@ -10,6 +10,10 @@ export default async function AdminPage() {
   }
 
   try {
+    const currentUser = await prisma.adminUser.findUnique({
+      where: { username: session.username }
+    });
+
     const leads = await prisma.consultationLead.findMany({
       where: { deletedAt: null },
       orderBy: { createdAt: "desc" },
@@ -35,6 +39,7 @@ export default async function AdminPage() {
           createdAt: row.createdAt.toISOString(),
           representativeName: row.representativeName ?? '',
         }))}
+        currentUser={currentUser}
       />
     );
   } catch (error) {
