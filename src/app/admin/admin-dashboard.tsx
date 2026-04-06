@@ -188,6 +188,53 @@ export default function AdminDashboard({ initialLeads, currentUser }: { initialL
     }
   });
 
+  const updateAdminMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/admin/users/${editAdminForm.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editAdminForm),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Update failed");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin_users"] });
+      setAdminMessage({ type: 'success', text: "관리자 정보가 수정되었습니다." });
+      setIsEditAdminModalOpen(false);
+    },
+    onError: (error: any) => {
+      setAdminMessage({ type: 'error', text: error.message });
+    }
+  });
+
+  const updateAdminUser = () => {
+    updateAdminMutation.mutate();
+  };
+
+  const deleteAdminMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Delete failed");
+      }
+    },
+    onSuccess: () => {
+      window.location.href = "/admin/login";
+    },
+    onError: (error: any) => {
+      alert(error.message);
+    }
+  });
+
+  const deleteAdminUser = (id: string) => {
+    deleteAdminMutation.mutate(id);
+  };
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/admin/consultations/${id}`, { method: "DELETE" });
@@ -348,37 +395,6 @@ export default function AdminDashboard({ initialLeads, currentUser }: { initialL
     }
   };
 
-  const updateAdminUser = async () => {
-    setEditAdminLoading(true);
-    setAdminMessage(null);
-    try {
-      const res = await fetch(`/api/admin/users/${editAdminForm.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: editAdminForm.name,
-          username: editAdminForm.username,
-          password: editAdminForm.password,
-        }),
-      });
-
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.message || "관리자 수정에 실패했습니다. 권한이 없거나 중복된 아이디일 수 있습니다.");
-      }
-
-      setAdminMessage({ type: "success", text: "관리자 계정이 수정되었습니다." });
-      setEditAdminForm({ id: "", name: "", username: "", password: "" });
-      setIsEditAdminModalOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "관리자 수정에 실패했습니다.";
-      setAdminMessage({ type: "error", text: message });
-    } finally {
-      setEditAdminLoading(false);
-    }
-  };
-
   if (!isMounted) return null;
 
   if (isMobile) {
@@ -471,6 +487,7 @@ export default function AdminDashboard({ initialLeads, currentUser }: { initialL
           {ui.activeTab === 'members' && (
             <MembersTab
               adminUsers={adminUsers}
+              currentUser={currentUser}
               adminForm={adminForm}
               setAdminForm={setAdminForm}
               editAdminForm={editAdminForm}
@@ -480,9 +497,10 @@ export default function AdminDashboard({ initialLeads, currentUser }: { initialL
               isEditAdminModalOpen={isEditAdminModalOpen}
               setIsEditAdminModalOpen={setIsEditAdminModalOpen}
               adminLoading={adminLoading}
-              editAdminLoading={editAdminLoading}
+              editAdminLoading={updateAdminMutation.isPending}
               createAdminUser={createAdminUser}
               updateAdminUser={updateAdminUser}
+              deleteAdminUser={deleteAdminUser}
               setAdminMessage={setAdminMessage}
             />
           )}

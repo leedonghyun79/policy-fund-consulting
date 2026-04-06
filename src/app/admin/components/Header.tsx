@@ -61,7 +61,7 @@ export default function Header({
           </div>
           <div style={{ textAlign: 'left' }}>
             <p style={{ margin: 0, fontSize: '12px', fontWeight: 800 }}>
-              {currentUser?.role === 'SUPER_ADMIN' ? '최고 관리자' : (currentUser?.customRole || '시스템 관리자')}
+              {currentUser?.role === 'SUPER' ? '시스템 관리자' : (currentUser?.role === 'MANAGER' ? '최고 관리자' : (currentUser?.role || '시스템 관리자'))}
             </p>
           </div>
         </div>

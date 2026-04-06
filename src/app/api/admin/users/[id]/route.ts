@@ -105,3 +105,49 @@ export async function PATCH(
     return NextResponse.json({ message: "Internal server error." }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getAdminSessionFromCookies();
+  if (!session) {
+    return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  try {
+    const currentUser = await prisma.adminUser.findUnique({
+      where: { username: session.username },
+      select: { id: true, role: true },
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ message: "Session user not found." }, { status: 404 });
+    }
+
+    // Only self can delete
+    if (currentUser.id !== id) {
+      return NextResponse.json({ message: "Permission denied. You can only delete your own account." }, { status: 403 });
+    }
+
+    const isTopAdmin = currentUser.role === "MANAGER";
+    if (isTopAdmin) {
+      return NextResponse.json({ message: "Top admins cannot be deleted." }, { status: 403 });
+    }
+
+    // Remove session cookie if they are deleting themselves
+    const response = NextResponse.json({ ok: true });
+    response.cookies.set('admin_session', '', { maxAge: -1 });
+
+    await prisma.adminUser.delete({
+      where: { id }
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Admin user delete error:", error);
+    return NextResponse.json({ message: "Internal server error." }, { status: 500 });
+  }
+}

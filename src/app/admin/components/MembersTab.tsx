@@ -5,6 +5,7 @@ import { AdminUserRow } from "../types";
 
 interface MembersTabProps {
   adminUsers: AdminUserRow[];
+  currentUser?: { name: string; username: string; role: string; };
   setAdminMessage: (msg: { type: 'success' | 'error', text: string } | null) => void;
   setIsAddAdminModalOpen: (open: boolean) => void;
   setEditAdminForm: (form: { id: string, name: string, username: string, password: string }) => void;
@@ -18,10 +19,12 @@ interface MembersTabProps {
   editAdminForm: any;
   updateAdminUser: () => void;
   editAdminLoading: boolean;
+  deleteAdminUser: (id: string) => void;
 }
 
 export default function MembersTab({
   adminUsers,
+  currentUser,
   setAdminMessage,
   setIsAddAdminModalOpen,
   setEditAdminForm,
@@ -35,7 +38,10 @@ export default function MembersTab({
   editAdminForm,
   updateAdminUser,
   editAdminLoading,
+  deleteAdminUser,
 }: MembersTabProps) {
+  const isTopAdmin = currentUser?.role === 'MANAGER';
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', border: `1px solid ${THEME.border}`, borderRadius: '20px', padding: '24px 28px' }}>
@@ -43,15 +49,17 @@ export default function MembersTab({
           <h3 style={{ margin: 0, fontSize: '22px', fontWeight: 900, color: THEME.textMain }}>관리자 계정 관리</h3>
           <p style={{ margin: '8px 0 0', color: THEME.textMuted, fontSize: '13px' }}>로그인 가능한 관리자 계정을 등록하고 권한을 관리합니다.</p>
         </div>
-        <button
-          onClick={() => {
-            setAdminMessage(null);
-            setIsAddAdminModalOpen(true);
-          }}
-          style={{ height: '44px', padding: '0 20px', borderRadius: '12px', border: 'none', backgroundColor: THEME.primary, color: '#fff', fontWeight: 800, cursor: 'pointer' }}
-        >
-          관리자 등록
-        </button>
+        {isTopAdmin && (
+          <button
+            onClick={() => {
+              setAdminMessage(null);
+              setIsAddAdminModalOpen(true);
+            }}
+            style={{ height: '44px', padding: '0 20px', borderRadius: '12px', border: 'none', backgroundColor: THEME.primary, color: '#fff', fontWeight: 800, cursor: 'pointer' }}
+          >
+            관리자 등록
+          </button>
+        )}
       </div>
 
       <div style={{ backgroundColor: '#fff', border: `1px solid ${THEME.border}`, borderRadius: '20px', overflow: 'hidden' }}>
@@ -78,16 +86,32 @@ export default function MembersTab({
                 </td>
                 <td style={{ padding: '14px 20px', color: THEME.textMuted }}>{new Date(u.createdAt).toLocaleString()}</td>
                 <td style={{ padding: '14px 20px' }}>
-                  <button
-                    onClick={() => {
-                      setAdminMessage(null);
-                      setEditAdminForm({ id: u.id, name: u.name, username: u.username, password: "" });
-                      setIsEditAdminModalOpen(true);
-                    }}
-                    style={{ padding: '6px 12px', borderRadius: '8px', border: `1px solid ${THEME.border}`, backgroundColor: '#fff', fontSize: '12px', fontWeight: 700, cursor: 'pointer', color: THEME.textMain }}
-                  >
-                    수정
-                  </button>
+                  {u.username === currentUser?.username && (
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        onClick={() => {
+                          setAdminMessage(null);
+                          setEditAdminForm({ id: u.id, name: u.name, username: u.username, password: "" });
+                          setIsEditAdminModalOpen(true);
+                        }}
+                        style={{ padding: '6px 12px', borderRadius: '8px', border: `1px solid ${THEME.border}`, backgroundColor: '#fff', fontSize: '12px', fontWeight: 700, cursor: 'pointer', color: THEME.textMain }}
+                      >
+                        수정
+                      </button>
+                      {!isTopAdmin && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm("정말로 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+                              deleteAdminUser(u.id);
+                            }
+                          }}
+                          style={{ padding: '6px 12px', borderRadius: '8px', border: `1px solid #ef4444`, backgroundColor: '#fff', fontSize: '12px', fontWeight: 700, cursor: 'pointer', color: '#ef4444' }}
+                        >
+                          삭제
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
