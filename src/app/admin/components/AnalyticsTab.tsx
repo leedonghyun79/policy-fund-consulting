@@ -18,6 +18,7 @@ interface AnalyticsTabProps {
   activeReferrerSites: any[];
   activeSearchKeywords: any[];
   setActiveTab: (tab: string) => void;
+  leads: any[];
 }
 
 export default function AnalyticsTab({
@@ -25,8 +26,24 @@ export default function AnalyticsTab({
   activeVisitorData,
   activeReferrerSites,
   activeSearchKeywords,
-  setActiveTab
+  setActiveTab,
+  leads,
 }: AnalyticsTabProps) {
+  // UTC -> KST 변환 후 날짜 문자열 반환 (YYYY-MM-DD)
+  const toKSTDate = (isoStr: string): string => {
+    const kst = new Date(new Date(isoStr).getTime() + 9 * 60 * 60 * 1000);
+    return kst.toISOString().substring(0, 10);
+  };
+
+  // 초 -> '분 초' 형식 변환
+  const formatDuration = (secs: number): string => {
+    const s = Math.round(secs);
+    if (s <= 0) return '0초';
+    if (s < 60) return `${s}초`;
+    const m = Math.floor(s / 60);
+    const rem = s % 60;
+    return rem > 0 ? `${m}분 ${rem}초` : `${m}분`;
+  };
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
@@ -87,7 +104,7 @@ export default function AnalyticsTab({
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead style={{ background: '#f8fafc' }}>
             <tr>
-              {['분석 일자', '페이지뷰 (PV)', '순방문자 (UV)', '회원가입/전환', '이탈률', '평균 세션 (초)'].map(h => (
+              {['분석 일자', '페이지뷰 (PV)', '순방문자 (UV)', '회원가입/전환', '이탈률', '체류시간'].map(h => (
                 <th key={h} style={{ padding: '20px 24px', textAlign: 'left', fontSize: '13px', fontWeight: 800, color: THEME.textMuted }}>{h}</th>
               ))}
             </tr>
@@ -108,9 +125,11 @@ export default function AnalyticsTab({
                   <td style={{ padding: '20px 24px', fontWeight: 800, color: THEME.primary }}>{row.date?.length === 5 ? `2026-${row.date}` : row.date}</td>
                   <td style={{ padding: '20px 24px', fontWeight: 700 }}>{(row.views || 0).toLocaleString()}</td>
                   <td style={{ padding: '20px 24px', fontWeight: 700 }}>{(row.visitors || 0).toLocaleString()}</td>
-                  <td style={{ padding: '20px 24px', fontWeight: 700 }}>{Math.round((row.visitors || 0) * 0.05)}건</td>
+                  <td style={{ padding: '20px 24px', fontWeight: 700 }}>
+                    {leads.filter((l: any) => toKSTDate(l.createdAt) === row.date).length}건
+                  </td>
                   <td style={{ padding: '20px 24px', color: '#ef4444', fontWeight: 800 }}>{(row.bounceRate || 0).toFixed(1)}%</td>
-                  <td style={{ padding: '20px 24px', fontWeight: 700 }}>{Math.round(row.avgSessionDuration || 0)}s</td>
+                  <td style={{ padding: '20px 24px', fontWeight: 700 }}>{formatDuration(row.avgSessionDuration || 0)}</td>
                 </tr>
               ))
             )}

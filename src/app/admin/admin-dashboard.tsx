@@ -130,7 +130,16 @@ export default function AdminDashboard({ initialLeads, currentUser }: { initialL
     enabled: ui.activeTab === 'dashboard' || ui.activeTab.startsWith('analytics'),
   });
 
-  const activeVisitorData = gaOverview && gaOverview.visitorData ? gaOverview.visitorData : [];
+  const { data: gaMonthly } = useQuery({
+    queryKey: ['ga_monthly', selectedYear],
+    queryFn: () => fetch(`/api/analytics?type=monthly&year=${selectedYear}`).then(res => res.json()),
+    refetchInterval: 300000,
+    enabled: ui.activeTab === 'analytics_period' && periodMode === 'month',
+  });
+
+  const allVisitorData = gaOverview && gaOverview.visitorData ? gaOverview.visitorData : [];
+  // 차트/KPI 요약용: 최근 30일
+  const activeVisitorData = allVisitorData.slice(-30);
   const activeReferrerSites = gaReferrers && gaReferrers.referrerSites ? gaReferrers.referrerSites : [];
   const activeSearchKeywords = gaKeywords && gaKeywords.keywords ? gaKeywords.keywords : [];
 
@@ -160,17 +169,24 @@ export default function AdminDashboard({ initialLeads, currentUser }: { initialL
   ];
 
   const filteredVisitorData = useMemo(() => {
-    if (periodMode === 'month') return []; // 월별 데이터는 현재 API 미지원으로 빈 배열
+    if (periodMode === 'month') {
+      // 월별: GA monthly API 결과 사용 (해당 연도 전체)
+      return gaMonthly && gaMonthly.monthlyData ? gaMonthly.monthlyData : [];
+    }
     
-    // 일별 모드인 경우 선택된 연도/월 필터링 (가져온 데이터의 date 형식이 'MM-DD' 또는 'YYYY-MM-DD'임을 가정)
-    return activeVisitorData.filter((d: any) => {
-      const dateStr = d.date?.includes('-') ? d.date : '';
-      if (!dateStr) return true;
-      
-      const monthPart = dateStr.split('-').reverse()[1]; // '04-06' -> '04'
-      return Number(monthPart) === selectedMonth;
+    // 일별: YYYY-MM-DD 형식 기준으로 선택 연도/월 필터
+    return allVisitorData.filter((d: any) => {
+      const dateStr: string = d.date || '';
+      if (!dateStr.includes('-')) return false;
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        // YYYY-MM-DD
+        return Number(parts[0]) === selectedYear && Number(parts[1]) === selectedMonth;
+      }
+      // 혹시 MM-DD 형식이면 월만 비교
+      return Number(parts[0]) === selectedMonth;
     });
-  }, [activeVisitorData, periodMode, selectedYear, selectedMonth]);
+  }, [allVisitorData, gaMonthly, periodMode, selectedYear, selectedMonth]);
 
 
   const updateMutation = useMutation({
@@ -445,6 +461,7 @@ export default function AdminDashboard({ initialLeads, currentUser }: { initialL
               activeReferrerSites={activeReferrerSites}
               activeSearchKeywords={activeSearchKeywords}
               setActiveTab={ui.setActiveTab}
+              leads={leads}
             />
           )}
           {ui.activeTab === 'analytics_period' && (
@@ -456,6 +473,7 @@ export default function AdminDashboard({ initialLeads, currentUser }: { initialL
               selectedMonth={selectedMonth}
               setSelectedMonth={setSelectedMonth}
               filteredVisitorData={filteredVisitorData}
+              leads={leads}
             />
           )}
           {ui.activeTab === 'analytics_sites' && (

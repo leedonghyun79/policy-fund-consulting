@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { HiOutlineChartBar, HiOutlineViewColumns, HiOutlineArrowDownTray } from "react-icons/hi2";
+import * as XLSX from "xlsx";
+import { HiOutlineChartBar, HiOutlineArrowDownTray } from "react-icons/hi2";
 import { THEME } from "../constants";
 
 interface AnalyticsPeriodTabProps {
@@ -12,6 +13,7 @@ interface AnalyticsPeriodTabProps {
   selectedMonth: number;
   setSelectedMonth: (month: number) => void;
   filteredVisitorData: any[];
+  leads: any[];
 }
 
 export default function AnalyticsPeriodTab({
@@ -22,11 +24,65 @@ export default function AnalyticsPeriodTab({
   selectedMonth,
   setSelectedMonth,
   filteredVisitorData,
+  leads,
 }: AnalyticsPeriodTabProps) {
+  // UTC -> KST 변환 후 날짜 문자열 반환 (YYYY-MM-DD)
+  const toKSTDate = (isoStr: string): string => {
+    const kst = new Date(new Date(isoStr).getTime() + 9 * 60 * 60 * 1000);
+    return kst.toISOString().substring(0, 10);
+  };
+
+  // 초 -> '분 초' 형식 변환
+  const formatDuration = (secs: number): string => {
+    const s = Math.round(secs);
+    if (s <= 0) return '0초';
+    if (s < 60) return `${s}초`;
+    const m = Math.floor(s / 60);
+    const rem = s % 60;
+    return rem > 0 ? `${m}분 ${rem}초` : `${m}분`;
+  };
+
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
   const totalPages = Math.ceil(filteredVisitorData.length / ITEMS_PER_PAGE) || 1;
   const paginatedData = filteredVisitorData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  const exportToExcel = () => {
+    const data = filteredVisitorData.map(row => {
+      const convCount = leads.filter((l: any) => {
+        const kstDate = toKSTDate(l.createdAt);
+        const dateKey = row.date?.length === 7 ? kstDate.substring(0, 7) : kstDate;
+        return dateKey === row.date;
+      }).length;
+
+      return {
+        [periodMode === 'month' ? '분석 월' : '분석 일자']: row.date,
+        '페이지뷰 (PV)': row.views || 0,
+        '순방문자 (UV)': row.visitors || 0,
+        '전환 (문의)': convCount,
+        '이탈률 (%)': parseFloat((row.bounceRate || 0).toFixed(1)),
+        '체류시간': formatDuration(row.avgSessionDuration || 0),
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    ws['!cols'] = [
+      { wch: 14 }, // 날짜/월
+      { wch: 14 }, // PV
+      { wch: 14 }, // UV
+      { wch: 12 }, // 전환
+      { wch: 12 }, // 이탈률
+      { wch: 14 }, // 체류시간
+    ];
+
+    const wb = XLSX.utils.book_new();
+    const sheetName = periodMode === 'month' ? '월별분석' : '일별분석';
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    const filename = periodMode === 'month'
+      ? `분석_월별_${selectedYear}.xlsx`
+      : `분석_일별_${selectedYear}-${String(selectedMonth).padStart(2, '0')}.xlsx`;
+    XLSX.writeFile(wb, filename);
+  };
 
   return (
     <div style={{ background: '#fff', borderRadius: '24px', border: `1px solid ${THEME.border}`, overflow: 'hidden' }}>
@@ -70,10 +126,11 @@ export default function AnalyticsPeriodTab({
               ))}
             </select>
           )}
-          <button style={{ width: '36px', height: '36px', borderRadius: '8px', border: `1px solid ${THEME.border}`, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-            <HiOutlineViewColumns size={18} color={THEME.textMuted} />
-          </button>
-          <button style={{ width: '36px', height: '36px', borderRadius: '8px', border: `1px solid ${THEME.border}`, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+          <button
+            onClick={exportToExcel}
+            style={{ width: '36px', height: '36px', borderRadius: '8px', border: `1px solid ${THEME.border}`, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            title="엑셀 내보내기"
+          >
             <HiOutlineArrowDownTray size={18} color={THEME.textMuted} />
           </button>
         </div>
@@ -81,7 +138,7 @@ export default function AnalyticsPeriodTab({
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead style={{ background: '#f8fafc' }}>
           <tr>
-            {[periodMode === 'day' ? '분석 일자' : '분석 월', '페이지뷰 (PV)', '순방문자 (UV)', '회원가입/전환', '이탈률', '평균 세션 (초)'].map(h => (
+            {[periodMode === 'day' ? '분석 일자' : '분석 월', '페이지뷰 (PV)', '순방문자 (UV)', '회원가입/전환', '이탈률', '체류시간'].map(h => (
               <th key={h} style={{ padding: '20px 24px', textAlign: 'left', fontSize: '13px', fontWeight: 800, color: THEME.textMuted }}>{h}</th>
             ))}
           </tr>
@@ -102,16 +159,25 @@ export default function AnalyticsPeriodTab({
               return (
                 <tr key={actualIndex} style={{ borderBottom: `1px solid ${THEME.border}` }}>
                   <td style={{ padding: '20px 24px', fontWeight: 800, color: THEME.primary }}>
-                    {periodMode === 'day' 
-                      ? (row.date?.length === 5 ? `${selectedYear}-${row.date}` : row.date)
-                      : `${selectedYear}-${actualIndex + 1 < 10 ? '0' : ''}${actualIndex + 1}`
+                    {periodMode === 'month'
+                      ? row.date  // YYYY-MM 형식 그대로
+                      : row.date  // YYYY-MM-DD 형식 그대로
                     }
                   </td>
                   <td style={{ padding: '20px 24px', fontWeight: 700 }}>{(row.views || 0).toLocaleString()}</td>
                   <td style={{ padding: '20px 24px', fontWeight: 700 }}>{(row.visitors || 0).toLocaleString()}</td>
-                  <td style={{ padding: '20px 24px', fontWeight: 700 }}>{Math.round((row.visitors || 0) * 0.05)}건</td>
+                  <td style={{ padding: '20px 24px', fontWeight: 700 }}>
+                    {leads.filter((l: any) => {
+                      const kstDate = toKSTDate(l.createdAt);
+                      // month 모드면 YYYY-MM(7자), day 모드면 YYYY-MM-DD(10자) 비교
+                      const dateKey = row.date?.length === 7
+                        ? kstDate.substring(0, 7)
+                        : kstDate;
+                      return dateKey === row.date;
+                    }).length}건
+                  </td>
                   <td style={{ padding: '20px 24px', color: '#ef4444', fontWeight: 800 }}>{(row.bounceRate || 0).toFixed(1)}%</td>
-                  <td style={{ padding: '20px 24px', fontWeight: 700 }}>{Math.round(row.avgSessionDuration || 0)}s</td>
+                  <td style={{ padding: '20px 24px', fontWeight: 700 }}>{formatDuration(row.avgSessionDuration || 0)}</td>
                 </tr>
               );
             })
