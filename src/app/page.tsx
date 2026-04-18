@@ -13,11 +13,17 @@ import {
 import DaumPostcodeEmbed from 'react-daum-postcode';
 
 const STATUS_DATA = [
-  { bizName: "픽셀*넷", repName: "김*수", industry: "도·소매업", tag: "진행중" },
-  { bizName: "비티*컴퍼니", repName: "이*정", industry: "제조업", tag: "진행 완료" },
-  { bizName: "한성*테크", repName: "박*호", industry: "서비스업", tag: "진행 완료" },
-  { bizName: "그린*푸드", repName: "최*아", industry: "요식업", tag: "진행 완료" },
-  { bizName: "스타*물류", repName: "강*하", industry: "도·소매업", tag: "진행중" },
+  { bizName: "유진*텍", repName: "이*진", industry: "제조업", tag: "진행 완료" },
+  { bizName: "지이*코리아", repName: "강*호", industry: "기타", tag: "진행 완료" },
+  { bizName: "대흥*류", repName: "김*수", industry: "도·소매업", tag: "진행중" },
+  { bizName: "영진*밀", repName: "박*호", industry: "제조업", tag: "진행 완료" },
+  { bizName: "바른*푸드", repName: "윤*아", industry: "요식업", tag: "진행중" },
+  { bizName: "씨앤*루션", repName: "정*우", industry: "서비스업", tag: "진행 완료" },
+  { bizName: "한결*자인", repName: "서*하", industry: "기타", tag: "진행중" },
+  { bizName: "미래*노베이션", repName: "임*준", industry: "제조업", tag: "진행 완료" },
+  { bizName: "명성*린", repName: "오*승", industry: "기타", tag: "진행 완료" },
+  { bizName: "태양*라", repName: "송*철", industry: "기타", tag: "진행 완료" },
+  { bizName: "글로*정밀", repName: "전*민", industry: "제조업", tag: "진행 완료" },
 ];
 
 const REGIONS = [
@@ -246,6 +252,9 @@ export default function Home() {
       <section className="hero-image-style">
         <div className="container" style={{ maxWidth: 1200 }}>
           <div className="hero-inner-content reveal">
+            <div className="hero-hook-badge">
+              <FiCheckCircle className="icon" /> 성과가 없으면 비용도 받지 않습니다!
+            </div>
             <h1 className="hero-main-title">
               정책자금, <span className="hero-point">제대로</span> 알고<br className="mo-only" /> <span className="hero-point">제대로</span> 받으세요.
             </h1>
@@ -520,18 +529,37 @@ export default function Home() {
             </div>
             <div className="form-group">
               <label className="form-label">지역(주소) *</label>
-              <div className="form-row" style={{ marginBottom: 8 }}>
-                <input
-                  className="form-input"
-                  type="text"
-                  value={address}
-                  placeholder="주소 찾기를 클릭하세요"
-                  readOnly
-                  onClick={() => setShowPostcode(true)}
-                  required
-                />
-                <button type="button" className="btn-search" onClick={() => setShowPostcode(true)}>주소 찾기</button>
+              
+              {/* PC Version: Postcode Search */}
+              <div className="pc-only">
+                <div className="form-row" style={{ marginBottom: 8 }}>
+                  <input
+                    className="form-input"
+                    type="text"
+                    value={address}
+                    placeholder="주소 찾기를 클릭하세요"
+                    readOnly
+                    onClick={() => setShowPostcode(true)}
+                    required
+                  />
+                  <button type="button" className="btn-search" onClick={() => setShowPostcode(true)}>주소 찾기</button>
+                </div>
               </div>
+
+              {/* Mobile Version: Simple Dropdown */}
+              <div className="mo-only" style={{ marginBottom: 8 }}>
+                <select 
+                  className="form-input" 
+                  value={address} 
+                  onChange={(e) => setAddress(e.target.value)}
+                  style={{ width: '100%', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23666\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 15px center', backgroundSize: '18px' }}
+                  required
+                >
+                  <option value="">지역 선택</option>
+                  {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+
               <input
                 className="form-input"
                 type="text"
