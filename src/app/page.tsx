@@ -276,6 +276,16 @@ export default function Home() {
                 <FiCheck className="icon" /> 비대면 상담 가능
               </div>
             </div>
+
+            <div className="hero-btn-wrap">
+              <button className="header-cta-btn" onClick={scrollToForm}>
+                빠른 견적 문의
+              </button>
+              <div className="hero-tel-wrap">
+                <span className="pc-only">고객센터 1833-6362</span>
+                <a href="tel:18336362" className="mo-only">고객센터 1833-6362</a>
+              </div>
+            </div>
           </div>
 
           {/* Scroll Indicator */}
@@ -627,7 +637,7 @@ export default function Home() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
             <p>상호명: 주식회사 비티씨 | 사업자번호: 452-81-03847</p>
-            <p>대표전화: 010-4148-0242</p>
+            <p>대표전화: 1555-0756</p>
             <p>경기도 부천시 원미구 옥산로7, 상가 a동 116호</p>
           </div>
           <p style={{ marginTop: 20, opacity: 0.6, fontSize: "0.75rem" }}>© 2026 주식회사 비티씨. All rights reserved.</p>

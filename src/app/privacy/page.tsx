@@ -245,7 +245,7 @@ export default function PrivacyPage() {
                     </tr>
                     <tr>
                       <td style={{ padding: "8px 0", fontWeight: 700, color: "var(--text-dark)" }}>대표전화</td>
-                      <td style={{ padding: "8px 0" }}>010-4148-0242</td>
+                      <td style={{ padding: "8px 0" }}>1555-0756</td>
                     </tr>
                     <tr>
                       <td style={{ padding: "8px 0", fontWeight: 700, color: "var(--text-dark)" }}>주소</td>

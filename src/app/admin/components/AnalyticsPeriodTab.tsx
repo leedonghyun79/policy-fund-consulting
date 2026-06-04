@@ -44,11 +44,13 @@ export default function AnalyticsPeriodTab({
 
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
-  const totalPages = Math.ceil(filteredVisitorData.length / ITEMS_PER_PAGE) || 1;
-  const paginatedData = filteredVisitorData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  // 최신 데이터가 1페이지에 오도록 역순 정렬
+  const reversedData = [...filteredVisitorData].reverse();
+  const totalPages = Math.ceil(reversedData.length / ITEMS_PER_PAGE) || 1;
+  const paginatedData = reversedData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const exportToExcel = () => {
-    const data = filteredVisitorData.map(row => {
+    const data = reversedData.map(row => {
       const convCount = leads.filter((l: any) => {
         const kstDate = toKSTDate(l.createdAt);
         const dateKey = row.date?.length === 7 ? kstDate.substring(0, 7) : kstDate;

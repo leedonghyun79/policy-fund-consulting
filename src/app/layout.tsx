@@ -55,41 +55,76 @@ export default function RootLayout({
           rel="stylesheet"
         />
         {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
-      </head>
-      <body>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify([
-              {
-                "@context": "https://schema.org",
-                "@type": "WebSite",
-                "name": "비티씨",
-                "alternateName": ["비티씨 정책자금"],
-                "url": "https://btccompany.co.kr",
-              },
-              {
-                "@context": "https://schema.org",
-                "@type": "ConsultingService",
-                "name": "비티씨",
-                "description": "중소기업 및 소상공인을 위한 정부 정책자금 정밀 진단 및 컨설팅 서비스",
-                "url": "https://btccompany.co.kr",
-                "address": {
-                  "@type": "PostalAddress",
-                  "addressLocality": "부천시",
-                  "addressRegion": "경기도",
-                  "addressCountry": "KR"
-                },
-                "areaServed": "KR",
-                "provider": {
-                  "@type": "Organization",
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "WebSite",
+                  "@id": "https://btccompany.co.kr/#website",
                   "name": "비티씨",
-                  "url": "https://btccompany.co.kr"
+                  "alternateName": ["비티씨 정책자금", "BTC Company"],
+                  "url": "https://btccompany.co.kr",
+                  "description": "소상공인·중소기업을 위한 정부 정책자금 컨설팅 전문 기업",
+                  "inLanguage": "ko-KR",
+                  "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": {
+                      "@type": "EntryPoint",
+                      "urlTemplate": "https://btccompany.co.kr/?s={search_term_string}"
+                    },
+                    "query-input": "required name=search_term_string"
+                  }
+                },
+                {
+                  "@type": ["FinancialService", "LocalBusiness"],
+                  "@id": "https://btccompany.co.kr/#organization",
+                  "name": "비티씨",
+                  "alternateName": "BTC Company",
+                  "description": "소상공인 저금리 대출, 사업자 대출, 중소기업 정부 정책자금 정밀 진단 및 맞춤 컨설팅 서비스를 제공합니다.",
+                  "url": "https://btccompany.co.kr",
+                  "telephone": "1555-0756",
+                  "priceRange": "무료 상담",
+                  "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "부천시",
+                    "addressRegion": "경기도",
+                    "addressCountry": "KR"
+                  },
+                  "geo": {
+                    "@type": "GeoCoordinates",
+                    "latitude": "37.5034",
+                    "longitude": "126.7660"
+                  },
+                  "openingHoursSpecification": [
+                    {
+                      "@type": "OpeningHoursSpecification",
+                      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                      "opens": "09:00",
+                      "closes": "18:00"
+                    }
+                  ],
+                  "areaServed": {
+                    "@type": "Country",
+                    "name": "KR"
+                  },
+                  "serviceType": ["정책자금 컨설팅", "소상공인 대출 상담", "사업자 대출", "중소기업 지원금"],
+                  "sameAs": [
+                    "https://btccompany.co.kr"
+                  ],
+                  "parentOrganization": {
+                    "@type": "Organization",
+                    "@id": "https://btccompany.co.kr/#organization"
+                  }
                 }
-              }
-            ]),
+              ]
+            }),
           }}
         />
+      </head>
+      <body>
         <Providers>
           {children}
           <FloatingBlogButton />
