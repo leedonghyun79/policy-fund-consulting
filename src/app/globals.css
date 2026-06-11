@@ -255,12 +255,10 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(
-    90deg, 
-    rgba(255, 255, 255, 0.15) 0%, 
-    rgba(255, 255, 255, 0.3) 50%, 
-    rgba(255, 255, 255, 0.15) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0.15) 100%);
   background-size: 200% auto;
   border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 10px 24px;
@@ -272,20 +270,33 @@ body {
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   word-break: keep-all;
-  animation: 
+  animation:
     shimmer 3s linear infinite,
     pulse-subtle 2s ease-in-out infinite;
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
 }
 
 @keyframes pulse-subtle {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .hero-hook-badge .icon {
@@ -390,9 +401,12 @@ body {
 }
 
 .hero-tel-wrap {
+  padding: 12px 28px;
+  border-radius: var(--radius-full);
   color: #fff;
   font-size: 1.15rem;
   font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .hero-tel-wrap a {
@@ -417,13 +431,13 @@ body {
     width: 100%;
     padding: 0 20px;
   }
-  
-  .hero-btn-wrap > button,
+
+  .hero-btn-wrap>button,
   .hero-tel-wrap {
     width: 100%;
     max-width: 400px;
   }
-  
+
   .hero-tel-wrap a {
     text-align: center;
   }
@@ -883,6 +897,7 @@ body {
 .mo-only {
   display: none !important;
 }
+
 .pc-only {
   display: block;
 }
@@ -891,9 +906,11 @@ body {
   .mo-only {
     display: block !important;
   }
+
   br.mo-only {
     display: inline !important;
   }
+
   .pc-only {
     display: none !important;
   }
@@ -907,6 +924,7 @@ body {
     gap: 6px;
     white-space: nowrap;
   }
+
   .hero-hook-badge .icon {
     font-size: 1rem;
   }
@@ -1345,9 +1363,8 @@ input[type="number"] {
 
 /* Scroll Indicator */
 .scroll-indicator {
-  position: absolute;
-  bottom: 60px;
-  /* Slightly higher from bottom */
+  position: relative;
+  bottom: -50px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -1372,16 +1389,16 @@ input[type="number"] {
 }
 
 .mouse {
-  width: 24px;
-  height: 40px;
+  width: 20px;
+  height: 38px;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 20px;
   position: relative;
 }
 
 .wheel {
-  width: 3px;
-  height: 8px;
+  width: 1px;
+  height: 7px;
   background: #fff;
   border-radius: 2px;
   position: absolute;
@@ -1756,4 +1773,4 @@ input[type="number"] {
     width: 80px;
     height: 80px;
   }
-}
+}
