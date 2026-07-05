@@ -1,12 +1,9 @@
 [build]
-  command = "prisma generate && next build"
+  command = "npm run build"
   publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-# 예시: 리다이렉트 규칙 (필요에 따라 수정하세요)
-# [[redirects]]
-#   from = "/*"
-#   to = "/index.html"
-#   status = 200

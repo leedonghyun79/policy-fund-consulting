@@ -401,11 +401,15 @@ body {
 }
 
 .hero-tel-wrap {
-  padding: 12px 28px;
-  border-radius: var(--radius-full);
   color: #fff;
   font-size: 1.15rem;
   font-weight: 800;
+}
+
+.hero-tel-wrap span.pc-only {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: var(--radius-full);
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
@@ -417,6 +421,7 @@ body {
   border-radius: var(--radius-full);
   display: block;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .hero-tel-wrap a:hover {
@@ -432,7 +437,11 @@ body {
     padding: 0 20px;
   }
 
-  .hero-btn-wrap>button,
+  .hero-btn-wrap>button {
+    width: 100%;
+    max-width: 400px;
+  }
+
   .hero-tel-wrap {
     width: 100%;
     max-width: 400px;
@@ -440,6 +449,8 @@ body {
 
   .hero-tel-wrap a {
     text-align: center;
+    font-size: 1rem;
+    padding: 10px 20px;
   }
 }
 
