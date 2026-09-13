@@ -282,8 +282,8 @@ export default function Home() {
                 빠른 견적 문의
               </button>
               <div className="hero-tel-wrap">
-                <span className="pc-only">고객센터 1833-6362</span>
-                <a href="tel:18336362" className="mo-only">고객센터 1833-6362</a>
+                <span className="pc-only">고객센터 1555-0756</span>
+                <a href="tel:15550756" className="mo-only">고객센터 1555-0756</a>
               </div>
             </div>
           </div>
