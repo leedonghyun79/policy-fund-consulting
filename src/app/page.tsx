@@ -660,10 +660,6 @@ export default function Home() {
             <p>대표전화: 1555-0756</p>
             <p>경기도 부천시 원미구 옥산로7, 상가 a동 116호</p>
           </div>
-          <div style={{ marginTop: 24, padding: "16px 20px", background: "rgba(0,0,0,0.05)", borderRadius: "8px", fontSize: "0.75rem", lineHeight: 1.7, color: "#64748b", textAlign: "left" }}>
-            ⚠️ 비티씨는 정부기관이 아니며, 중소벤처기업부·창업진흥원 등과 무관한 민간 컨설팅 전문 업체입니다.
-            정책자금 승인 여부는 보증 또는 확정되지 않으며, 기업 상황에 따라 달라질 수 있습니다. 컨설팅은 승인을 보장하지 않습니다.
-          </div>
           <p style={{ marginTop: 16, opacity: 0.6, fontSize: "0.75rem" }}>© 2026 주식회사 비티씨. All rights reserved.</p>
         </div>
       </footer>
