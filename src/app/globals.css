@@ -145,7 +145,7 @@ body {
 }
 
 .highlight-red {
-  color: #f08c00;
+  color: #C2410C;
   font-weight: 700;
 }
 
@@ -193,7 +193,7 @@ body {
 }
 
 .header-cta-btn {
-  background: #f08c00;
+  background: #C2410C;
   color: #fff;
   border: none;
   padding: 12px 28px;
@@ -721,7 +721,7 @@ body {
 
 /* Buttons */
 .btn-vibrant {
-  background: linear-gradient(-45deg, #f08c00, #ffa633, #f08c00, #d97e00);
+  background: linear-gradient(-45deg, #C2410C, #ea580c, #C2410C, #9a3412);
   background-size: 300% 300%;
   animation: moveGradient 4s ease infinite;
   color: #fff;
