@@ -2,28 +2,32 @@
 
 import { CSSProperties, FormEvent, useEffect, useRef, useState, useMemo } from "react";
 import {
-  FiShield,
   FiCheck,
   FiCheckCircle,
   FiAlertCircle,
   FiDollarSign,
   FiBarChart2,
   FiTruck,
+  FiZap,
+  FiRefreshCw,
+  FiLayers,
+  FiAward,
 } from "react-icons/fi";
 import DaumPostcodeEmbed from 'react-daum-postcode';
 
 const STATUS_DATA = [
-  { bizName: "유진*텍", repName: "이*진", industry: "제조업", tag: "진행 완료" },
-  { bizName: "지이*코리아", repName: "강*호", industry: "기타", tag: "진행 완료" },
+  { bizName: "유진*텍", repName: "이*진", industry: "제조업", tag: "승인 완료" },
+  { bizName: "지이*코리아", repName: "강*호", industry: "기타", tag: "승인 완료" },
   { bizName: "대흥*류", repName: "김*수", industry: "도·소매업", tag: "진행중" },
-  { bizName: "영진*밀", repName: "박*호", industry: "제조업", tag: "진행 완료" },
+  { bizName: "영진*밀", repName: "박*호", industry: "제조업", tag: "승인 완료" },
   { bizName: "바른*푸드", repName: "윤*아", industry: "요식업", tag: "진행중" },
-  { bizName: "씨앤*루션", repName: "정*우", industry: "서비스업", tag: "진행 완료" },
+  { bizName: "씨앤*루션", repName: "정*우", industry: "서비스업", tag: "승인 완료" },
   { bizName: "한결*자인", repName: "서*하", industry: "기타", tag: "진행중" },
-  { bizName: "미래*노베이션", repName: "임*준", industry: "제조업", tag: "진행 완료" },
-  { bizName: "명성*린", repName: "오*승", industry: "기타", tag: "진행 완료" },
-  { bizName: "태양*라", repName: "송*철", industry: "기타", tag: "진행 완료" },
-  { bizName: "글로*정밀", repName: "전*민", industry: "제조업", tag: "진행 완료" },
+  { bizName: "미래*노베이션", repName: "임*준", industry: "제조업", tag: "승인 완료" },
+  { bizName: "명성*린", repName: "오*승", industry: "기타", tag: "승인 완료" },
+  { bizName: "태양*라", repName: "송*철", industry: "기타", tag: "승인 완료" },
+  { bizName: "글로*정밀", repName: "전*민", industry: "제조업", tag: "승인 완료" },
+  { bizName: "삼우*스", repName: "조*현", industry: "도·소매업", tag: "진행중" },
 ];
 
 const REGIONS = [
@@ -41,45 +45,56 @@ const INDUSTRY_TO_CODE: Record<string, string> = {
 };
 
 const CountUp = ({ end, decimals = 0, suffix = "" }: { end: number, decimals?: number, suffix?: string }) => {
+  // SSR에서는 end값 그대로 렌더링 → SEO 크롤러가 실제 수치를 읽음
   const [count, setCount] = useState(end);
+  const [started, setStarted] = useState(false);
   const elementRef = useRef<HTMLSpanElement>(null);
 
+  // 클라이언트 마운트 후 0으로 리셋 (SSR 이후 실행되므로 hydration 안전)
   useEffect(() => {
+    setCount(0);
+  }, []);
+
+  // 인터섹션 감지 → 카운트업 시작
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setStarted(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (elementRef.current) observer.observe(elementRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // started가 되면 0 → end 애니메이션
+  useEffect(() => {
+    if (!started) return;
+
     let startTime: number | null = null;
-    const duration = 800; // Snappier 0.8 seconds animation
+    const duration = 1800;
 
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-
-      // Easing function: easeOutExpo
+      // easeOutExpo: 빠르게 올라가다 끝에서 부드럽게 감속
       const easing = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-
       setCount(easing * end);
-
-      if (progress < 1) {
-        window.requestAnimationFrame(animate);
-      }
+      if (progress < 1) window.requestAnimationFrame(animate);
     };
 
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        window.requestAnimationFrame(animate);
-        observer.disconnect();
-      }
-    }, { threshold: 0.1 });
-
-    if (elementRef.current) observer.observe(elementRef.current);
-
-    return () => observer.disconnect();
-  }, [end]);
+    window.requestAnimationFrame(animate);
+  }, [started, end]);
 
   return (
     <span ref={elementRef}>
       <span className="brand-stat-number">
         {count.toLocaleString(undefined, {
           minimumFractionDigits: decimals,
-          maximumFractionDigits: decimals
+          maximumFractionDigits: decimals,
         })}
       </span>
       <span className="brand-stat-unit">{suffix}</span>
@@ -96,12 +111,12 @@ export default function Home() {
   const [address, setAddress] = useState("");
   const [extraAddress, setExtraAddress] = useState("");
   const [showPostcode, setShowPostcode] = useState(false);
-  const [activeTargetIndex, setActiveTargetIndex] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [realLeads, setRealLeads] = useState<any[]>([]);
   const [rollingIndex, setRollingIndex] = useState(0);
   const [isRollingTransition, setIsRollingTransition] = useState(true);
   const formRef = useRef<HTMLDivElement>(null);
+  const topRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchRecentLeads = async () => {
@@ -121,10 +136,30 @@ export default function Home() {
   }, []);
 
   const mergedLeads = useMemo(() => {
-    // Combine real leads with dummy data, keep total around a healthy number for the loop
     const combined = [...realLeads, ...STATUS_DATA];
-    return combined.slice(0, 15); // Show top 15 (max 10 real + default dummy)
+    return combined.slice(0, 15);
   }, [realLeads]);
+
+  // 1행씩 2초마다 위로 롤링
+  useEffect(() => {
+    if (mergedLeads.length === 0) return;
+    const interval = setInterval(() => {
+      setRollingIndex((prev) => prev + 1);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [mergedLeads.length]);
+
+  // 마지막 행 이후 처음으로 순환
+  useEffect(() => {
+    if (rollingIndex > mergedLeads.length && mergedLeads.length > 0) {
+      const timeout = setTimeout(() => {
+        setIsRollingTransition(false);
+        setRollingIndex(0);
+        setTimeout(() => setIsRollingTransition(true), 50);
+      }, 650);
+      return () => clearTimeout(timeout);
+    }
+  }, [rollingIndex, mergedLeads.length]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -134,38 +169,25 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveTargetIndex((prev) => (prev >= 4 ? 1 : prev + 1));
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Rolling Status logic
-  useEffect(() => {
-    if (mergedLeads.length === 0) return;
-    const interval = setInterval(() => {
-      setRollingIndex((prev) => {
-        if (prev >= mergedLeads.length) {
-          // Snap back will happen in another effect
-          return prev + 1;
-        }
-        return prev + 1;
-      });
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [mergedLeads.length]);
-
-  useEffect(() => {
-    if (rollingIndex > mergedLeads.length) {
-      const timeout = setTimeout(() => {
-        setIsRollingTransition(false);
-        setRollingIndex(0);
-        setTimeout(() => setIsRollingTransition(true), 50);
-      }, 650); // Match CSS transition
-      return () => clearTimeout(timeout);
+  const scrollToTop = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
     }
-  }, [rollingIndex, mergedLeads.length]);
+    if (typeof window !== "undefined" && window.location.hash) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+    if (topRef.current) {
+      topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    if (document.documentElement) {
+      document.documentElement.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+    if (document.body) {
+      document.body.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  };
 
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -228,10 +250,11 @@ export default function Home() {
   };
 
   return (
-    <main className="page-wrapper">
+    <main className="page-wrapper" style={{ position: "relative" }}>
+      <div ref={topRef} id="page-top" style={{ position: "absolute", top: 0, left: 0, width: "1px", height: "1px", pointerEvents: "none" }} />
       {/* Header */}
       <header className="header">
-        <div className="logo">
+        <div className="logo" onClick={scrollToTop}>
           <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="32" height="32" rx="8" fill="#1E40AF" />
             <path d="M9 7H16.5C18.9853 7 21 9.01472 21 11.5C21 13.9853 18.9853 16 16.5 16H9V7Z" fill="white" />
@@ -248,7 +271,7 @@ export default function Home() {
         </button>
       </header>
 
-      {/* Hero Section (Reference Image Style) */}
+      {/* Hero Section */}
       <section className="hero-image-style">
         <div className="container" style={{ maxWidth: 1200 }}>
           <div className="hero-inner-content reveal">
@@ -262,24 +285,14 @@ export default function Home() {
               중소기업·소상공인을 위한 정부 정책자금<br />
               복잡한 절차는 줄이고, 승인 가능성은 높이세요.
             </p>
-
-
-
             <div className="hero-checkpoints">
-              <div className="checkpoint-item">
-                <FiCheck className="icon" /> 맞춤 자금 진단
-              </div>
-              <div className="checkpoint-item">
-                <FiCheck className="icon" /> 서류 준비 컨설팅
-              </div>
-              <div className="checkpoint-item">
-                <FiCheck className="icon" /> 비대면 상담 가능
-              </div>
+              <div className="checkpoint-item"><FiCheck className="icon" /> 맞춤 자금 진단</div>
+              <div className="checkpoint-item"><FiCheck className="icon" /> 서류 준비 컨설팅</div>
+              <div className="checkpoint-item"><FiCheck className="icon" /> 비대면 상담 가능</div>
             </div>
-
             <div className="hero-btn-wrap">
               <button className="header-cta-btn" onClick={scrollToForm}>
-                빠른 견적 문의
+                무료 상담 신청
               </button>
               <div className="hero-tel-wrap">
                 <span className="pc-only">고객센터 1555-0756</span>
@@ -287,25 +300,66 @@ export default function Home() {
               </div>
             </div>
           </div>
-
-          {/* Scroll Indicator */}
           <div className={`scroll-indicator ${scrolled ? "hidden" : ""}`}>
-            <div className="mouse">
-              <div className="wheel"></div>
-            </div>
+            <div className="mouse"><div className="wheel"></div></div>
             <span>SCROLL</span>
           </div>
-
         </div>
       </section>
 
-      {/* Section 1-1: Brand Stats (Separated from Hero) */}
+      {/* Section 1: 고민 카드 (히어로 바로 다음 → 공감 포인트 먼저) */}
+      <section className="bg-forest text-center reveal">
+        <div className="deco-wrap">
+          <div className="deco-shape deco-1"></div>
+          <div className="deco-shape deco-2"></div>
+        </div>
+        <div className="container">
+          <h2 className="section-title white" style={{ marginBottom: 30 }}>
+            <span style={{ color: '#93c5fd' }}>어떤 고민으로</span><br /> 여기까지 오셨나요?
+          </h2>
+          <div className="forest-desc">
+            대표님의 고민, 맞춤 컨설팅으로 해결해드리겠습니다.<br />
+            더 이상 혼자 고민하지 마세요.
+          </div>
+          <div className="card-grid-2">
+            <div className="card-item">
+              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}><FiAlertCircle /></div>
+              <h4>긴급 운영자금</h4>
+              <p>갑작스러운 유동성 확보가<br />시급한 소상공인</p>
+            </div>
+            <div className="card-item">
+              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}><FiDollarSign /></div>
+              <h4>고금리 대환 필요</h4>
+              <p>연 7% 이상의 높은 이자를<br />감당하고 계신 기업</p>
+            </div>
+            <div className="card-item">
+              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}><FiBarChart2 /></div>
+              <h4>한도 부족 해결</h4>
+              <p>이미 은행 대출을 가득 받아<br />대안이 필요할 때</p>
+            </div>
+            <div className="card-item">
+              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}><FiTruck /></div>
+              <h4>시설 투자 계획</h4>
+              <p>공장 및 기계 설비 도입을<br />준비 중인 기업</p>
+            </div>
+          </div>
+
+          {/* 중간 CTA #1 */}
+          <div style={{ marginTop: 48, textAlign: 'center' }}>
+            <button className="btn-mid-cta" onClick={scrollToForm}>
+              지금 바로 무료 상담 신청 →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 1-1: Brand Stats */}
       <section className="section-padding reveal" style={{ background: '#fff' }}>
         <div className="container text-center">
           <p className="brand-stats-headcopy">
-            <span style={{ color: '#363636' }}>매년 수조 원의 정책자금,</span><br />
-            <span className="font-ria text-blue">비티씨는 그 기회를</span><br />
-            <span style={{ color: '#363636' }}>현실로 만들어 왔습니다.</span>
+            <span style={{ color: '#363636' }}>수백 곳의 기업을 도왔습니다.</span><br />
+            <span className="font-ria text-blue">비티씨의 실적이</span><br />
+            <span style={{ color: '#363636' }}>그 증거입니다.</span>
           </p>
           <div className="brand-stats-grid">
             <div className="brand-stat-item">
@@ -327,11 +381,10 @@ export default function Home() {
               <span>누적 상담</span>
             </div>
           </div>
-
         </div>
       </section>
 
-      {/* Section 2: Trust & Pain Point Focus (Text Only) */}
+      {/* Section 2: Trust & Pain Point */}
       <section className="section-padding bg-light text-center reveal">
         <div className="container">
           <h2 className="section-title">
@@ -344,108 +397,106 @@ export default function Home() {
             비티씨는 수많은 거절 사례를 분석하여,<br />
             승인 가능성을 극대화하는 맞춤형 전략을 설계합니다.
           </div>
-
-          <div style={{ marginTop: 80, paddingTop: 60 }}>
-            <h3 className="section-title definition-title">
-              <FiShield /> 정책자금, 제대로 알고 계신가요?
-            </h3>
-            <div className="definition-box" style={{ marginTop: 20 }}>
-              <h4>정책자금이란?</h4>
-              <p>
-                정부가 중소기업·소상공인을 위해 지원하는 저금리 자금입니다.
-              </p>
-              <ul className="definition-list">
-                <li>시중 금융권 대비 낮은 금리</li>
-                <li>유연한 상환 조건</li>
-                <li>업종·규모·사업 단계별 맞춤 신청 가능</li>
-              </ul>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* Section 2-1: Policy Fund Types */}
-      <section className="section-padding bg-image-section reveal">
-        <div className="container text-center">
-          <h2 className="section-title">정책자금 종류 안내</h2>
+      <section className="section-padding fund-types-section reveal">
+        <div className="container">
+          <h2 className="section-title" style={{ textAlign: 'left', marginBottom: 40 }}>
+            업종도, 규모도<br />다 다릅니다
+          </h2>
+          <div className="fund-list">
+            <div className="fund-list-item">
+              <span className="fund-num">01</span>
+              <div className="fund-info">
+                <div className="fund-meta"><span className="fund-tag">초기창업 · 스타트업</span></div>
+                <h3 className="fund-name">창업 지원 자금</h3>
+                <p className="fund-desc">사업 초기 정착을 위한 사업화 자금 및 초기 운전자금. 예비창업자·3년 미만 기업 신청 가능.</p>
+              </div>
+            </div>
+            <div className="fund-list-item">
+              <span className="fund-num">02</span>
+              <div className="fund-info">
+                <div className="fund-meta"><span className="fund-tag">경영안정 · 유동성 확보</span></div>
+                <h3 className="fund-name">운전자금</h3>
+                <p className="fund-desc">원자재 구매, 인건비, 임대료 등 기업 운영 전반에 필요한 운영자금 저금리 지원.</p>
+              </div>
+            </div>
+            <div className="fund-list-item">
+              <span className="fund-num">03</span>
+              <div className="fund-info">
+                <div className="fund-meta"><span className="fund-tag">사업확장 · 설비 도입</span></div>
+                <h3 className="fund-name">시설자금</h3>
+                <p className="fund-desc">공장 신축·매입, 생산 설비·기계 도입, 사업장 확장에 필요한 장기 저금리 자금.</p>
+              </div>
+            </div>
+            <div className="fund-list-item">
+              <span className="fund-num">04</span>
+              <div className="fund-info">
+                <div className="fund-meta"><span className="fund-tag">R&D · 특허 · 벤처기업</span></div>
+                <h3 className="fund-name">기술·혁신 자금</h3>
+                <p className="fund-desc">특허 보유, 기업부설연구소, 벤처·이노비즈 인증 기업 대상 우대 금리 및 한도 확대 지원.</p>
+              </div>
+            </div>
+          </div>
+          <p className="fund-types-desc" style={{ marginTop: 32, textAlign: 'left' }}>
+            사업 단계·목적별로 다른 정책자금,<br />
+            비티씨가 최적 프로그램을 찾아드립니다.
+          </p>
 
-          <div className="card-grid-2">
-            <div className="card-item card-startup">
-              <div className="card-overlay"></div>
-              <div className="card-content">
-                <h4>창업 지원 자금</h4>
-                <p>초기 창업기업을 위한 자금<br />(사업화 자금, 시설자금, 운전자금)</p>
-              </div>
-            </div>
-            <div className="card-item card-operating">
-              <div className="card-overlay"></div>
-              <div className="card-content">
-                <h4>운전자금</h4>
-                <p>재료비, 인건비, 임대료 등<br />운영자금 지원</p>
-              </div>
-            </div>
-            <div className="card-item card-facility">
-              <div className="card-overlay"></div>
-              <div className="card-content">
-                <h4>시설자금</h4>
-                <p>공장 설립, 기계 설비 도입,<br />사업장 확장</p>
-              </div>
-            </div>
-            <div className="card-item card-tech">
-              <div className="card-overlay"></div>
-              <div className="card-content">
-                <h4>기술·혁신 자금</h4>
-                <p>R&D 기업, 특허 보유 기업<br />대상 지원</p>
-              </div>
-            </div>
+          {/* 중간 CTA #2 */}
+          <div style={{ marginTop: 40, textAlign: 'center' }}>
+            <button className="btn-mid-cta" onClick={scrollToForm}>
+              어떤 자금이 맞는지 무료로 확인하기 →
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Section 3: Targeted (Forest Green) */}
-      <section className="bg-forest text-center reveal">
-        <div className="deco-wrap">
-          <div className="deco-shape deco-1"></div>
-          <div className="deco-shape deco-2"></div>
-        </div>
-        <div className="container">
-          <h2 className="section-title white" style={{ marginBottom: 30 }}>
-            <span style={{ color: '#93c5fd' }}>어떤 고민으로</span><br /> 여기까지 오셨나요?
-          </h2>
-
-          <div className="forest-desc">
-            대표님의 고민, 맞춤 컨설팅으로 해결해드리겠습니다.<br />
-            더 이상 혼자 고민하지 마세요.
+      {/* Section 3: 진행 절차 */}
+      <section className="section-padding process-section reveal">
+        <div className="container text-center">
+          <h2 className="section-title" style={{ marginBottom: 12 }}>지원금 신청, 이렇게 진행돼요</h2>
+          <p className="section-subtitle" style={{ marginBottom: 52 }}>상담부터 승인까지, 비티씨가 전 과정을 함께합니다.</p>
+          <div className="process-steps">
+            <div className="process-step">
+              <div className="process-num">1</div>
+              <div className="process-label">무료상담</div>
+              <p className="process-desc">사업 현황 파악 및<br />지원 가능성 검토</p>
+            </div>
+            <div className="process-arrow">→</div>
+            <div className="process-step">
+              <div className="process-num">2</div>
+              <div className="process-label">사업진단</div>
+              <p className="process-desc">사업계획 분석 및<br />자금 계획 수립</p>
+            </div>
+            <div className="process-arrow">→</div>
+            <div className="process-step">
+              <div className="process-num">3</div>
+              <div className="process-label">서류준비</div>
+              <p className="process-desc">필요서류 안내 및<br />작성 지원</p>
+            </div>
+            <div className="process-arrow">→</div>
+            <div className="process-step">
+              <div className="process-num">4</div>
+              <div className="process-label">신청검수</div>
+              <p className="process-desc">최종 점검 및<br />신청 준비 완료</p>
+            </div>
+            <div className="process-arrow">→</div>
+            <div className="process-step">
+              <div className="process-num">5</div>
+              <div className="process-label">승인·완료</div>
+              <p className="process-desc">자금 지원 개시 및<br />사후관리</p>
+            </div>
           </div>
 
-          <div className="card-grid-2">
-            <div className={`card-item ${activeTargetIndex === 1 ? "active-loop" : ""}`}>
-              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}>
-                <FiAlertCircle />
-              </div>
-              <h4>긴급 운영자금</h4>
-              <p>갑작스러운 유동성 확보가<br />시급한 소상공인</p>
-            </div>
-            <div className={`card-item ${activeTargetIndex === 2 ? "active-loop" : ""}`}>
-              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}>
-                <FiDollarSign />
-              </div>
-              <h4>고금리 대환 필요</h4>
-              <p>연 7% 이상의 높은 이자를<br />감당하고 계신 기업</p>
-            </div>
-            <div className={`card-item ${activeTargetIndex === 3 ? "active-loop" : ""}`}>
-              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}>
-                <FiBarChart2 />
-              </div>
-              <h4>한도 부족 해결</h4>
-              <p>이미 은행 대출을 가득 받아<br />대안이 필요할 때</p>
-            </div>
-            <div className={`card-item ${activeTargetIndex === 4 ? "active-loop" : ""}`}>
-              <div className="card-icon" style={{ marginBottom: 15, fontSize: '2rem' }}>
-                <FiTruck />
-              </div>
-              <h4>시설 투자 계획</h4>
-              <p>공장 및 기계 설비 도입을<br />준비 중인 기업</p>
+          {/* 수수료 설명 */}
+          <div className="fee-notice">
+            <FiCheckCircle className="fee-icon" />
+            <div>
+              <strong>성과 없으면 비용도 없습니다.</strong> 승인이 완료된 경우에만 수수료가 발생하며,
+              승인액의 일정 비율로 책정됩니다. 상담 시 안내드립니다.
             </div>
           </div>
         </div>
@@ -454,7 +505,7 @@ export default function Home() {
       {/* Section 4: Live Status */}
       <section className="rolling-section text-center reveal">
         <div className="container">
-          <h3 className="section-title">최근 상담 사례</h3>
+          <h3 className="section-title">실시간 상담 현황</h3>
           <div className="table-wrapper text-center">
             <div className="tr-head">
               <div>사업자</div>
@@ -465,9 +516,7 @@ export default function Home() {
             <div className="rolling-viewport">
               <div
                 className={`rolling-list ${!isRollingTransition ? 'no-transition' : ''}`}
-                style={{
-                  transform: `translateY(-${rollingIndex * 55}px)`,
-                }}
+                style={{ transform: `translateY(-${rollingIndex * 55}px)` }}
               >
                 {[...mergedLeads, ...mergedLeads.slice(0, 4)].map((row, i) => (
                   <div className="tr-row" key={i}>
@@ -491,8 +540,8 @@ export default function Home() {
       <section className="form-box reveal" ref={formRef} id="consult">
         <div className="container text-center">
           <h2 className="section-title">
-            <span style={{ color: "var(--blue-primary)" }}>성과가 없으면</span><br />
-            비용도 받지 않습니다!
+            <span style={{ color: "var(--blue-primary)" }}>우리 기업에 맞는 자금,</span><br />
+            무료로 확인해보세요
           </h2>
           <p className="section-subtitle" style={{ marginBottom: 40 }}>먼저 편하게 말씀해 주세요.<br className="mo-only" /> 방향은 저희가 잡아드리겠습니다.</p>
 
@@ -538,46 +587,17 @@ export default function Home() {
               </div>
             </div>
             <div className="form-group">
-              <label className="form-label">지역(주소) *</label>
-              
-              {/* PC Version: Postcode Search */}
-              <div className="pc-only">
-                <div className="form-row" style={{ marginBottom: 8 }}>
-                  <input
-                    className="form-input"
-                    type="text"
-                    value={address}
-                    placeholder="주소 찾기를 클릭하세요"
-                    readOnly
-                    onClick={() => setShowPostcode(true)}
-                    required
-                  />
-                  <button type="button" className="btn-search" onClick={() => setShowPostcode(true)}>주소 찾기</button>
-                </div>
-              </div>
-
-              {/* Mobile Version: Simple Dropdown */}
-              <div className="mo-only" style={{ marginBottom: 8 }}>
-                <select 
-                  className="form-input" 
-                  value={address} 
-                  onChange={(e) => setAddress(e.target.value)}
-                  style={{ width: '100%', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23666\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 15px center', backgroundSize: '18px' }}
-                  required
-                >
-                  <option value="">지역 선택</option>
-                  {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-
-              <input
+              <label className="form-label">지역(시/도) *</label>
+              <select
                 className="form-input"
-                type="text"
-                value={extraAddress}
-                onChange={(e) => setExtraAddress(e.target.value)}
-                placeholder="상세 주소를 입력해주세요"
-                autoComplete="off"
-              />
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                style={{ width: '100%', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23666\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 15px center', backgroundSize: '18px' }}
+                required
+              >
+                <option value="">시/도 선택</option>
+                {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
             </div>
 
             <div className="form-group">
@@ -611,7 +631,7 @@ export default function Home() {
               </label>
             </div>
 
-            <div style={{ marginTop: 40 }} className="text-center">
+            <div style={{ marginTop: 16 }} className="text-center">
               <button type="submit" className="btn-vibrant" disabled={submitting}>
                 {submitting ? "접수 완료 중..." : "무료 상담 신청하기"}
               </button>
@@ -640,7 +660,11 @@ export default function Home() {
             <p>대표전화: 1555-0756</p>
             <p>경기도 부천시 원미구 옥산로7, 상가 a동 116호</p>
           </div>
-          <p style={{ marginTop: 20, opacity: 0.6, fontSize: "0.75rem" }}>© 2026 주식회사 비티씨. All rights reserved.</p>
+          <div style={{ marginTop: 24, padding: "16px 20px", background: "rgba(0,0,0,0.05)", borderRadius: "8px", fontSize: "0.75rem", lineHeight: 1.7, color: "#64748b", textAlign: "left" }}>
+            ⚠️ 비티씨는 정부기관이 아니며, 중소벤처기업부·창업진흥원 등과 무관한 민간 컨설팅 전문 업체입니다.
+            정책자금 승인 여부는 보증 또는 확정되지 않으며, 기업 상황에 따라 달라질 수 있습니다. 컨설팅은 승인을 보장하지 않습니다.
+          </div>
+          <p style={{ marginTop: 16, opacity: 0.6, fontSize: "0.75rem" }}>© 2026 주식회사 비티씨. All rights reserved.</p>
         </div>
       </footer>
 
@@ -691,6 +715,10 @@ export default function Home() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, borderBottom: "1px solid #eee", paddingBottom: 15 }}>
               <h2 style={{ fontSize: "1.25rem", fontWeight: 800 }}>이용약관 및 개인정보처리방침</h2>
               <button onClick={() => setShowTermsModal(false)} style={{ background: "none", border: "none", fontSize: "1.5rem", cursor: "pointer", color: "#666" }}>&times;</button>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, padding: "10px 16px", marginBottom: 20, fontSize: "0.85rem", color: "#166534", fontWeight: 600 }}>
+              <span>🔒</span> 100% 무료 맞춤 상담 · 수집된 정보는 상담 목적으로만 사용되며 안전하게 보호됩니다.
             </div>
 
             <div style={{ fontSize: "0.9rem", color: "#475569", lineHeight: 1.8 }}>
