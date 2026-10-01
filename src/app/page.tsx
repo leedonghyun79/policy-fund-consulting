@@ -378,7 +378,7 @@ export default function Home() {
               <b>
                 <CountUp end={1.5} decimals={1} suffix="만건" />
               </b>
-              <span>누적 상담</span>
+              <span>누적 상담건수</span>
             </div>
           </div>
         </div>
