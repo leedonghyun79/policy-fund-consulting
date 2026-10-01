@@ -729,6 +729,10 @@ body {
   background: #fff;
 }
 
+.section-padding.process-section {
+  padding-bottom: 0;
+}
+
 .process-steps {
   display: flex;
   align-items: flex-start;
@@ -1440,7 +1444,7 @@ body {
 
 /* Rolling Status */
 .rolling-section {
-  padding: 50px 0 100px;
+  padding: 100px 0;
 }
 
 .table-wrapper {

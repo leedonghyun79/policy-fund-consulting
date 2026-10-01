@@ -490,15 +490,6 @@ export default function Home() {
               <p className="process-desc">자금 지원 개시 및<br />사후관리</p>
             </div>
           </div>
-
-          {/* 수수료 설명 */}
-          <div className="fee-notice">
-            <FiCheckCircle className="fee-icon" />
-            <div>
-              <strong>성과 없으면 비용도 없습니다.</strong> 승인이 완료된 경우에만 수수료가 발생하며,
-              승인액의 일정 비율로 책정됩니다. 상담 시 안내드립니다.
-            </div>
-          </div>
         </div>
       </section>
 
@@ -631,7 +622,7 @@ export default function Home() {
               </label>
             </div>
 
-            <div style={{ marginTop: 16 }} className="text-center">
+            <div style={{ marginTop: 32 }} className="text-center">
               <button type="submit" className="btn-vibrant" disabled={submitting}>
                 {submitting ? "접수 완료 중..." : "무료 상담 신청하기"}
               </button>
