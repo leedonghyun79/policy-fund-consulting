@@ -440,9 +440,9 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <p className="fund-types-desc" style={{ marginTop: 32, textAlign: 'left' }}>
-            사업 단계·목적별로 다른 정책자금,<br />
-            비티씨가 최적 프로그램을 찾아드립니다.
+          <p className="fund-types-desc" style={{ marginTop: 32, textAlign: 'left', maxWidth: 'none', wordBreak: 'keep-all' }}>
+            어떤 자금이 맞는지 고민되시나요?<br />
+            업종·규모·사업 단계에 맞는 정책자금을 비티씨가 찾아드립니다.
           </p>
 
           {/* 중간 CTA #2 */}
@@ -457,7 +457,7 @@ export default function Home() {
       {/* Section 3: 진행 절차 */}
       <section className="section-padding process-section reveal">
         <div className="container text-center">
-          <h2 className="section-title" style={{ marginBottom: 12 }}>지원금 신청, 이렇게 진행돼요</h2>
+          <h2 className="section-title" style={{ marginBottom: 12 }}>지원금 신청,<br className="mo-only" /> 이렇게 진행돼요</h2>
           <p className="section-subtitle" style={{ marginBottom: 52 }}>상담부터 승인까지, 비티씨가 전 과정을 함께합니다.</p>
           <div className="process-steps">
             <div className="process-step">
@@ -647,7 +647,7 @@ export default function Home() {
             <p style={{ fontWeight: 800, color: "var(--text-dark)", marginBottom: 0, fontSize: "1rem" }}>주식회사 비티씨</p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <p>상호명: 주식회사 비티씨 | 사업자번호: 452-81-03847</p>
+            <p>상호명: 주식회사 비티씨<span className="footer-sep"> | </span><br className="mo-only" />사업자번호: 452-81-03847</p>
             <p>대표전화: 1555-0756</p>
             <p>경기도 부천시 원미구 옥산로7, 상가 a동 116호</p>
           </div>

@@ -818,18 +818,59 @@ body {
 
 @media (max-width: 768px) {
   .process-steps {
-    gap: 16px;
+    gap: 0;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+    max-width: 360px;
+    margin: 0 auto;
+    text-align: left;
   }
   .process-arrow {
-    transform: rotate(90deg);
-    margin-top: 0;
-    padding-top: 0;
+    display: none;
   }
   .process-step {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    grid-template-areas: "num label" ". desc";
+    grid-template-rows: 44px auto;
+    column-gap: 16px;
+    row-gap: 4px;
+    align-items: start;
     max-width: 100%;
     width: 100%;
+    position: relative;
+    padding-bottom: 28px;
+  }
+  .process-step:last-child {
+    padding-bottom: 0;
+  }
+  .process-step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 21px;
+    top: 44px;
+    bottom: 0;
+    width: 2px;
+    background: #dbeafe;
+  }
+  .process-num {
+    grid-area: num;
+    width: 44px;
+    height: 44px;
+    font-size: 1.15rem;
+    margin-bottom: 0;
+  }
+  .process-label {
+    grid-area: label;
+    font-size: 1.05rem;
+    margin-bottom: 0;
+    align-self: center;
+  }
+  .process-desc {
+    grid-area: desc;
+    text-align: left;
+    font-size: 0.9rem;
+    line-height: 1.5;
   }
   .fee-notice {
     padding: 16px;
@@ -2111,6 +2152,12 @@ input[type="number"] {
   }
 
   /* mo-only inside mobile media query */
+}
+
+@media (max-width: 800px) {
+  .footer-sep {
+    display: none;
+  }
 }
 
 /* Admin Sidebar Hover */
