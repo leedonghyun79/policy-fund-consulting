@@ -10,6 +10,19 @@ const industryLabels: Record<string, string> = {
   OTHER: "기타",
 };
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function sanitizeSubject(str: string): string {
+  return str.replace(/[\r\n]+/g, " ").trim();
+}
+
 export async function sendConsultationEmail(data: {
   businessName: string;
   representativeName: string;
@@ -26,7 +39,9 @@ export async function sendConsultationEmail(data: {
     return;
   }
 
-  const subject = `[신규 상담 접수] ${data.businessName} (${data.representativeName}님)`;
+  const safeBizName = sanitizeSubject(data.businessName);
+  const safeRepName = sanitizeSubject(data.representativeName);
+  const subject = `[신규 상담 접수] ${safeBizName} (${safeRepName}님)`;
 
   const html = `
     <div style="font-family: 'Malgun Gothic', sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; background-color: #ffffff;">
@@ -42,11 +57,11 @@ export async function sendConsultationEmail(data: {
           <table style="width: 100%; border-collapse: collapse;">
             <tr style="border-bottom: 1px solid #e2e8f0;">
               <td style="padding: 12px 0; color: #64748b; font-size: 13px; font-weight: 700; width: 110px;">사업자명</td>
-              <td style="padding: 12px 0; color: #0f172a; font-size: 14px; font-weight: 900;">${data.businessName}</td>
+              <td style="padding: 12px 0; color: #0f172a; font-size: 14px; font-weight: 900;">${escapeHtml(data.businessName)}</td>
             </tr>
             <tr>
               <td style="padding: 12px 0; color: #64748b; font-size: 13px; font-weight: 700;">대표자명</td>
-              <td style="padding: 12px 0; color: #0f172a; font-size: 14px; font-weight: 900;">${data.representativeName}</td>
+              <td style="padding: 12px 0; color: #0f172a; font-size: 14px; font-weight: 900;">${escapeHtml(data.representativeName)}</td>
             </tr>
           </table>
         </div>

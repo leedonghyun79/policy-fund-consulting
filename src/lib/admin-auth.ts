@@ -14,7 +14,14 @@ function base64UrlDecode(input: string): string {
 }
 
 function getSessionSecret(): string {
-  return process.env.ADMIN_SESSION_SECRET || "dev-only-change-me";
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("ADMIN_SESSION_SECRET environment variable is missing.");
+    }
+    return "dev-only-change-me";
+  }
+  return secret;
 }
 
 export function createAdminSessionToken(username: string): string {
@@ -37,7 +44,15 @@ export function verifyAdminSessionToken(token: string): { username: string } | n
     .update(payloadEncoded)
     .digest("base64url");
 
-  if (signature !== expectedSig) return null;
+  const signatureBuffer = Buffer.from(signature);
+  const expectedSigBuffer = Buffer.from(expectedSig);
+
+  if (
+    signatureBuffer.length !== expectedSigBuffer.length ||
+    !crypto.timingSafeEqual(signatureBuffer, expectedSigBuffer)
+  ) {
+    return null;
+  }
 
   try {
     const payload = JSON.parse(base64UrlDecode(payloadEncoded)) as {

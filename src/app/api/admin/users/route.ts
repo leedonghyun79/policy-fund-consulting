@@ -44,7 +44,25 @@ export async function POST(req: NextRequest) {
     const name = (body.name ?? "").trim();
     const username = (body.username ?? "").trim().toLowerCase();
     const password = body.password ?? "";
-    const role = (body.role ?? "MANAGER").trim();
+    let role = (body.role ?? "MANAGER").trim().toUpperCase();
+
+    // Verify current user has admin creation rights
+    const currentUser = await prisma.adminUser.findUnique({
+      where: { username: session.username },
+      select: { role: true },
+    });
+    if (!currentUser || (currentUser.role !== "SUPER" && currentUser.role !== "MANAGER")) {
+      return NextResponse.json({ message: "관리자 등록 권한이 없습니다." }, { status: 403 });
+    }
+
+    if (role !== "MANAGER" && role !== "SUPER") {
+      role = "MANAGER";
+    }
+
+    // Only SUPER can create another SUPER account
+    if (role === "SUPER" && currentUser.role !== "SUPER") {
+      return NextResponse.json({ message: "SUPER 권한을 부여할 수 있는 권한이 없습니다." }, { status: 403 });
+    }
 
     if (name.length < 2) {
       return NextResponse.json({ message: "Name must be at least 2 characters." }, { status: 400 });

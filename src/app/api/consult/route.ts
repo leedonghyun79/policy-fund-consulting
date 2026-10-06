@@ -37,58 +37,90 @@ function isValidIndustry(value?: string): value is IndustryType {
   return Object.values(IndustryType).includes(value as IndustryType);
 }
 
+// In-memory rate limiting for consultation form submissions (max 5 per 10 minutes per IP)
+const consultRateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function checkConsultRateLimit(ip: string, limit = 5, windowMs = 10 * 60 * 1000): boolean {
+  if (!ip || ip === "unknown") return true;
+  const now = Date.now();
+  const entry = consultRateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetTime) {
+    consultRateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+    return true;
+  }
+
+  if (entry.count >= limit) {
+    return false;
+  }
+
+  entry.count += 1;
+  return true;
+}
+
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = extractClientIp(req) || "unknown";
+
+    if (!checkConsultRateLimit(clientIp)) {
+      return NextResponse.json(
+        { message: "단시간 내에 너무 많은 상담 요청이 접수되었습니다. 잠시 후 다시 시도해 주세요." },
+        { status: 429 }
+      );
+    }
+
     const body = (await req.json()) as ConsultPayload;
 
-    if (!body.businessName?.trim()) {
-      return NextResponse.json({ message: "Business name is required." }, { status: 400 });
+    const businessName = body.businessName?.trim();
+    const representativeName = body.representativeName?.trim();
+    const addressRoad = body.addressRoad?.trim();
+
+    if (!businessName || businessName.length > 100) {
+      return NextResponse.json({ message: "상호명을 올바르게 입력해주세요 (최대 100자)." }, { status: 400 });
     }
-    if (!body.representativeName?.trim()) {
-      return NextResponse.json({ message: "Representative name is required." }, { status: 400 });
+    if (!representativeName || representativeName.length > 50) {
+      return NextResponse.json({ message: "대표자명을 올바르게 입력해주세요 (최대 50자)." }, { status: 400 });
     }
     if (!isValidPhonePart(body.phoneMiddle) || !isValidPhonePart(body.phoneLast)) {
-      return NextResponse.json({ message: "Phone number format is invalid." }, { status: 400 });
+      return NextResponse.json({ message: "연락처 형식이 올바르지 않습니다." }, { status: 400 });
     }
-    if (!body.addressRoad?.trim()) {
-      return NextResponse.json({ message: "Address is required." }, { status: 400 });
+    if (!addressRoad || addressRoad.length > 200) {
+      return NextResponse.json({ message: "주소를 올바르게 입력해주세요 (최대 200자)." }, { status: 400 });
     }
     if (!isValidIndustry(body.industry)) {
-      return NextResponse.json({ message: "Industry value is invalid." }, { status: 400 });
+      return NextResponse.json({ message: "업종을 선택해주세요." }, { status: 400 });
     }
     if (!body.agreed) {
-      return NextResponse.json({ message: "Consent is required." }, { status: 400 });
+      return NextResponse.json({ message: "개인정보 수집 및 이용에 동의해주세요." }, { status: 400 });
     }
 
     const phoneRaw = `010-${body.phoneMiddle}-${body.phoneLast}`;
-    const userAgent = req.headers.get("user-agent");
+    const userAgent = req.headers.get("user-agent")?.slice(0, 500) || null;
+    const addressDetail = body.addressDetail?.trim().slice(0, 200) || null;
+    const desiredAmountText = body.desiredAmountText?.trim().slice(0, 100) || null;
 
-    console.log("Creating lead with payload:", {
-      businessName: body.businessName?.trim(),
-      representativeName: body.representativeName?.trim(),
-      phoneRaw,
-    });
+    console.log("Processing consultation lead submission from IP:", clientIp.slice(0, 15));
 
     const lead = await (prisma.consultationLead as any).create({
       data: {
-        businessName: body.businessName!.trim(),
-        representativeName: body.representativeName!.trim(),
+        businessName,
+        representativeName,
         phoneMiddle: body.phoneMiddle!,
         phoneLast: body.phoneLast!,
         phoneRaw,
-        addressRoad: body.addressRoad!.trim(),
-        addressDetail: body.addressDetail?.trim() || null,
+        addressRoad,
+        addressDetail,
         industry: body.industry!,
-        desiredAmountText: body.desiredAmountText?.trim() || null,
+        desiredAmountText,
         consentAgreedAt: new Date(),
         consentVersion: body.consentVersion?.trim() || "v1",
-        referrer: body.referrer || null,
-        utmSource: body.utmSource || null,
-        utmMedium: body.utmMedium || null,
-        utmCampaign: body.utmCampaign || null,
-        utmTerm: body.utmTerm || null,
-        utmContent: body.utmContent || null,
-        ipAddress: extractClientIp(req),
+        referrer: body.referrer?.slice(0, 500) || null,
+        utmSource: body.utmSource?.slice(0, 100) || null,
+        utmMedium: body.utmMedium?.slice(0, 100) || null,
+        utmCampaign: body.utmCampaign?.slice(0, 100) || null,
+        utmTerm: body.utmTerm?.slice(0, 100) || null,
+        utmContent: body.utmContent?.slice(0, 100) || null,
+        ipAddress: clientIp !== "unknown" ? clientIp : null,
         userAgent,
         events: {
           create: { type: "CREATED", memo: "Landing form submission" },

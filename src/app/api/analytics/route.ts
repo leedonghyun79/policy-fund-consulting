@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
+import { getAdminSessionFromCookies } from '@/src/lib/admin-auth';
 
 const propertyId = process.env.GA_PROPERTY_ID;
 const privateKey = process.env.GA_PRIVATE_KEY?.replace(/\\n/g, '\n');
@@ -12,6 +13,11 @@ const analyticsDataClient = new BetaAnalyticsDataClient({
 });
 
 export async function GET(request: Request) {
+  const session = await getAdminSessionFromCookies();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'overview';
