@@ -138,8 +138,18 @@ export default function AdminDashboard({ initialLeads, currentUser }: { initialL
   });
 
   const allVisitorData = gaOverview && gaOverview.visitorData ? gaOverview.visitorData : [];
-  // 차트/KPI 요약용: 최근 30일
-  const activeVisitorData = allVisitorData.slice(-30);
+  // 차트/KPI 요약용: 오늘(KST) 기준 과거 30일 (방문 없는 날은 0으로 채움, 오래된 날짜 → 최신 날짜 순)
+  const activeVisitorData = useMemo(() => {
+    const byDate = new Map(allVisitorData.map((d: any) => [d.date, d]));
+    const dateFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' });
+    const now = Date.now();
+    const days = [];
+    for (let i = 29; i >= 0; i--) {
+      const key = dateFormatter.format(new Date(now - i * 86400000));
+      days.push(byDate.get(key) ?? { date: key, views: 0, visitors: 0, bounceRate: 0, avgSessionDuration: 0 });
+    }
+    return days;
+  }, [allVisitorData]);
   const activeReferrerSites = gaReferrers && gaReferrers.referrerSites ? gaReferrers.referrerSites : [];
   const activeSearchKeywords = gaKeywords && gaKeywords.keywords ? gaKeywords.keywords : [];
 

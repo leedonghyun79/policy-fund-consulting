@@ -120,7 +120,7 @@ export default function AnalyticsTab({
                 </td>
               </tr>
             ) : (
-              activeVisitorData.map((row: any, i: number) => (
+              [...activeVisitorData].reverse().map((row: any, i: number) => (
                 <tr key={i} style={{ borderBottom: `1px solid ${THEME.border}` }}>
                   <td style={{ padding: '20px 24px', fontWeight: 800, color: THEME.primary }}>{row.date?.length === 5 ? `2026-${row.date}` : row.date}</td>
                   <td style={{ padding: '20px 24px', fontWeight: 700 }}>{(row.views || 0).toLocaleString()}</td>
