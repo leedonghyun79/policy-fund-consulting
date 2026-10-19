@@ -143,7 +143,7 @@ export default function AdminDashboard({ initialLeads, currentUser }: { initialL
     const byDate = new Map(allVisitorData.map((d: any) => [d.date, d]));
     const dateFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' });
     const now = Date.now();
-    const days = [];
+    const days: any[] = [];
     for (let i = 29; i >= 0; i--) {
       const key = dateFormatter.format(new Date(now - i * 86400000));
       days.push(byDate.get(key) ?? { date: key, views: 0, visitors: 0, bounceRate: 0, avgSessionDuration: 0 });
@@ -153,8 +153,8 @@ export default function AdminDashboard({ initialLeads, currentUser }: { initialL
   const activeReferrerSites = gaReferrers && gaReferrers.referrerSites ? gaReferrers.referrerSites : [];
   const activeSearchKeywords = gaKeywords && gaKeywords.keywords ? gaKeywords.keywords : [];
 
-  const todayData = activeVisitorData[activeVisitorData.length - 1] || { visitors: 0, bounceRate: 0, avgSessionDuration: 0 };
-  const yesterdayData = activeVisitorData[activeVisitorData.length - 2];
+  const todayData: any = activeVisitorData[activeVisitorData.length - 1] || { visitors: 0, bounceRate: 0, avgSessionDuration: 0 };
+  const yesterdayData: any = activeVisitorData[activeVisitorData.length - 2];
 
   // 성장률 계산 함수: 데이터가 없거나 둘 다 0이면 0.0 반환
   const calculateGrowth = (current: number, previous: number | undefined) => {
