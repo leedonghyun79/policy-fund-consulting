@@ -3,7 +3,10 @@ import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import { getAdminSessionFromCookies } from '@/src/lib/admin-auth';
 
 const propertyId = process.env.GA_PROPERTY_ID;
-const privateKey = process.env.GA_PRIVATE_KEY?.replace(/\\n/g, '\n');
+const privateKey = process.env.GA_PRIVATE_KEY
+  ?.trim()
+  .replace(/^["']|["']$/g, '')
+  .replace(/\\n/g, '\n');
 
 const analyticsDataClient = new BetaAnalyticsDataClient({
   credentials: {
